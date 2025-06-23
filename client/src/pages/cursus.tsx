@@ -327,6 +327,17 @@ export default function Cursus() {
                   </CardHeader>
                   
                   <CardContent>
+                    {/* Capa do Curso */}
+                    {course.image_url && (
+                      <div className="mb-4">
+                        <img 
+                          src={course.image_url} 
+                          alt={course.title}
+                          className="w-full h-32 object-cover rounded-lg border border-gray-600"
+                        />
+                      </div>
+                    )}
+                    
                     <p className="text-gray-300 text-sm mb-4 line-clamp-3" style={{ fontFamily: 'EB Garamond' }}>
                       {course.description}
                     </p>
