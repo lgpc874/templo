@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { PageTransition } from "@/components/page-transition";
 import ContentProtection from "@/components/content-protection";
@@ -175,6 +175,28 @@ export default function CursusNew() {
     acc[section.required_role] = courses.filter(course => course.required_role === section.required_role);
     return acc;
   }, {} as Record<string, Course[]>);
+
+  // Debug log - only show in development
+  if (import.meta.env.DEV) {
+    console.log('Courses data:', courses);
+    console.log('Course sections:', courseSections);
+    console.log('Courses by role:', coursesByRole);
+    console.log('User role:', user?.role);
+  }
+
+  // Encontrar seção ativa - começar com o role do usuário
+  useEffect(() => {
+    if (user?.role && courseSections.length > 0) {
+      // Verificar se existe seção para o role do usuário
+      const userSection = courseSections.find(s => s.required_role === user.role);
+      if (userSection) {
+        setActiveSection(user.role);
+      } else {
+        // Se não encontrar, usar buscador como padrão
+        setActiveSection('buscador');
+      }
+    }
+  }, [user?.role, courseSections]);
 
   // Encontrar seção ativa
   const currentSection = courseSections.find(s => s.required_role === activeSection) || courseSections[0];
@@ -381,14 +403,19 @@ export default function CursusNew() {
               </div>
 
               <div className="grid gap-6">
-                {coursesByRole[currentSection.required_role]?.length ? (
+                {coursesByRole[currentSection?.required_role]?.length ? (
                   coursesByRole[currentSection.required_role].map(course => renderCourseCard(course, currentSection.required_role))
                 ) : (
                   <Card className="bg-card-dark border-golden-amber/30">
                     <CardContent className="p-8 text-center">
                       <p className="text-ritualistic-beige/50">
-                        Nenhum curso disponível para este nível
+                        {coursesLoading ? "Carregando cursos..." : "Nenhum curso disponível para este nível"}
                       </p>
+                      {import.meta.env.DEV && (
+                        <p className="text-xs text-ritualistic-beige/30 mt-2">
+                          Debug: Role atual: {user?.role}, Seção ativa: {currentSection?.required_role}
+                        </p>
+                      )}
                     </CardContent>
                   </Card>
                 )}

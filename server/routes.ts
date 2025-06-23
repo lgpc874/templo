@@ -2264,8 +2264,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('Role atual do usuário:', user.role);
       
-      // Buscar cursos do Supabase baseado no role do usuário
-      const courses = await supabaseServiceNew.getCoursesByRole(user.role);
+      // Buscar todos os cursos (admin pode ver todos)
+      const courses = user.email === 'admin@templodoabismo.com.br' 
+        ? await supabaseServiceNew.getCourses()
+        : await supabaseServiceNew.getCoursesByRole(user.role);
       console.log(`Cursos encontrados para role ${user.role}:`, courses.length);
       
       res.json(courses);
@@ -2636,6 +2638,153 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(updatedProgress);
     } catch (error: any) {
       console.error("Error completing module:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Admin endpoint para criar cursos
+  app.post("/api/admin/courses", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { data: course, error } = await supabaseServiceNew.getClient()
+        .from('courses')
+        .insert(req.body)
+        .select()
+        .single();
+
+      if (error) throw error;
+      res.json(course);
+    } catch (error: any) {
+      console.error("Error creating course:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Admin endpoint para criar módulos
+  app.post("/api/admin/modules", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { data: module, error } = await supabaseServiceNew.getClient()
+        .from('modules')
+        .insert(req.body)
+        .select()
+        .single();
+
+      if (error) throw error;
+      res.json(module);
+    } catch (error: any) {
+      console.error("Error creating module:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Endpoint para criar módulos para cursos existentes
+  app.post("/api/admin/create-course-modules", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      // Buscar todos os cursos existentes
+      const { data: courses } = await supabaseServiceNew.getClient()
+        .from('courses')
+        .select('*')
+        .order('id');
+
+      const createdModules = [];
+
+      for (const course of courses || []) {
+        // Verificar se já tem módulos
+        const { data: existingModules } = await supabaseServiceNew.getClient()
+          .from('modules')
+          .select('id')
+          .eq('course_id', course.id);
+
+        if (!existingModules || existingModules.length === 0) {
+          // Criar módulos baseados no curso
+          const moduleTemplates = [
+            {
+              title: "Introdução e Fundamentos",
+              order: 1,
+              html_content: `
+                <h2>Bem-vindo ao ${course.title}</h2>
+                <p>${course.description}</p>
+                
+                <h3>Objetivos deste módulo:</h3>
+                <ul>
+                  <li>Compreender os fundamentos teóricos</li>
+                  <li>Estabelecer bases sólidas para a prática</li>
+                  <li>Preparar-se mental e espiritualmente</li>
+                </ul>
+                
+                <h3>Instruções:</h3>
+                <p>Leia atentamente todo o conteúdo e reflita sobre os conceitos apresentados. Este módulo estabelece as bases para todo o curso.</p>
+                
+                <p class="mt-4 p-4 bg-amber-900/20 border border-amber-500/30 rounded">
+                  <strong>Importante:</strong> Complete este módulo antes de prosseguir para o próximo.
+                </p>
+              `,
+              requires_submission: false,
+              ritual_mandatory: false
+            },
+            {
+              title: "Prática e Aplicação",
+              order: 2,
+              html_content: `
+                <h2>Colocando em Prática</h2>
+                <p>Agora que você compreende os fundamentos, é hora de aplicar o conhecimento adquirido.</p>
+                
+                <h3>Exercícios práticos:</h3>
+                <ol>
+                  <li>Reflexão diária de 10 minutos sobre os conceitos estudados</li>
+                  <li>Aplicação dos princípios em situações cotidianas</li>
+                  <li>Manutenção de um diário de experiências</li>
+                </ol>
+                
+                <h3>Avaliação:</h3>
+                <p>Ao final deste módulo, você deverá ser capaz de aplicar os conceitos aprendidos de forma prática e consciente.</p>
+                
+                <div class="mt-6 p-4 bg-green-900/20 border border-green-500/30 rounded">
+                  <strong>Parabéns!</strong> Ao completar este módulo, você terá concluído o curso com sucesso.
+                </div>
+              `,
+              requires_submission: false,
+              ritual_mandatory: false
+            }
+          ];
+
+          for (const moduleTemplate of moduleTemplates) {
+            const moduleData = {
+              course_id: course.id,
+              ...moduleTemplate
+            };
+
+            const { data: module, error } = await supabaseServiceNew.getClient()
+              .from('modules')
+              .insert(moduleData)
+              .select()
+              .single();
+
+            if (!error) {
+              createdModules.push(module);
+            }
+          }
+        }
+      }
+
+      res.json({ 
+        message: "Módulos criados com sucesso",
+        modules: createdModules,
+        count: createdModules.length
+      });
+    } catch (error: any) {
+      console.error("Error creating course modules:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
