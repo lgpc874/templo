@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,8 @@ import {
   Save,
   FileText,
   ArrowLeft,
-  Settings
+  Settings,
+  RefreshCw
 } from "lucide-react";
 
 interface Course {
@@ -48,14 +49,15 @@ interface CourseSection {
   sort_order: number;
 }
 
-export default function AdminCoursesWorking() {
+export default function AdminCoursesFinal() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   
   const [courses, setCourses] = useState<Course[]>([]);
   const [courseSections, setCourseSections] = useState<CourseSection[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
   const [courseForm, setCourseForm] = useState({
@@ -91,36 +93,45 @@ export default function AdminCoursesWorking() {
   }
 
   // Carregar dados
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem('auth_token');
-        
-        // Buscar cursos
-        const coursesResponse = await fetch('/api/admin/courses', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (coursesResponse.ok) {
-          const coursesData = await coursesResponse.json();
-          setCourses(coursesData);
-        }
-
-        // Buscar seções
-        const sectionsResponse = await fetch('/api/course-sections');
-        if (sectionsResponse.ok) {
-          const sectionsData = await sectionsResponse.json();
-          setCourseSections(sectionsData);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar dados:', error);
-      } finally {
-        setLoading(false);
+  const loadData = async () => {
+    if (loading) return;
+    
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('auth_token');
+      
+      // Buscar cursos
+      const coursesResponse = await fetch('/api/admin/courses', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (coursesResponse.ok) {
+        const coursesData = await coursesResponse.json();
+        setCourses(coursesData);
       }
-    };
 
+      // Buscar seções
+      const sectionsResponse = await fetch('/api/course-sections');
+      if (sectionsResponse.ok) {
+        const sectionsData = await sectionsResponse.json();
+        setCourseSections(sectionsData);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error);
+      toast({
+        title: "Erro ao carregar dados",
+        description: "Não foi possível carregar os cursos",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+      setInitialized(true);
+    }
+  };
+
+  // Inicializar dados automaticamente
+  if (!initialized && !loading) {
     loadData();
-  }, []);
+  }
 
   const handleCreateCourse = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,6 +261,15 @@ export default function AdminCoursesWorking() {
                 Voltar ao Painel
               </Button>
               <Button
+                onClick={loadData}
+                variant="outline"
+                className="text-amber-400 border-amber-600 hover:bg-amber-600/10"
+                disabled={loading}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Atualizar
+              </Button>
+              <Button
                 onClick={() => setLocation('/admin-modules')}
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >
@@ -328,7 +348,7 @@ export default function AdminCoursesWorking() {
                         id="price"
                         type="number"
                         value={courseForm.price}
-                        onChange={(e) => setCourseForm({...courseForm, price: parseFloat(e.target.value)})}
+                        onChange={(e) => setCourseForm({...courseForm, price: parseFloat(e.target.value) || 0})}
                         className="bg-black/30 border-gray-600"
                       />
                     </div>
@@ -364,6 +384,11 @@ export default function AdminCoursesWorking() {
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto"></div>
                     <p className="mt-2 text-gray-400">Carregando cursus...</p>
+                  </div>
+                ) : courses.length === 0 ? (
+                  <div className="text-center py-8">
+                    <BookOpen className="w-12 h-12 mx-auto text-gray-500 mb-4" />
+                    <p className="text-gray-400">Nenhum curso criado ainda</p>
                   </div>
                 ) : (
                   <div className="space-y-4 max-h-96 overflow-y-auto">
