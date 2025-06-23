@@ -860,6 +860,52 @@ O conteúdo deve ser um grimório completo e substancial em HTML formatado.`;
   // ======================
   // DIAGNÓSTICO
   // ======================
+  async checkAndCreateCourseTables(): Promise<{ status: string; details: any }> {
+    try {
+      console.log('=== VERIFICANDO ESTRUTURA DE TABELAS DE CURSOS ===');
+      
+      const tablesToCheck = [
+        'courses',
+        'course_modules', 
+        'course_progress',
+        'course_challenges',
+        'course_certificates'
+      ];
+      
+      const results = {};
+      
+      for (const tableName of tablesToCheck) {
+        try {
+          const { data, error } = await this.supabase
+            .from(tableName)
+            .select('*')
+            .limit(1);
+            
+          if (error) {
+            if (error.message.includes('does not exist')) {
+              results[tableName] = 'NOT_EXISTS';
+              console.log(`❌ Tabela ${tableName} NÃO EXISTE`);
+            } else {
+              results[tableName] = `ERROR: ${error.message}`;
+              console.log(`⚠️  Tabela ${tableName} erro: ${error.message}`);
+            }
+          } else {
+            results[tableName] = 'EXISTS';
+            console.log(`✅ Tabela ${tableName} existe`);
+          }
+        } catch (err) {
+          results[tableName] = `EXCEPTION: ${err.message}`;
+          console.log(`❌ Erro verificando ${tableName}:`, err.message);
+        }
+      }
+      
+      return { status: 'completed', details: results };
+    } catch (error) {
+      console.error('Erro ao verificar tabelas:', error);
+      return { status: 'error', details: error.message };
+    }
+  }
+
   async testConnection(): Promise<{ status: string; details: any }> {
     try {
       const { data, error } = await this.adminClient

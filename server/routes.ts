@@ -944,6 +944,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // DIAGNÓSTICO DO SISTEMA
   // ======================
   
+  app.get("/api/admin/check-course-tables", authenticateToken, async (req, res) => {
+    try {
+      const result = await supabaseServiceNew.checkAndCreateCourseTables();
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error checking course tables:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   app.get("/api/admin/supabase-status", authenticateToken, async (req, res) => {
     try {
       const connectionTest = await supabaseServiceNew.testConnection();
