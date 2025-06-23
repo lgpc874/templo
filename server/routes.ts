@@ -106,7 +106,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const data: LoginData = loginSchema.parse(req.body);
-      
       const user = await SupabaseDirect.getUserByEmail(data.email);
       if (!user) {
         return res.status(401).json({ error: "Credenciais inválidas" });
@@ -122,6 +121,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         process.env.JWT_SECRET || 'your-secret-key',
         { expiresIn: '7d' }
       );
+
+
 
       res.json({
         user: {
@@ -180,6 +181,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+
+
   // =====================
   // ROTAS DE COURSE SECTIONS
   // =====================
@@ -220,18 +223,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/courses/:id", authenticateToken, async (req: any, res) => {
+  app.get("/api/courses/:idOrSlug", authenticateToken, async (req: any, res) => {
     try {
-      const courseId = parseInt(req.params.id);
-      console.log('=== FETCHING COURSE BY ID ===');
-      console.log('Course ID:', courseId);
+      const idOrSlug = req.params.idOrSlug;
+      console.log('=== FETCHING COURSE BY ID/SLUG ===');
+      console.log('ID/Slug:', idOrSlug);
       
-      const course = await SupabaseDirect.getCourseById(courseId);
+      let course;
+      
+      // Tentar buscar por ID numérico primeiro
+      if (!isNaN(parseInt(idOrSlug))) {
+        const courseId = parseInt(idOrSlug);
+        course = await SupabaseDirect.getCourseById(courseId);
+      } else {
+        // Buscar por slug
+        course = await SupabaseDirect.getCourseBySlug(idOrSlug);
+      }
+      
       if (!course) {
         return res.status(404).json({ error: "Curso não encontrado" });
       }
 
       console.log('Course found:', course.title);
+      
+      // Verificar permissões de acesso
+      const user = await SupabaseDirect.getUserById(req.user.id);
+      if (!user) {
+        return res.status(401).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Admin tem acesso a tudo
+      if (user.email === 'admin@templodoabismo.com.br') {
+        return res.json(course);
+      }
+      
+      // Verificar se o usuário tem o role necessário
+      const hasAccess = checkRoleAccess(user.role, course.required_role);
+      
+      if (!hasAccess) {
+        return res.status(403).json({ 
+          error: "Acesso negado. Role insuficiente para este curso.",
+          userRole: user.role,
+          requiredRole: course.required_role
+        });
+      }
+
       res.json(course);
     } catch (error: any) {
       console.error("Error fetching course:", error);
@@ -239,11 +275,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/courses/:id/modules", authenticateToken, async (req: any, res) => {
+  app.get("/api/courses/:idOrSlug/modules", authenticateToken, async (req: any, res) => {
     try {
-      const courseId = parseInt(req.params.id);
+      const idOrSlug = req.params.idOrSlug;
       console.log('=== BUSCANDO MÓDULOS DO CURSO ===');
-      console.log('Course ID:', courseId);
+      console.log('ID/Slug:', idOrSlug);
+      
+      let course;
+      let courseId;
+      
+      // Tentar buscar curso por ID ou slug
+      if (!isNaN(parseInt(idOrSlug))) {
+        courseId = parseInt(idOrSlug);
+        course = await SupabaseDirect.getCourseById(courseId);
+      } else {
+        course = await SupabaseDirect.getCourseBySlug(idOrSlug);
+        courseId = course?.id;
+      }
+      
+      if (!course || !courseId) {
+        return res.status(404).json({ error: "Curso não encontrado" });
+      }
+      
+      // Verificar permissões de acesso
+      const user = await SupabaseDirect.getUserById(req.user.id);
+      if (!user) {
+        return res.status(401).json({ error: "Usuário não encontrado" });
+      }
+      
+      // Admin tem acesso a tudo
+      if (user.email !== 'admin@templodoabismo.com.br') {
+        const hasAccess = checkRoleAccess(user.role, course.required_role);
+        
+        if (!hasAccess) {
+          return res.status(403).json({ 
+            error: "Acesso negado. Role insuficiente para este curso.",
+            userRole: user.role,
+            requiredRole: course.required_role
+          });
+        }
+      }
       
       const modules = await SupabaseDirect.getCourseModules(courseId);
       console.log('Módulos encontrados:', modules.length);
@@ -368,6 +439,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
+
+  // Função para verificar hierarquia de roles
+  function checkRoleAccess(userRole: string, requiredRole: string): boolean {
+    const roleHierarchy = [
+      'buscador',
+      'iniciado', 
+      'portador_veu',
+      'discipulo_chamas',
+      'guardiao_nome',
+      'arauto_queda',
+      'portador_coroa',
+      'magus_supremo'
+    ];
+    
+    const userLevel = roleHierarchy.indexOf(userRole);
+    const requiredLevel = roleHierarchy.indexOf(requiredRole);
+    
+    return userLevel >= requiredLevel;
+  }
 
   return httpServer;
 }

@@ -236,6 +236,27 @@ export class SupabaseDirect {
     return data;
   }
 
+  static async getCourseBySlug(slug: string): Promise<Course | null> {
+    if (!supabase) return null;
+
+    const { data, error } = await supabase
+      .from('courses')
+      .select(`
+        *,
+        course_sections(
+          name,
+          color,
+          required_role
+        )
+      `)
+      .eq('slug', slug)
+      .eq('is_published', true)
+      .single();
+    
+    if (error || !data) return null;
+    return data;
+  }
+
   static async createCourse(courseData: Partial<Course>): Promise<Course | null> {
     if (!supabase) return null;
 
