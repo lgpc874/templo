@@ -56,18 +56,54 @@ export default function CursoDetalhe({ courseSlug }: CursoDetalheProps) {
   // Buscar dados do curso
   const { data: course, isLoading: courseLoading } = useQuery<Course>({
     queryKey: ['/api/courses/slug', courseSlug],
+    queryFn: async () => {
+      const token = localStorage.getItem('auth_token') || 'replit-bypass-token';
+      const response = await fetch(`/api/courses/slug/${courseSlug}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch course: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!user,
   });
 
   // Buscar módulos do curso
   const { data: modules = [], isLoading: modulesLoading } = useQuery<Module[]>({
     queryKey: ['/api/courses', course?.id, 'modules'],
+    queryFn: async () => {
+      const token = localStorage.getItem('auth_token') || 'replit-bypass-token';
+      const response = await fetch(`/api/courses/${course?.id}/modules`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch modules: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!course?.id,
   });
 
   // Buscar progresso do usuário
   const { data: userProgress } = useQuery<UserCourseProgress>({
     queryKey: ['/api/user/course-progress', course?.id],
+    queryFn: async () => {
+      const token = localStorage.getItem('auth_token') || 'replit-bypass-token';
+      const response = await fetch(`/api/user/course-progress/${course?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch progress: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!course?.id,
   });
 
