@@ -89,7 +89,7 @@ export default function OracleTarotInfernal() {
           </div>
 
           {/* Header */}
-          <div className="relative z-10 border-b border-red-500/50 bg-black/90">
+          <div className="relative z-10 border-b border-red-500/30 bg-black/40">
             <div className="max-w-4xl mx-auto px-4 py-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">

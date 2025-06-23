@@ -77,7 +77,7 @@ export default function OracleGuardiaoAbismo() {
             <div className="absolute bottom-20 right-20 w-80 h-80 bg-gray-800/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
           </div>
 
-          <div className="relative z-10 border-b border-slate-500/30 bg-gradient-to-r from-slate-900/50 to-black/80">
+          <div className="relative z-10 border-b border-slate-500/30 bg-black/40">
             <div className="max-w-4xl mx-auto px-4 py-6">
               <div className="flex items-center justify-between">
                 <Link href="/oraculum">
