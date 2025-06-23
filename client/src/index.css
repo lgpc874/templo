@@ -1,0 +1,2702 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+DW+Pica:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Cardo:ital,wght@0,400;1,400&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Proteção anti-cópia global */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  background: #000000 !important;
+}
+
+/* Desabilitar menu de contexto e drag */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  /* Background preto absoluto */
+  background: #000000 !important;
+  background-attachment: fixed;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Logo do Templo do Abismo rotativa no background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  background-image: url('/assets/logo-oficial.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transform: translate(-50%, -50%);
+  animation: rotate-seal 180s linear infinite;
+  z-index: -1;
+  pointer-events: none;
+  filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(346deg) brightness(104%) contrast(97%);
+  opacity: 0.35;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  body::before {
+    width: 250px;
+    height: 250px;
+  }
+  
+  /* Fix overflow issues */
+  html, body {
+    overflow-x: hidden;
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  /* Container adjustments */
+  .container {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    max-width: 100vw;
+    width: 100%;
+  }
+  
+  /* Fix navigation container */
+  .navigation-menu {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  /* Floating containers responsive */
+  .floating-container {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+  
+  /* Prevent text overflow */
+  .font-cinzel, .font-garamond {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Fix content sections */
+  .content-section {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    padding: 1rem;
+    max-width: calc(100vw - 1rem);
+    box-sizing: border-box;
+  }
+  
+  /* Mobile title adjustments */
+  h1 {
+    font-size: 1.5rem !important;
+    line-height: 1.2 !important;
+    text-align: center;
+    padding: 0 0.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem !important;
+    line-height: 1.3 !important;
+  }
+  
+  h3 {
+    font-size: 1.125rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Fix cards and panels */
+  .card, [class*="card"] {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    max-width: calc(100vw - 1rem);
+  }
+  
+  /* Button adjustments */
+  button {
+    min-height: 44px; /* Touch target size */
+    touch-action: manipulation;
+  }
+  
+  /* Form elements */
+  input, textarea, select {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@keyframes rotate-seal {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Permitir seleção apenas em inputs e textareas */
+input, textarea {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Proteção adicional para conteúdo de grimórios */
+.grimoire-content {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -moz-user-drag: none !important;
+  -o-user-drag: none !important;
+  user-drag: none !important;
+  pointer-events: auto;
+}
+
+/* Proteção contra captura de tela - overlay invisível */
+.screenshot-protection {
+  position: relative;
+}
+
+.screenshot-protection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  z-index: 999;
+  pointer-events: none;
+  mix-blend-mode: difference;
+}
+
+:root {
+  /* Paleta de cores luciferiana e mística */
+  --golden-amber: hsl(43, 85%, 55%); /* Dourado mais vibrante */
+  --ritualistic-beige: hsl(30, 30%, 75%); /* Bege ritualístico */
+  --blood-red: hsl(0, 80%, 45%); /* Vermelho sangue intenso */
+  --soft-amber: hsl(39, 100%, 60%); /* Âmbar suave */
+  --ancient-golden: hsl(36, 90%, 55%); /* Dourado antigo */
+  --burned-amber: hsl(25, 100%, 35%); /* Âmbar queimado */
+  --crimson-shadow: hsl(0, 60%, 20%); /* Sombra carmesim */
+  --infernal-glow: hsl(15, 90%, 40%); /* Brilho infernal sutil */
+  --dark-ruby: hsl(350, 70%, 25%); /* Rubi escuro */
+  --abyssal-dark: hsl(0, 15%, 8%); /* Preto com tom avermelhado */
+  
+  /* Base theme colors */
+  --background: hsl(0, 0%, 0%); /* Preto absoluto */
+  --foreground: hsl(40, 30%, 85%);
+  --muted: hsl(0, 0%, 10%);
+  --muted-foreground: hsl(0, 0%, 50%);
+  --popover: hsl(0, 0%, 8%);
+  --popover-foreground: hsl(40, 25%, 85%);
+  --card: hsl(0, 0%, 8%);
+  --card-foreground: hsl(40, 25%, 85%);
+  --border: hsl(32, 51%, 41%);
+  --input: hsl(0, 0%, 10%);
+  --primary: hsl(45, 100%, 50%);
+  --primary-foreground: hsl(0, 0%, 5%);
+  --secondary: hsl(0, 0%, 10%);
+  --secondary-foreground: hsl(40, 25%, 85%);
+  --accent: hsl(45, 69%, 52%);
+  --accent-foreground: hsl(0, 0%, 5%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(45, 100%, 50%);
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(40, 25%, 85%);
+  --muted: hsl(0, 0%, 10%);
+  --muted-foreground: hsl(0, 0%, 50%);
+  --popover: hsl(0, 0%, 8%);
+  --popover-foreground: hsl(40, 25%, 85%);
+  --card: hsl(0, 0%, 8%);
+  --card-foreground: hsl(40, 25%, 85%);
+  --border: hsl(32, 51%, 41%);
+  --input: hsl(0, 0%, 10%);
+  --primary: hsl(45, 100%, 50%);
+  --primary-foreground: hsl(0, 0%, 5%);
+  --secondary: hsl(0, 0%, 10%);
+  --secondary-foreground: hsl(40, 25%, 85%);
+  --accent: hsl(45, 69%, 52%);
+  --accent-foreground: hsl(0, 0%, 5%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(45, 100%, 50%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    background: url('https://i.postimg.cc/qqX1Q7zn/Textura-envelhecida-e-marcada-pelo-tempo.png') center/cover fixed;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  html {
+    overflow-x: hidden;
+  }
+  
+  /* Mobile-first responsive design */
+  * {
+    box-sizing: border-box;
+  }
+  
+  #root {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
+/* Typography Classes */
+.font-cinzel {
+  font-family: 'Cinzel Decorative', serif;
+}
+
+/* Smart Grimoire Reader Styles - Fundo Preto Rubro */
+.smart-grimoire-reader {
+  background: linear-gradient(135deg, 
+    hsl(0, 0%, 0%) 0%,           /* Preto puro */
+    hsl(0, 30%, 5%) 25%,         /* Preto com tom rubro sutil */
+    hsl(0, 40%, 8%) 50%,         /* Rubro escuro */
+    hsl(0, 25%, 3%) 75%,         /* Volta ao preto rubro */
+    hsl(0, 0%, 0%) 100%          /* Preto puro */
+  );
+  min-height: 100vh;
+}
+
+/* Conteúdo HTML no leitor inteligente - Força estilos inline */
+.grimoire-content {
+  /* Layout mínimo */
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Forçar cor vermelha para elementos com style="color: #D6342C" */
+.grimoire-content div[style*="#D6342C"],
+.grimoire-content span[style*="#D6342C"],
+.grimoire-content p[style*="#D6342C"],
+.grimoire-content h1[style*="#D6342C"],
+.grimoire-content h2[style*="#D6342C"],
+.grimoire-content li[style*="#D6342C"] {
+  color: #D6342C !important;
+}
+
+/* Forçar itálico para elementos com font-style: italic */
+.grimoire-content div[style*="italic"],
+.grimoire-content span[style*="italic"],
+.grimoire-content p[style*="italic"] {
+  font-style: italic !important;
+}
+
+/* Forçar centralização para elementos com text-align: center */
+.grimoire-content div[style*="center"],
+.grimoire-content span[style*="center"],
+.grimoire-content p[style*="center"] {
+  text-align: center !important;
+}
+
+/* Forçar fonte EB Garamond */
+.grimoire-content div[style*="EB Garamond"],
+.grimoire-content span[style*="EB Garamond"],
+.grimoire-content p[style*="EB Garamond"] {
+  font-family: 'EB Garamond', serif !important;
+}
+
+/* Forçar fonte Cinzel */
+.grimoire-content div[style*="Cinzel"],
+.grimoire-content span[style*="Cinzel"],
+.grimoire-content h1[style*="Cinzel"],
+.grimoire-content h2[style*="Cinzel"] {
+  font-family: 'Cinzel Decorative', serif !important;
+}
+
+/* Forçar tamanho 1.1rem */
+.grimoire-content div[style*="1.1rem"],
+.grimoire-content span[style*="1.1rem"],
+.grimoire-content p[style*="1.1rem"] {
+  font-size: 1.1rem !important;
+}
+
+/* Forçar margens específicas */
+.grimoire-content div[style*="3rem 0 2rem 0"],
+.grimoire-content div[style*="margin: 3rem 0 2rem 0"] {
+  margin: 3rem 0 2rem 0 !important;
+}
+
+/* Forçar peso da fonte */
+.grimoire-content span[style*="bold"],
+.grimoire-content div[style*="bold"] {
+  font-weight: bold !important;
+}
+
+/* Responsivo para mobile - EXCETO para elementos com classes grimório */
+@media (max-width: 767px) {
+  .grimoire-content h1:not(.grimorio-titulo):not(.capitulo-titulo) { font-size: 1.4rem !important; }
+  .grimoire-content h2:not(.grimorio-titulo):not(.capitulo-titulo) { font-size: 1.2rem !important; }
+  .grimoire-content h3:not(.grimorio-titulo):not(.capitulo-titulo) { font-size: 1.1rem !important; }
+  .grimoire-content h4:not(.grimorio-titulo):not(.capitulo-titulo) { font-size: 1rem !important; }
+  
+  .grimoire-content p:not(.grimorio-subtitulo):not(.grimorio-conteudo p) {
+    text-indent: 1rem !important;
+    margin: 0.8rem 0 !important;
+  }
+}
+
+/* Ajustes para desktop - tamanhos normais de website */
+@media (min-width: 768px) {
+  /* Títulos principais - tamanhos padrão */
+  h1 {
+    font-size: 2.5rem !important; /* 40px - tamanho normal */
+    line-height: 1.2 !important;
+  }
+  
+  h2 {
+    font-size: 2rem !important; /* 32px - tamanho normal */
+    line-height: 1.3 !important;
+  }
+  
+  h3 {
+    font-size: 1.5rem !important; /* 24px - tamanho normal */
+    line-height: 1.4 !important;
+  }
+  
+  /* Classes de tamanho Tailwind - valores padrão normais */
+  .text-6xl {
+    font-size: 3.75rem !important; /* 60px */
+  }
+  
+  .text-5xl {
+    font-size: 3rem !important; /* 48px */
+  }
+  
+  .text-4xl {
+    font-size: 2.25rem !important; /* 36px */
+  }
+  
+  .text-3xl {
+    font-size: 1.875rem !important; /* 30px */
+  }
+  
+  .text-2xl {
+    font-size: 1.5rem !important; /* 24px */
+  }
+  
+  .text-xl {
+    font-size: 1.25rem !important; /* 20px */
+  }
+  
+  .text-lg {
+    font-size: 1.125rem !important; /* 18px */
+  }
+  
+  .text-base {
+    font-size: 1rem !important; /* 16px - padrão normal */
+  }
+  
+  .text-sm {
+    font-size: 0.875rem !important; /* 14px */
+  }
+  
+  .text-xs {
+    font-size: 0.75rem !important; /* 12px */
+  }
+  
+  /* Navegação e header - tamanhos normais */
+  nav, header {
+    font-size: 1rem !important;
+  }
+  
+  nav a, nav button, header a, header button {
+    font-size: 1rem !important;
+    padding: 0.5rem 1rem !important;
+  }
+  
+  /* Menu específico - tamanho normal */
+  .navigation-menu a,
+  .navigation-menu button {
+    font-size: 0.875rem !important; /* 14px - padrão para menus */
+    padding: 0.5rem 1rem !important;
+  }
+  
+  /* Título do site - tamanho adequado */
+  .site-title {
+    font-size: 2rem !important; /* 32px */
+  }
+  
+  /* Cards e conteúdo - tamanhos normais */
+  .card h3, .card-title {
+    font-size: 1.25rem !important; /* 20px */
+  }
+  
+  .card p, .card-description {
+    font-size: 1rem !important; /* 16px */
+  }
+  
+  /* Botões - tamanhos padrão */
+  button {
+    font-size: 0.875rem !important; /* 14px */
+    padding: 0.5rem 1rem !important;
+  }
+  
+  /* Botões pequenos */
+  .btn-sm, button.text-xs {
+    font-size: 0.75rem !important; /* 12px */
+    padding: 0.375rem 0.75rem !important;
+  }
+  
+  /* Específico para biblioteca - tamanhos apropriados */
+  .biblioteca-title {
+    font-size: 3rem !important; /* 48px - título principal */
+  }
+  
+  .biblioteca-subtitle {
+    font-size: 1.125rem !important; /* 18px */
+  }
+  
+  /* Grimório cards - tamanhos legíveis */
+  .grimoire-card h3 {
+    font-size: 1rem !important; /* 16px */
+  }
+  
+  .grimoire-card p {
+    font-size: 0.875rem !important; /* 14px */
+  }
+  
+  /* Botões dos cards de grimórios - tamanho legível */
+  .grimoire-card button,
+  .grimoire-card .font-cinzel {
+    font-size: 0.75rem !important; /* 12px */
+    padding: 0.375rem 0.75rem !important;
+  }
+  
+  /* Status text nos cards */
+  .grimoire-card .text-xs,
+  .grimoire-card .text-sm {
+    font-size: 0.75rem !important; /* 12px */
+  }
+  
+  /* Espaçamentos normais para desktop */
+  .py-16 {
+    padding-top: 4rem !important; /* 64px */
+    padding-bottom: 4rem !important;
+  }
+  
+  .py-12 {
+    padding-top: 3rem !important; /* 48px */
+    padding-bottom: 3rem !important;
+  }
+  
+  .py-8 {
+    padding-top: 2rem !important; /* 32px */
+    padding-bottom: 2rem !important;
+  }
+  
+  .mb-16 {
+    margin-bottom: 4rem !important; /* 64px */
+  }
+  
+  .mb-12 {
+    margin-bottom: 3rem !important; /* 48px */
+  }
+  
+  .mb-8 {
+    margin-bottom: 2rem !important; /* 32px */
+  }
+  
+  .mb-6 {
+    margin-bottom: 1.5rem !important; /* 24px */
+  }
+  
+  .mb-4 {
+    margin-bottom: 1rem !important; /* 16px */
+  }
+  
+  /* Espaçamentos da biblioteca */
+  .biblioteca-title {
+    margin-bottom: 1.5rem !important; /* 24px */
+  }
+  
+  .biblioteca-subtitle {
+    margin-bottom: 2rem !important; /* 32px */
+  }
+}
+
+.font-garamond {
+  font-family: 'EB Garamond', serif;
+}
+
+.font-fell {
+  font-family: 'IM Fell DW Pica', serif;
+}
+
+.font-cormorant {
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.font-cardo {
+  font-family: 'Cardo', serif;
+}
+
+/* Color Classes */
+.text-golden-amber {
+  color: var(--golden-amber);
+}
+
+.text-ritualistic-beige {
+  color: var(--ritualistic-beige);
+}
+
+.text-blood-red {
+  color: var(--blood-red);
+}
+
+.text-soft-amber {
+  color: var(--soft-amber);
+}
+
+.text-ancient-golden {
+  color: var(--ancient-golden);
+}
+
+.text-burned-amber {
+  color: var(--burned-amber);
+}
+
+.border-golden-amber {
+  border-color: var(--golden-amber);
+}
+
+.border-burned-amber {
+  border-color: var(--burned-amber);
+}
+
+/* Mystical Effects - Floating Transparent Elements */
+.floating-container {
+  backdrop-filter: blur(3px);
+  background: linear-gradient(135deg, 
+    rgba(20, 8, 8, 0.15) 0%, 
+    rgba(30, 12, 12, 0.12) 50%, 
+    rgba(15, 6, 6, 0.18) 100%);
+  border: 1px solid rgba(204, 41, 54, 0.2);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(204, 41, 54, 0.1) inset,
+    0 2px 8px rgba(204, 41, 54, 0.1);
+  animation: subtle-float 6s ease-in-out infinite;
+}
+
+.content-section {
+  backdrop-filter: blur(2px);
+  background: linear-gradient(135deg, 
+    rgba(25, 10, 10, 0.12) 0%, 
+    rgba(20, 8, 8, 0.08) 50%, 
+    rgba(15, 6, 6, 0.15) 100%);
+  border: 1px solid rgba(218, 165, 32, 0.15);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(218, 165, 32, 0.08) inset;
+  animation: gentle-float 8s ease-in-out infinite;
+}
+
+@keyframes subtle-float {
+  0%, 100% { 
+    transform: translateY(0px) rotateX(0deg);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(204, 41, 54, 0.1) inset,
+      0 2px 8px rgba(204, 41, 54, 0.1);
+  }
+  50% { 
+    transform: translateY(-3px) rotateX(1deg);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(204, 41, 54, 0.15) inset,
+      0 4px 12px rgba(204, 41, 54, 0.15);
+  }
+}
+
+@keyframes gentle-float {
+  0%, 100% { 
+    transform: translateY(0px);
+    box-shadow: 
+      0 4px 16px rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(218, 165, 32, 0.08) inset;
+  }
+  50% { 
+    transform: translateY(-2px);
+    box-shadow: 
+      0 6px 20px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(218, 165, 32, 0.12) inset;
+  }
+}
+
+.warning-overlay {
+  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.95);
+}
+
+.sacred-seal {
+  animation: subtle-pulse 4s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+.veil-button {
+  transition: all 0.3s ease;
+  border: 2px solid var(--golden-amber);
+  background: transparent;
+}
+
+.veil-button:hover {
+  background: rgba(255, 191, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 1.5s ease-in;
+}
+
+.fade-out {
+  animation: fadeOut 1s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Header Logo Animations */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin-reverse-slow {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-spin-reverse-slow {
+  animation: spin-reverse-slow 8s linear infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .font-cinzel {
+    letter-spacing: 0.02em;
+    font-size: 0.9em;
+  }
+  
+  .floating-container,
+  .content-section {
+    margin: 8px;
+    padding: 16px;
+  }
+  
+  .sacred-seal {
+    width: 120px !important;
+    height: 120px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .font-cinzel {
+    letter-spacing: 0.05em;
+  }
+  
+  .floating-container,
+  .content-section {
+    margin: 12px;
+    padding: 20px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .floating-container,
+  .content-section {
+    margin: 16px;
+    padding: 24px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .floating-container,
+  .content-section {
+    margin: 32px;
+    padding: 48px;
+  }
+}
+
+/* Grimoire Content Styles - Disabled by default (only custom CSS applies) */
+.grimoire-content-disabled {
+  line-height: 1.8;
+}
+
+/* All grimoire styles disabled - only custom CSS will apply */
+
+.grimoire-content ul, .grimoire-content ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.grimoire-content li {
+  margin-bottom: 0.5rem;
+}
+
+.grimoire-content .chapter-closing {
+  text-align: center;
+  font-style: italic;
+  color: hsl(43, 74%, 49%);
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(218, 165, 32, 0.3);
+  font-size: 1.1rem;
+}
+
+.grimoire-content .final-blessing {
+  text-align: center;
+  font-size: 1.1rem;
+  color: hsl(43, 74%, 49%);
+  background: rgba(139, 69, 19, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(218, 165, 32, 0.3);
+  margin: 2rem 0;
+}
+
+.grimoire-content .signature {
+  text-align: right;
+  font-style: italic;
+  color: hsl(24, 33%, 64%);
+  margin-top: 1rem;
+}
+
+/* Estados ativos com cor vermelha */
+.menu-item-active {
+  color: #dc2626 !important;
+  border-color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.1) !important;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.3) !important;
+}
+
+.tab-active {
+  color: #dc2626 !important;
+  border-bottom-color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.1) !important;
+  text-shadow: 0 0 8px rgba(220, 38, 38, 0.5) !important;
+}
+
+.admin-tab-active {
+  color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.15) !important;
+  border-color: #dc2626 !important;
+}
+
+.nav-link-active {
+  color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.1) !important;
+}
+
+/* Abas Shadcn/UI - Estados ativos vermelhos */
+[data-state="active"][role="tab"] {
+  color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.1) !important;
+  border-bottom-color: #dc2626 !important;
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Tabs específicas da biblioteca admin */
+.admin-biblioteca-tabs [data-state="active"] {
+  color: #dc2626 !important;
+  background: rgba(220, 38, 38, 0.15) !important;
+  border-color: #dc2626 !important;
+}
+
+/* ░▒▓ CORES RITUALÍSTICAS DAS SEÇÕES ▓▒░ */
+
+/* ATRIUM IGNIS — Vermelho Místico Ritualístico */
+.atrium-ignis {
+  color: #8b0000;
+  border-color: #8b0000;
+}
+
+.grimorio-citacao.atrium-ignis {
+  border-left: 3px solid #8b0000;
+  color: #8b0000;
+}
+
+.destaque.atrium-ignis {
+  color: #8b0000;
+  font-weight: bold;
+}
+
+/* PORTA UMBRAE — Roxo Abissal Místico */
+.porta-umbrae {
+  color: #6a0dad;
+  border-color: #6a0dad;
+}
+
+.grimorio-citacao.porta-umbrae {
+  border-left: 3px solid #6a0dad;
+  color: #6a0dad;
+}
+
+.destaque.porta-umbrae {
+  color: #6a0dad;
+  font-weight: bold;
+}
+
+/* ARCANA NOCTIS — Azul Profundo Velado */
+.arcana-noctis {
+  color: #003366;
+  border-color: #003366;
+}
+
+.grimorio-citacao.arcana-noctis {
+  border-left: 3px solid #003366;
+  color: #003366;
+}
+
+.destaque.arcana-noctis {
+  color: #003366;
+  font-weight: bold;
+}
+
+/* VIA TENEBRIS — Preto Abissal com Cinza Espectral */
+.via-tenebris {
+  color: #dddddd;
+  background-color: #111111;
+  border-color: #555555;
+}
+
+.grimorio-citacao.via-tenebris {
+  border-left: 3px solid #555555;
+  color: #dddddd;
+}
+
+.destaque.via-tenebris {
+  color: #dddddd;
+  font-weight: bold;
+}
+
+/* TEMPLO DO ABISMO — Âmbar Dourado Ritualístico */
+.templo-do-abismo {
+  color: #e6b800;
+  border-color: #e6b800;
+}
+
+.grimorio-citacao.templo-do-abismo {
+  border-left: 3px solid #e6b800;
+  color: #e6b800;
+}
+
+.destaque.templo-do-abismo {
+  color: #e6b800;
+  font-weight: bold;
+}
+
+/* Estilos para conteúdo de grimórios */
+.prose-grimoire p {
+  color: #f5f5dc !important;
+  margin-bottom: 1rem !important;
+  line-height: 1.8 !important;
+}
+
+.prose-grimoire h1,
+.prose-grimoire h2,
+.prose-grimoire h3,
+.prose-grimoire h4,
+.prose-grimoire h5,
+.prose-grimoire h6 {
+  font-family: 'Cinzel', serif !important;
+  margin: 1.5rem 0 1rem 0 !important;
+}
+
+/* Apenas títulos sem cor inline recebem cor padrão */
+.prose-grimoire h1:not([style*="color"]),
+.prose-grimoire h2:not([style*="color"]),
+.prose-grimoire h3:not([style*="color"]),
+.prose-grimoire h4:not([style*="color"]),
+.prose-grimoire h5:not([style*="color"]),
+.prose-grimoire h6:not([style*="color"]) {
+  color: #d4af37 !important;
+}
+
+.prose-grimoire strong {
+  color: #d4af37 !important;
+  font-weight: 600 !important;
+}
+
+.prose-grimoire em {
+  color: #f5f5dc !important;
+  font-style: italic !important;
+}
+
+.prose-grimoire ul,
+.prose-grimoire ol {
+  color: #f5f5dc !important;
+  margin: 1rem 0 !important;
+  padding-left: 1.5rem !important;
+}
+
+.prose-grimoire li {
+  margin-bottom: 0.5rem !important;
+  color: #f5f5dc !important;
+}
+
+.prose-grimoire blockquote {
+  border-left: 4px solid #d4af37 !important;
+  background: rgba(212, 175, 55, 0.1) !important;
+  padding: 1rem 1.5rem !important;
+  margin: 1.5rem 0 !important;
+  font-style: italic !important;
+  color: #f5f5dc !important;
+}
+
+.prose-grimoire a {
+  color: #d4af37 !important;
+  text-decoration: underline !important;
+}
+
+.prose-grimoire a:hover {
+  color: #f5f5dc !important;
+}
+
+/* Grimoire Reader Responsive Fonts */
+.grimoire-content {
+  font-size: 14px !important; /* Mobile padrão */
+}
+
+@media (min-width: 768px) {
+  .grimoire-content {
+    font-size: 18px !important; /* Desktop */
+  }
+}
+
+/* Header do grimoire reader */
+.grimoire-header-title {
+  font-size: 8px !important; /* Mobile */
+}
+
+@media (min-width: 768px) {
+  .grimoire-header-title {
+    font-size: 18px !important; /* Desktop */
+  }
+}
+
+/* Estilos específicos para o grimório luciferiano */
+.grimoire-content .chapter-opening {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 2px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  background: rgba(139, 69, 19, 0.1);
+}
+
+.grimoire-content .mystical-border {
+  padding: 1rem;
+}
+
+.grimoire-content .chapter-title {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.8rem !important;
+  color: #d4af37 !important;
+  margin-bottom: 0.5rem !important;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.grimoire-content .chapter-subtitle {
+  font-family: 'EB Garamond', serif !important;
+  font-size: 1.2rem !important;
+  color: #f5f5dc !important;
+  font-style: italic;
+  margin-bottom: 1rem !important;
+}
+
+.grimoire-content .ritual-divider {
+  color: #d4af37 !important;
+  font-size: 1.1rem !important;
+  margin: 1rem 0 !important;
+  letter-spacing: 2px;
+}
+
+.grimoire-content .invocation-box {
+  background: rgba(139, 69, 19, 0.2);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.grimoire-content .latin-phrase {
+  font-family: 'EB Garamond', serif !important;
+  font-style: italic !important;
+  color: #d4af37 !important;
+  font-size: 1.1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.grimoire-content .translation {
+  color: #f5f5dc !important;
+  font-size: 0.9rem !important;
+  opacity: 0.8;
+}
+
+.grimoire-content .opening-paragraph {
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+  margin-bottom: 2rem !important;
+  text-align: justify !important;
+  color: #f5f5dc !important;
+}
+
+.grimoire-content .section-header {
+  font-family: 'Cinzel', serif !important;
+  color: #d4af37 !important;
+  font-size: 1.4rem !important;
+  margin: 2rem 0 1rem 0 !important;
+  text-align: center !important;
+}
+
+.grimoire-content .mystical-quote {
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #f5f5dc !important;
+}
+
+.grimoire-content .warning-section {
+  margin: 1.5rem 0;
+}
+
+.grimoire-content .warning-section h4 {
+  color: #dc2626 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.grimoire-content .blessing-final {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.grimoire-content .blessing {
+  font-style: italic;
+  color: #d4af37 !important;
+  line-height: 1.6 !important;
+}
+
+.grimoire-content .mystical-seal {
+  display: none;
+}
+
+.grimoire-content .chapter-closing {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.grimoire-content .final-blessing {
+  color: #d4af37 !important;
+  font-style: italic;
+  line-height: 1.8 !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Elementos de grid e cards */
+.grimoire-content .signs-grid,
+.grimoire-content .attributes-grid,
+.grimoire-content .comparison-grid,
+.grimoire-content .pillars-section,
+.grimoire-content .dukes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.grimoire-content .sign-card,
+.grimoire-content .attribute,
+.grimoire-content .comparison-item,
+.grimoire-content .pillar,
+.grimoire-content .duke-card,
+.grimoire-content .queen-profile,
+.grimoire-content .king-card {
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.grimoire-content .sign-icon {
+  display: none;
+}
+
+.grimoire-content .sign-meaning,
+.grimoire-content .truth-revelation,
+.grimoire-content .liberation-key {
+  margin: 1rem 0;
+  padding: 0;
+}
+
+/* Listas simples */
+.grimoire-content ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+}
+
+.grimoire-content ul li {
+  margin: 0.5rem 0;
+  color: #f5f5dc !important;
+}
+
+/* Elementos simples de livro */
+.grimoire-content .method-section,
+.grimoire-content .practice-time,
+.grimoire-content .ritual-step {
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.grimoire-content .step-instructions {
+  margin-top: 0.5rem;
+}
+
+/* Blockquotes simples */
+.grimoire-content blockquote {
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: #e6d7a3 !important;
+}
+
+/* Avisos simples */
+.grimoire-content .ritual-warning,
+.grimoire-content .safety-warning {
+  margin: 2rem 0;
+  padding: 0;
+}
+
+.grimoire-content .ritual-warning h4,
+.grimoire-content .safety-warning h4 {
+  font-size: 1.2rem !important;
+  margin-bottom: 1rem !important;
+}
+
+.grimoire-content .ritual-warning h4:not([style*="color"]),
+.grimoire-content .safety-warning h4:not([style*="color"]) {
+  color: #d4af37 !important;
+}
+
+/* Seções simples */
+.grimoire-content .expectation-timeline,
+.grimoire-content .liberation-strategies {
+  margin: 1.5rem 0;
+}
+
+.grimoire-content .expectation-period,
+.grimoire-content .strategy {
+  margin: 1rem 0;
+  padding: 0;
+}
+
+/* Elementos de meditação simples */
+.grimoire-content .contemplation-section,
+.grimoire-content .philosophical-meditation,
+.grimoire-content .pantheon-meditation {
+  margin: 2rem 0;
+  padding: 0;
+}
+
+/* Texto simples */
+.grimoire-content .invocation-text,
+.grimoire-content .blessing-text {
+  font-style: italic;
+  color: #d4af37 !important;
+  line-height: 1.8 !important;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+/* Elementos simples */
+.grimoire-content .prep-timing,
+.grimoire-content .prep-space,
+.grimoire-content .prep-materials,
+.grimoire-content .prep-personal {
+  margin: 1rem 0;
+}
+
+/* Hierarquias e estágios */
+.grimoire-content .stage,
+.grimoire-content .fear-level,
+.grimoire-content .fire-aspect {
+  margin: 1rem 0;
+}
+
+/* Aspecto final */
+.grimoire-content .final-invocation,
+.grimoire-content .pantheon-blessing,
+.grimoire-content .graduation-declaration {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+/* Ocultar todos os ícones, símbolos e emojis */
+.grimoire-content .mystical-seal-final,
+.grimoire-content .sign-icon,
+.grimoire-content .mystical-seal,
+.grimoire-content span[style*="font-size"],
+.grimoire-content .emoji {
+  display: none !important;
+}
+
+/* Remover emojis específicos através de seletores de texto */
+.grimoire-content span:first-child:only-child {
+  font-size: 0 !important;
+  color: transparent !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Ocultar spans que contêm apenas símbolos */
+.grimoire-content span:empty,
+.grimoire-content span[style*="font-size: 2rem"],
+.grimoire-content span[style*="font-size: 1.5rem"],
+.grimoire-content span[style*="font-size:2rem"],
+.grimoire-content span[style*="font-size:1.5rem"] {
+  display: none !important;
+}
+
+/* Headers específicos com espaçamento uniforme */
+.grimoire-content h1,
+.grimoire-content h2,
+.grimoire-content h3,
+.grimoire-content h4,
+.grimoire-content h5,
+.grimoire-content h6 {
+  font-family: 'Cinzel', serif !important;
+  margin: 1rem 0 0.6rem 0 !important;
+  line-height: 1.4 !important;
+}
+
+/* Apenas títulos sem cor inline recebem cor padrão */
+.grimoire-content h1:not([style*="color"]),
+.grimoire-content h2:not([style*="color"]),
+.grimoire-content h3:not([style*="color"]),
+.grimoire-content h4:not([style*="color"]),
+.grimoire-content h5:not([style*="color"]),
+.grimoire-content h6:not([style*="color"]) {
+  color: #d4af37 !important;
+}
+
+/* Normalização completa de espaçamento - todos os elementos centralizados */
+.grimoire-content [style*="text-align: center"],
+.grimoire-content [style*="text-align:center"],
+.grimoire-content div[style*="text-align"],
+.grimoire-content p[style*="text-align"],
+.grimoire-content h1[style*="text-align"],
+.grimoire-content h2[style*="text-align"],
+.grimoire-content h3[style*="text-align"],
+.grimoire-content h4[style*="text-align"],
+.grimoire-content h5[style*="text-align"],
+.grimoire-content h6[style*="text-align"] {
+  margin: 0.8rem 0 0.6rem 0 !important;
+  padding: 0 !important;
+}
+
+/* Ajuste específico para símbolos/ícones antes dos títulos */
+.grimoire-content span {
+  margin: 0.4rem 0 !important;
+  display: inline-block;
+}
+
+/* Filtro universal para remover emojis e símbolos Unicode */
+.grimoire-content span:only-child {
+  font-size: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Remover spans que só contêm símbolos ou emojis */
+.grimoire-content span:not(:has(text)):not([class*="color"]):not([style*="color"]) {
+  display: none !important;
+}
+
+/* Elementos que contêm símbolos e títulos juntos */
+.grimoire-content div:has(span) {
+  margin: 0.6rem 0 !important;
+}
+
+/* Forçar espaçamento consistente e menor em todos os elementos */
+.grimoire-content div,
+.grimoire-content span,
+.grimoire-content p:not(:first-child) {
+  margin: 0.5rem 0 !important;
+}
+
+/* Espaçamento específico para elementos de seção */
+.grimoire-content div > p,
+.grimoire-content div > div {
+  margin: 0.3rem 0 !important;
+}
+
+.grimoire-content h1 { font-size: 2rem !important; }
+.grimoire-content h2 { font-size: 1.8rem !important; }
+.grimoire-content h3 { font-size: 1.6rem !important; }
+.grimoire-content h4 { font-size: 1.4rem !important; }
+.grimoire-content h5 { font-size: 1.2rem !important; }
+.grimoire-content h6 { font-size: 1.1rem !important; }
+
+/* Parágrafos e texto com espaçamento controlado */
+.grimoire-content p {
+  color: #f5f5dc !important;
+  line-height: 1.6 !important;
+  margin: 0.8rem 0 !important;
+  text-align: justify !important;
+}
+
+.grimoire-content strong {
+  color: #d4af37 !important;
+  font-weight: bold !important;
+}
+
+.grimoire-content em {
+  color: #f5f5dc !important;
+  font-style: italic !important;
+}
+
+/* Espaçamento uniformizado para todos os elementos especiais */
+.grimoire-content .myth-revelation,
+.grimoire-content .myth-comparison,
+.grimoire-content .lies-section,
+.grimoire-content .queens-section,
+.grimoire-content .kings-section,
+.grimoire-content .alliance-principles,
+.grimoire-content .working-methods,
+.grimoire-content .safety-guidelines,
+.grimoire-content .development-stages,
+.grimoire-content .readiness-assessment,
+.grimoire-content .ritual-preparation,
+.grimoire-content .ritual-execution,
+.grimoire-content .post-initiation-guidance,
+.grimoire-content .integration-practices,
+.grimoire-content .temple-invitation,
+.grimoire-content .continued-learning,
+.grimoire-content .conclusion,
+.grimoire-content .false-version,
+.grimoire-content .true-version,
+.grimoire-content .lie-card,
+.grimoire-content .queen-header,
+.grimoire-content .queen-content,
+.grimoire-content .king-header,
+.grimoire-content .king-content,
+.grimoire-content .principle-item,
+.grimoire-content .method-description,
+.grimoire-content .assessment-section,
+.grimoire-content .primordial-names,
+.grimoire-content .name-card,
+.grimoire-content .timeline-item,
+.grimoire-content .stellar-aspects,
+.grimoire-content .lie-header,
+.grimoire-content .lie-content,
+.grimoire-content .mechanism,
+.grimoire-content .effect,
+.grimoire-content .prison-type,
+.grimoire-content .prison-description,
+.grimoire-content .aspect,
+.grimoire-content .ritual-steps,
+.grimoire-content .ritual-text,
+.grimoire-content .sign,
+.grimoire-content .method-example,
+.grimoire-content .questions,
+.grimoire-content .daily-structure {
+  margin: 0.8rem 0 !important;
+}
+
+/* Elementos com ícones específicos */
+.grimoire-content .lie-header h4,
+.grimoire-content .queen-header h4,
+.grimoire-content .king-header h4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Classes de texto especiais */
+.grimoire-content .source,
+.grimoire-content .conclusion,
+.grimoire-content .essence {
+  font-style: italic;
+  color: #d4af37 !important;
+  font-size: 0.9rem !important;
+}
+
+/* Advertência em vermelho no prólogo */
+.grimoire-content .warning,
+.grimoire-content .advertencia,
+.grimoire-content .aviso,
+.grimoire-content [style*="color: red"],
+.grimoire-content [style*="color:#ff0000"],
+.grimoire-content [style*="color: #ff0000"],
+.grimoire-content strong[style*="color"],
+.grimoire-content em[style*="color"],
+.grimoire-content p:has(strong[style*="color"]),
+.grimoire-content div:has(strong[style*="color"]) {
+  color: #ff4444 !important;
+  font-weight: bold !important;
+  background-color: rgba(255, 68, 68, 0.1) !important;
+  padding: 0.2rem 0.4rem !important;
+  border-left: 3px solid #ff4444 !important;
+  margin: 1rem 0 !important;
+  display: block !important;
+}
+
+/* Seletores específicos para texto de advertência */
+.grimoire-content p:contains("ADVERTÊNCIA"),
+.grimoire-content p:contains("WARNING"),
+.grimoire-content p:contains("AVISO"),
+.grimoire-content strong:contains("ADVERTÊNCIA"),
+.grimoire-content strong:contains("WARNING"),
+.grimoire-content strong:contains("AVISO") {
+  color: #ff4444 !important;
+  font-weight: bold !important;
+  background-color: rgba(255, 68, 68, 0.1) !important;
+  padding: 0.2rem 0.4rem !important;
+  border-left: 3px solid #ff4444 !important;
+  margin: 1rem 0 !important;
+  display: block !important;
+}
+
+/* Listas ordenadas */
+.grimoire-content ol {
+  list-style: none;
+  counter-reset: item;
+  padding-left: 0;
+}
+
+.grimoire-content ol li {
+  counter-increment: item;
+  position: relative;
+  padding-left: 2rem;
+  margin: 0.8rem 0;
+  color: #f5f5dc !important;
+}
+
+.grimoire-content ol li::before {
+  content: counter(item) ".";
+  position: absolute;
+  left: 0;
+  color: #d4af37;
+  font-weight: bold;
+}
+
+/* Início de capítulo sempre em nova página */
+.grimoire-content .chapter-start {
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Classes para fundos personalizados por seção */
+.grimoire-reader-fire {
+  background: linear-gradient(135deg, #8B0000 0%, #2D0B00 100%) !important;
+}
+
+.grimoire-reader-shadow {
+  background: linear-gradient(135deg, #2D0B2D 0%, #0B0B0B 100%) !important;
+}
+
+.grimoire-reader-abyss {
+  background: linear-gradient(135deg, #000000 0%, #1A0000 100%) !important;
+}
+
+.grimoire-reader-crimson {
+  background: linear-gradient(135deg, #8B0000 0%, #000000 100%) !important;
+}
+
+.grimoire-reader-purple {
+  background: linear-gradient(135deg, #4A0E4E 0%, #2D0B2D 100%) !important;
+}
+
+.grimoire-reader-dark {
+  background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%) !important;
+}
+
+.grimoire-reader-emerald {
+  background: linear-gradient(135deg, #0D4F3C 0%, #001F1A 100%) !important;
+}
+
+.grimoire-reader-amber {
+  background: linear-gradient(135deg, #B45309 0%, #451A03 100%) !important;
+}
+
+.grimoire-reader-blue {
+  background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 100%) !important;
+}
+
+.grimoire-content .chapter-start .chapter-title {
+  font-family: 'Cinzel', serif !important;
+  font-size: 1.8rem !important;
+  color: #d4af37 !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Responsividade mobile */
+@media (max-width: 768px) {
+  .grimoire-content .signs-grid,
+  .grimoire-content .attributes-grid,
+  .grimoire-content .comparison-grid,
+  .grimoire-content .pillars-section,
+  .grimoire-content .dukes-grid {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+  
+  .grimoire-content .chapter-title,
+  .grimoire-content .chapter-start .chapter-title {
+    font-size: 1.8rem !important;
+  }
+  
+  .grimoire-content .section-header {
+    font-size: 1.5rem !important;
+  }
+  
+  /* Texto principal do grimório no mobile - muito maior */
+  .grimoire-content,
+  .grimoire-content p,
+  .grimoire-content div,
+  .grimoire-content span {
+    font-size: 18px !important;
+    line-height: 1.7 !important;
+  }
+  
+  /* Aumentar título do grimório no header mobile */
+  .grimoire-header-title {
+    font-size: 16px !important;
+  }
+  
+  /* Citações e elementos especiais maiores no mobile */
+  .grimoire-content .mystical-quote,
+  .grimoire-content blockquote {
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    padding: 1.2rem !important;
+  }
+  
+  /* Listas maiores no mobile */
+  .grimoire-content li {
+    font-size: 18px !important;
+    line-height: 1.8 !important;
+  }
+  
+  /* Headers maiores no mobile */
+  .grimoire-content h1 { font-size: 1.5rem !important; }
+  .grimoire-content h2 { font-size: 1.3rem !important; }
+  .grimoire-content h3 { font-size: 1.2rem !important; }
+  .grimoire-content h4 { font-size: 1.1rem !important; }
+}
+
+/* Formatação limpa e profissional para grimórios */
+.grimoire-content .mystical-quote {
+  background: rgba(45, 30, 0, 0.2);
+  border-left: 4px solid #d4af37;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+  color: #f0e6d2 !important;
+  text-align: center;
+}
+
+.grimoire-content .citation-author {
+  font-size: 0.9em !important;
+  color: #d4af37 !important;
+  margin-top: 1rem !important;
+  text-align: center !important;
+  font-style: normal !important;
+}
+
+.grimoire-content .mystical-emphasis {
+  font-weight: 600;
+  color: #d4af37 !important;
+  font-style: italic;
+  display: block;
+  margin: 1.5rem 0;
+  text-align: center;
+  font-size: 1.1em;
+}
+
+.grimoire-content .opening-invocation {
+  font-size: 1.15em;
+  font-weight: 500;
+  margin: 2rem 0;
+  text-align: center;
+  font-style: italic;
+  color: #e6d7a3 !important;
+  border-left: 3px solid #d4af37;
+  padding-left: 1.5rem;
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.grimoire-content .revelation-text {
+  font-size: 1.4em;
+  font-weight: 700;
+  color: #d4af37 !important;
+  text-align: center;
+  margin: 2rem 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  padding: 1rem;
+  border: 2px solid #d4af37;
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.grimoire-content .mystical-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 1.5rem 0;
+}
+
+.grimoire-content .mystical-list li {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  position: relative;
+  color: #f5f5dc !important;
+}
+
+.grimoire-content .mystical-list li:before {
+  content: "•";
+  color: #d4af37;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  font-size: 1.2em;
+}
+
+.grimoire-content .final-blessing {
+  font-style: italic;
+  text-align: center;
+  color: #d4af37 !important;
+  margin: 1.5rem 0;
+  font-size: 1.1em;
+}
+
+.grimoire-content .mystical-seal {
+  font-size: 1.1em;
+  font-weight: 600;
+  text-align: center;
+  color: #d4af37 !important;
+  margin-top: 2rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* Remover todos os ornamentos decorativos */
+.grimoire-content .mystical-ornament {
+  display: none !important;
+}
+
+/* Ocultar emojis e símbolos específicos */
+.grimoire-content div:has-text("🜏"),
+.grimoire-content div:has-text("🕯️"),
+.grimoire-content div:has-text("⭐"),
+.grimoire-content div:has-text("🔥"),
+.grimoire-content div:has-text("✨"),
+.grimoire-content div:has-text("👁️"),
+.grimoire-content div:has-text("🔱"),
+.grimoire-content div:has-text("🎭"),
+.grimoire-content div:has-text("🌟"),
+.grimoire-content div:has-text("📘") {
+  display: none !important;
+}
+
+/* Seletores mais específicos para remover ornamentos */
+.grimoire-content [class*="ornament"],
+.grimoire-content [class*="symbol"],
+.grimoire-content [class*="emoji"] {
+  display: none !important;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .sacred-seal {
+    animation: none;
+  }
+  
+  .veil-button {
+    transition: none;
+  }
+}
+
+/* Estilos personalizados para criação de grimórios - Ultra alta prioridade */
+
+/* Corpo geral do grimório - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .grimorio-conteudo,
+.smart-grimoire-reader .grimorio-conteudo,
+.grimoire-content .grimorio-conteudo,
+.grimorio-conteudo {
+  font-family: 'EB Garamond', serif !important;
+  color: #CCCCCC !important;
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+  text-align: justify !important;
+  padding: 2rem 1rem !important;
+}
+
+/* Título do grimório - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .grimorio-titulo,
+.smart-grimoire-reader .grimorio-titulo,
+.grimoire-content .grimorio-titulo,
+.grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Subtítulo / Volume - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .grimorio-subtitulo,
+.smart-grimoire-reader .grimorio-subtitulo,
+.grimoire-content .grimorio-subtitulo,
+.grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Citação destacada - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .grimorio-citacao,
+.smart-grimoire-reader .grimorio-citacao,
+.grimoire-content .grimorio-citacao,
+.grimorio-citacao {
+  font-style: italic !important;
+  font-size: 1.1rem !important;
+  color: #CCCCCC !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+}
+
+/* Fonte da citação - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .grimorio-citacao small,
+.smart-grimoire-reader .grimorio-citacao small,
+.grimoire-content .grimorio-citacao small,
+.grimorio-citacao small {
+  display: block !important;
+  font-style: normal !important;
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: #999999 !important;
+}
+
+/* Título de capítulo - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .capitulo-titulo,
+.smart-grimoire-reader .capitulo-titulo,
+.grimoire-content .capitulo-titulo,
+.capitulo-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.5rem !important;
+  color: #D6342C !important;
+  margin-top: 3rem !important;
+  margin-bottom: 1rem !important;
+  text-align: center !important;
+}
+
+/* Parágrafo com indentação ritualística - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .grimorio-conteudo p,
+.smart-grimoire-reader .grimorio-conteudo p,
+.grimoire-content .grimorio-conteudo p,
+.grimorio-conteudo p {
+  text-indent: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  color: #CCCCCC !important;
+}
+
+/* Destaques importantes - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .destaque,
+.smart-grimoire-reader .destaque,
+.grimoire-content .destaque,
+.destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+}
+
+/* Separadores ritualísticos - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .separador,
+.smart-grimoire-reader .separador,
+.grimoire-content .separador,
+.separador {
+  border-top: 1px solid #D6342C !important;
+  margin: 3rem 0 !important;
+}
+
+/* Lista específica para grimórios - SmartGrimoireReader específico */
+.smart-grimoire-reader .grimoire-content .grimorio-lista,
+.smart-grimoire-reader .grimorio-lista,
+.grimoire-content .grimorio-lista,
+.grimorio-lista {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  margin: 1.5rem 0 !important;
+  padding-left: 2rem !important;
+}
+
+.smart-grimoire-reader .grimoire-content .grimorio-lista li,
+.smart-grimoire-reader .grimorio-lista li,
+.grimoire-content .grimorio-lista li,
+.grimorio-lista li {
+  color: #D6342C !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Estilos específicos para H2 e H3 no Smart Reader */
+.smart-grimoire-reader .grimoire-content h2.grimorio-titulo,
+.smart-grimoire-reader h2.grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.smart-grimoire-reader .grimoire-content p.grimorio-subtitulo,
+.smart-grimoire-reader p.grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+}
+
+.smart-grimoire-reader .grimoire-content blockquote.grimorio-citacao,
+.smart-grimoire-reader blockquote.grimorio-citacao {
+  font-style: italic !important;
+  font-size: 1.1rem !important;
+  color: #CCCCCC !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+/* Suporte adicional para classe prose no painel admin */
+.prose .grimorio-conteudo,
+.prose.prose-sm .grimorio-conteudo {
+  font-family: 'EB Garamond', serif !important;
+  color: #CCCCCC !important;
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+  text-align: justify !important;
+  padding: 2rem 1rem !important;
+}
+
+.prose .grimorio-titulo,
+.prose.prose-sm .grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.prose .grimorio-subtitulo,
+.prose.prose-sm .grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+}
+
+.prose .grimorio-citacao,
+.prose.prose-sm .grimorio-citacao {
+  font-style: italic !important;
+  font-size: 1.1rem !important;
+  color: #CCCCCC !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+}
+
+.prose .grimorio-citacao small,
+.prose.prose-sm .grimorio-citacao small {
+  display: block !important;
+  font-style: normal !important;
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: #999999 !important;
+}
+
+.prose .capitulo-titulo,
+.prose.prose-sm .capitulo-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.5rem !important;
+  color: #D6342C !important;
+  margin-top: 3rem !important;
+  margin-bottom: 1rem !important;
+  text-align: center !important;
+}
+
+.prose .grimorio-conteudo p,
+.prose.prose-sm .grimorio-conteudo p {
+  text-indent: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  color: #CCCCCC !important;
+}
+
+.prose .destaque,
+.prose.prose-sm .destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+}
+
+.prose .separador,
+.prose.prose-sm .separador {
+  border-top: 1px solid #D6342C !important;
+  margin: 3rem 0 !important;
+}
+
+.prose .grimorio-lista,
+.prose.prose-sm .grimorio-lista {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  margin: 1.5rem 0 !important;
+  padding-left: 2rem !important;
+}
+
+.prose .grimorio-lista li,
+.prose.prose-sm .grimorio-lista li {
+  color: #D6342C !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.prose h2.grimorio-titulo,
+.prose.prose-sm h2.grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.prose p.grimorio-subtitulo,
+.prose.prose-sm p.grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+}
+
+.prose blockquote.grimorio-citacao,
+.prose.prose-sm blockquote.grimorio-citacao {
+  font-style: italic !important;
+  font-size: 1.1rem !important;
+  color: #CCCCCC !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+/* Overrides críticos para garantir que estilos grimório funcionem no Smart Reader */
+.smart-grimoire-reader .grimoire-content {
+  font-size: inherit !important;
+  color: inherit !important;
+  line-height: inherit !important;
+}
+
+/* Reaplica estilos específicos após reset */
+.smart-grimoire-reader .grimoire-content .grimorio-conteudo {
+  font-family: 'EB Garamond', serif !important;
+  color: #CCCCCC !important;
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+  text-align: justify !important;
+  padding: 2rem 1rem !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content h2.grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+  display: block !important;
+  font-weight: normal !important;
+}
+
+.smart-grimoire-reader .grimoire-content p.grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content blockquote.grimorio-citacao {
+  font-style: italic !important;
+  font-size: 1.1rem !important;
+  color: #CCCCCC !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content .grimorio-citacao small {
+  display: block !important;
+  font-style: normal !important;
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: #999999 !important;
+}
+
+.smart-grimoire-reader .grimoire-content .grimorio-conteudo p {
+  text-indent: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  color: #CCCCCC !important;
+  display: block !important;
+  font-family: 'EB Garamond', serif !important;
+}
+
+.smart-grimoire-reader .grimoire-content .destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  display: inline !important;
+}
+
+.smart-grimoire-reader .grimoire-content ul.grimorio-lista {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  margin: 1.5rem 0 !important;
+  padding-left: 2rem !important;
+  display: block !important;
+  list-style: disc !important;
+}
+
+.smart-grimoire-reader .grimoire-content ul.grimorio-lista li {
+  color: #D6342C !important;
+  margin-bottom: 0.5rem !important;
+  display: list-item !important;
+}
+
+/* Suporte específico para spans com classes grimório */
+.smart-grimoire-reader .grimoire-content span.destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  display: inline !important;
+  font-family: inherit !important;
+}
+
+.smart-grimoire-reader .grimoire-content span.grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  display: inline !important;
+}
+
+.smart-grimoire-reader .grimoire-content span.grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  display: inline !important;
+}
+
+/* Suporte para prose também */
+.prose span.destaque,
+.prose.prose-sm span.destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  display: inline !important;
+}
+
+.prose span.grimorio-titulo,
+.prose.prose-sm span.grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  display: inline !important;
+}
+
+.prose span.grimorio-subtitulo,
+.prose.prose-sm span.grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  display: inline !important;
+}
+
+/* CSS ULTRA ESPECÍFICO - FORÇA MÁXIMA PARA SMART READER */
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] .grimorio-conteudo {
+  font-family: 'EB Garamond', serif !important;
+  color: #CCCCCC !important;
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+  text-align: justify !important;
+  padding: 2rem 1rem !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] h2.grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: normal !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] p.grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] blockquote.grimorio-citacao {
+  font-style: italic !important;
+  font-size: 1.1rem !important;
+  color: #CCCCCC !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] .grimorio-citacao small {
+  display: block !important;
+  font-style: normal !important;
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: #999999 !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] .grimorio-conteudo p {
+  text-indent: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  color: #CCCCCC !important;
+  font-family: 'EB Garamond', serif !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] .destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] span.destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] ul.grimorio-lista {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  margin: 1.5rem 0 !important;
+  padding-left: 2rem !important;
+  list-style: disc !important;
+}
+
+div.smart-grimoire-reader div.grimoire-content div[dangerouslySetInnerHTML] ul.grimorio-lista li {
+  color: #D6342C !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* FORÇA ABSOLUTA - ATRIBUTO STYLE */
+div.smart-grimoire-reader [style*="dangerouslySetInnerHTML"] * {
+  color: inherit !important;
+  font-family: inherit !important;
+}
+
+/* FORÇA ABSOLUTA - TODOS OS ELEMENTOS NO GRIMOIRE-CONTENT */
+.smart-grimoire-reader .grimoire-content [class*="grimorio"] {
+  all: revert !important;
+}
+
+.smart-grimoire-reader .grimoire-content .grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content .grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content .grimorio-citacao {
+  font-style: italic !important;
+  font-size: 1.1rem !important;
+  color: #CCCCCC !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content .destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  display: inline !important;
+}
+
+.smart-grimoire-reader .grimoire-content .grimorio-conteudo p {
+  text-indent: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  color: #CCCCCC !important;
+  font-family: 'EB Garamond', serif !important;
+  display: block !important;
+}
+
+/* ÚLTIMA TENTATIVA - WILDCARD ABSOLUTO */
+body .smart-grimoire-reader .grimoire-content .grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  color: #D6342C !important;
+  font-size: 1.7rem !important;
+  text-align: center !important;
+}
+
+body .smart-grimoire-reader .grimoire-content .destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+}
+
+/* CSS GRIMÓRIO FINAL - FORÇA MÁXIMA */
+* .grimorio-conteudo,
+*[class*="grimorio-conteudo"] {
+  font-family: 'EB Garamond', serif !important;
+  color: #CCCCCC !important;
+  font-size: 1.1rem !important;
+  line-height: 1.8 !important;
+  text-align: justify !important;
+  padding: 2rem 1rem !important;
+}
+
+* .grimorio-titulo,
+*[class*="grimorio-titulo"] {
+  font-family: 'Cinzel Decorative', serif !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  font-size: 1.7rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+* .grimorio-subtitulo,
+*[class*="grimorio-subtitulo"] {
+  font-style: italic !important;
+  text-align: center !important;
+  color: #D6342C !important;
+  font-size: 1rem !important;
+  margin-bottom: 2rem !important;
+}
+
+* .grimorio-citacao,
+*[class*="grimorio-citacao"] {
+  font-style: italic !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+  color: #CCCCCC !important;
+}
+
+* .grimorio-citacao small,
+*[class*="grimorio-citacao"] small {
+  display: block !important;
+  font-style: normal !important;
+  font-size: 0.9rem !important;
+  margin-top: 0.5rem !important;
+  color: #999999 !important;
+}
+
+* .grimorio-lista,
+*[class*="grimorio-lista"] {
+  list-style-type: disc !important;
+  margin-left: 2rem !important;
+  color: #D6342C !important;
+  font-weight: bold !important;
+  font-family: 'EB Garamond', serif !important;
+}
+
+* .indentado,
+*[class*="indentado"] {
+  text-indent: 3rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+* .destaque,
+*[class*="destaque"] {
+  color: #D6342C !important;
+  font-weight: bold !important;
+}
+
+/* CSS MOBILE - FORÇA IDÊNTICA AO DESKTOP */
+@media (max-width: 768px) {
+  * .grimorio-conteudo,
+  *[class*="grimorio-conteudo"] {
+    font-family: 'EB Garamond', serif !important;
+    color: #CCCCCC !important;
+    font-size: 1.1rem !important;
+    line-height: 1.8 !important;
+    text-align: justify !important;
+    padding: 2rem 1rem !important;
+  }
+
+  * .grimorio-titulo,
+  *[class*="grimorio-titulo"] {
+    font-family: 'Cinzel Decorative', serif !important;
+    color: #D6342C !important;
+    text-align: center !important;
+    font-size: 1.7rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  * .grimorio-subtitulo,
+  *[class*="grimorio-subtitulo"] {
+    font-style: italic !important;
+    text-align: center !important;
+    color: #D6342C !important;
+    font-size: 1rem !important;
+    margin-bottom: 2rem !important;
+  }
+
+  * .grimorio-citacao,
+  *[class*="grimorio-citacao"] {
+    font-style: italic !important;
+    border-left: 3px solid #D6342C !important;
+    padding-left: 1rem !important;
+    margin: 2rem 0 !important;
+    color: #CCCCCC !important;
+  }
+
+  * .grimorio-citacao small,
+  *[class*="grimorio-citacao"] small {
+    display: block !important;
+    font-style: normal !important;
+    font-size: 0.9rem !important;
+    margin-top: 0.5rem !important;
+    color: #999999 !important;
+  }
+
+  * .grimorio-lista,
+  *[class*="grimorio-lista"] {
+    list-style-type: disc !important;
+    margin-left: 2rem !important;
+    color: #D6342C !important;
+    font-weight: bold !important;
+    font-family: 'EB Garamond', serif !important;
+  }
+
+  * .indentado,
+  *[class*="indentado"] {
+    text-indent: 3rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  * .destaque,
+  *[class*="destaque"] {
+    color: #D6342C !important;
+    font-weight: bold !important;
+  }
+}
+
+/* CSS DEFINITIVO - ESTRUTURA EXATA DO SMART READER */
+.smart-grimoire-reader .grimoire-content div[dangerouslysetinnerhtml] .grimorio-titulo,
+.smart-grimoire-reader .grimoire-content div .grimorio-titulo,
+.smart-grimoire-reader .grimoire-content .grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif !important;
+  font-size: 1.7rem !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 0.5rem !important;
+  font-weight: normal !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content div[dangerouslysetinnerhtml] .grimorio-subtitulo,
+.smart-grimoire-reader .grimoire-content div .grimorio-subtitulo,
+.smart-grimoire-reader .grimoire-content .grimorio-subtitulo {
+  font-style: italic !important;
+  color: #D6342C !important;
+  text-align: center !important;
+  margin-bottom: 2rem !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content div[dangerouslysetinnerhtml] .grimorio-citacao,
+.smart-grimoire-reader .grimoire-content div .grimorio-citacao,
+.smart-grimoire-reader .grimoire-content .grimorio-citacao {
+  font-style: italic !important;
+  font-size: 1.1rem !important;
+  color: #CCCCCC !important;
+  border-left: 3px solid #D6342C !important;
+  padding-left: 1rem !important;
+  margin: 2rem 0 !important;
+  background: none !important;
+  border-radius: 0 !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content div[dangerouslysetinnerhtml] .destaque,
+.smart-grimoire-reader .grimoire-content div .destaque,
+.smart-grimoire-reader .grimoire-content .destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  display: inline !important;
+}
+
+.smart-grimoire-reader .grimoire-content div[dangerouslysetinnerhtml] span.destaque,
+.smart-grimoire-reader .grimoire-content div span.destaque,
+.smart-grimoire-reader .grimoire-content span.destaque {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  display: inline !important;
+}
+
+.smart-grimoire-reader .grimoire-content div[dangerouslysetinnerhtml] .grimorio-conteudo p,
+.smart-grimoire-reader .grimoire-content div .grimorio-conteudo p,
+.smart-grimoire-reader .grimoire-content .grimorio-conteudo p {
+  text-indent: 3rem !important;
+  margin-bottom: 1.5rem !important;
+  color: #CCCCCC !important;
+  font-family: 'EB Garamond', serif !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content div[dangerouslysetinnerhtml] ul.grimorio-lista,
+.smart-grimoire-reader .grimoire-content div ul.grimorio-lista,
+.smart-grimoire-reader .grimoire-content ul.grimorio-lista {
+  color: #D6342C !important;
+  font-weight: bold !important;
+  margin: 1.5rem 0 !important;
+  padding-left: 2rem !important;
+  list-style: disc !important;
+  display: block !important;
+}
+
+.smart-grimoire-reader .grimoire-content div[dangerouslysetinnerhtml] ul.grimorio-lista li,
+.smart-grimoire-reader .grimoire-content div ul.grimorio-lista li,
+.smart-grimoire-reader .grimoire-content ul.grimorio-lista li {
+  color: #D6342C !important;
+  margin-bottom: 0.5rem !important;
+  display: list-item !important;
+}
+
+.grimorio-conteudo {
+  font-family: 'EB Garamond', serif;
+  color: #CCCCCC;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  text-align: justify;
+  padding: 2rem 1rem;
+}
+
+.grimorio-titulo {
+  font-family: 'Cinzel Decorative', serif;
+  color: #D6342C;
+  text-align: center;
+  font-size: 1.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.grimorio-subtitulo {
+  font-style: italic;
+  text-align: center;
+  color: #D6342C;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.grimorio-citacao {
+  font-style: italic;
+  border-left: 3px solid #D6342C;
+  padding-left: 1rem;
+  margin: 2rem 0;
+  color: #CCCCCC;
+}
+
+.grimorio-citacao small {
+  display: block;
+  font-style: normal;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  color: #999999;
+}
+
+.grimorio-lista {
+  list-style-type: disc;
+  margin-left: 2rem;
+  color: #D6342C;
+  font-weight: bold;
+  font-family: 'EB Garamond', serif;
+}
+
+.indentado {
+  text-indent: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.destaque {
+  color: #D6342C;
+  font-weight: bold;
+}
+
+/* === CORES ESPECÍFICAS POR SEÇÃO DA BIBLIOTECA === */
+
+/* === ATRIUM IGNIS === */
+.grimorio-conteudo.atrium-ignis {
+  font-family: 'EB Garamond', serif;
+  color: #e0d7d0;
+}
+
+.grimorio-titulo.atrium-ignis, .grimorio-subtitulo.atrium-ignis {
+  font-family: 'Cinzel Decorative', serif;
+  color: #8b0000; /* Vermelho místico ritualístico verdadeiro */
+}
+
+.grimorio-citacao.atrium-ignis {
+  color: #b22222;
+  font-style: italic;
+  border-left: 3px solid #8b0000;
+  padding-left: 15px;
+  margin: 20px 0;
+}
+
+.destaque.atrium-ignis {
+  color: #b22222;
+  font-weight: bold;
+}
+
+/* === PORTA UMBRAE === */
+.grimorio-conteudo.porta-umbrae {
+  font-family: 'EB Garamond', serif;
+  color: #d8d3eb;
+}
+
+.grimorio-titulo.porta-umbrae, .grimorio-subtitulo.porta-umbrae {
+  font-family: 'Cinzel Decorative', serif;
+  color: #6a0dad; /* Roxo abissal místico */
+}
+
+.grimorio-citacao.porta-umbrae {
+  color: #a36be2;
+  font-style: italic;
+  border-left: 3px solid #6a0dad;
+  padding-left: 15px;
+  margin: 20px 0;
+}
+
+.destaque.porta-umbrae {
+  color: #9b30ff;
+  font-weight: bold;
+}
+
+/* === ARCANA NOCTIS === */
+.grimorio-conteudo.arcana-noctis {
+  font-family: 'EB Garamond', serif;
+  color: #ccd9f0;
+}
+
+.grimorio-titulo.arcana-noctis, .grimorio-subtitulo.arcana-noctis {
+  font-family: 'Cinzel Decorative', serif;
+  color: #003366; /* Azul profundo velado */
+}
+
+.grimorio-citacao.arcana-noctis {
+  color: #4169e1;
+  font-style: italic;
+  border-left: 3px solid #003366;
+  padding-left: 15px;
+  margin: 20px 0;
+}
+
+.destaque.arcana-noctis {
+  color: #1e90ff;
+  font-weight: bold;
+}
+
+/* === VIA TENEBRIS === */
+.grimorio-conteudo.via-tenebris {
+  font-family: 'EB Garamond', serif;
+  color: #d2d2d2;
+}
+
+.grimorio-titulo.via-tenebris, .grimorio-subtitulo.via-tenebris {
+  font-family: 'Cinzel Decorative', serif;
+  color: #111111; /* Preto abissal absoluto */
+}
+
+.grimorio-citacao.via-tenebris {
+  color: #666666;
+  font-style: italic;
+  border-left: 3px solid #222222;
+  padding-left: 15px;
+  margin: 20px 0;
+}
+
+.destaque.via-tenebris {
+  color: #888888;
+  font-weight: bold;
+}
