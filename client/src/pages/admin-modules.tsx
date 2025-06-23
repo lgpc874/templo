@@ -94,7 +94,7 @@ export default function AdminModules() {
   });
 
   // Buscar módulos do curso selecionado
-  const { data: modules = [], isLoading: modulesLoading } = useQuery<Module[]>({
+  const { data: modules = [], isLoading: modulesLoading } = useQuery({
     queryKey: ['/api/courses', selectedCourseId, 'modules'],
     queryFn: async () => {
       if (!selectedCourseId) return [];

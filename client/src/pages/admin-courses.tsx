@@ -86,7 +86,7 @@ export default function AdminCourses() {
   }
 
   // Buscar cursos
-  const { data: courses = [], isLoading: coursesLoading } = useQuery<Course[]>({
+  const { data: courses = [], isLoading: coursesLoading } = useQuery({
     queryKey: ['/api/admin/courses'],
     queryFn: async () => {
       const response = await apiRequest('/api/admin/courses');
@@ -95,7 +95,7 @@ export default function AdminCourses() {
   });
 
   // Buscar seções
-  const { data: courseSections = [] } = useQuery<CourseSection[]>({
+  const { data: courseSections = [] } = useQuery({
     queryKey: ['/api/course-sections'],
     queryFn: async () => {
       const response = await apiRequest('/api/course-sections');
