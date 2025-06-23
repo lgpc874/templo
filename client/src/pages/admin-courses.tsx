@@ -34,6 +34,8 @@ interface Course {
   is_paid: boolean;
   sort_order: number;
   course_section_id: number;
+  sequential_order?: number;
+  is_sequential?: boolean;
   course_sections?: {
     name: string;
     color: string;
@@ -68,7 +70,9 @@ export default function AdminCoursesFinal() {
     required_role: 'buscador',
     price: 0,
     is_paid: false,
-    course_section_id: 1
+    course_section_id: 1,
+    sequential_order: 1,
+    is_sequential: false
   });
 
   // Verificar se é admin
@@ -166,7 +170,9 @@ export default function AdminCoursesFinal() {
           required_role: 'buscador',
           price: 0,
           is_paid: false,
-          course_section_id: 1
+          course_section_id: 1,
+          sequential_order: 1,
+          is_sequential: false
         });
         toast({ title: "Curso criado com sucesso!" });
       } else {
@@ -352,7 +358,21 @@ export default function AdminCoursesFinal() {
                         className="bg-black/30 border-gray-600"
                       />
                     </div>
-                    <div className="flex items-center space-x-2 pt-6">
+                    <div>
+                      <Label htmlFor="sequential_order">Ordem Sequencial</Label>
+                      <Input
+                        id="sequential_order"
+                        type="number"
+                        value={courseForm.sequential_order}
+                        onChange={(e) => setCourseForm({...courseForm, sequential_order: parseInt(e.target.value) || 1})}
+                        className="bg-black/30 border-gray-600"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
                         id="is_paid"
@@ -360,6 +380,15 @@ export default function AdminCoursesFinal() {
                         onChange={(e) => setCourseForm({...courseForm, is_paid: e.target.checked})}
                       />
                       <Label htmlFor="is_paid">Curso Pago</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="is_sequential"
+                        checked={courseForm.is_sequential}
+                        onChange={(e) => setCourseForm({...courseForm, is_sequential: e.target.checked})}
+                      />
+                      <Label htmlFor="is_sequential">Bloqueio Sequencial</Label>
                     </div>
                   </div>
 
@@ -531,7 +560,7 @@ export default function AdminCoursesFinal() {
                     </Select>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <Label>Preço</Label>
                       <Input
@@ -553,9 +582,19 @@ export default function AdminCoursesFinal() {
                         min="0"
                       />
                     </div>
+                    <div>
+                      <Label>Ordem Sequencial</Label>
+                      <Input
+                        type="number"
+                        value={editingCourse.sequential_order || 1}
+                        onChange={(e) => setEditingCourse({...editingCourse, sequential_order: parseInt(e.target.value) || 1})}
+                        className="bg-black/30 border-gray-600"
+                        min="1"
+                      />
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
@@ -573,6 +612,15 @@ export default function AdminCoursesFinal() {
                         onChange={(e) => setEditingCourse({...editingCourse, is_published: e.target.checked})}
                       />
                       <Label htmlFor="edit_is_published">Curso Publicado</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="edit_is_sequential"
+                        checked={editingCourse.is_sequential || false}
+                        onChange={(e) => setEditingCourse({...editingCourse, is_sequential: e.target.checked})}
+                      />
+                      <Label htmlFor="edit_is_sequential">Bloqueio Sequencial</Label>
                     </div>
                   </div>
 

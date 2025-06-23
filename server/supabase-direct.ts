@@ -59,6 +59,8 @@ export interface Course {
   is_paid: boolean;
   sort_order: number;
   course_section_id: number;
+  sequential_order?: number;
+  is_sequential?: boolean;
   created_at?: string;
   updated_at?: string;
 }
