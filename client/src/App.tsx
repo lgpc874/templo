@@ -20,6 +20,7 @@ import CursoDetalhe from "@/pages/curso-detalhe";
 import RitualInicial from "@/pages/ritual-inicial";
 import CursusLeitor from "@/pages/cursus-leitor";
 import MeusCursos from "@/pages/meus-cursos";
+import Admin from "@/pages/admin";
 import Oraculum from "@/pages/oraculum";
 import VoxPluma from "@/pages/vox-pluma";
 import DeTemplo from "@/pages/de-templo";
@@ -83,10 +84,10 @@ function App() {
                 <Route path="/ritual-inicial/:curso_id" component={RitualInicial} />
                 <Route path="/cursus-leitor/:slug" component={CursusLeitor} />
                 <Route path="/meus-cursos" component={MeusCursos} />
+                <Route path="/admin" component={Admin} />
                 <Route path="/oraculum" component={Oraculum} />
                 <Route path="/vox-pluma" component={VoxPluma} />
                 <Route path="/de-templo" component={DeTemplo} />
-                {/* Admin route will be added back */}
                 <Route>
                   <div className="min-h-screen flex items-center justify-center">
                     <div className="text-center">
