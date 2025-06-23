@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { 
   BookOpen, 
@@ -48,16 +46,18 @@ interface CourseSection {
   required_role: string;
   color: string;
   sort_order: number;
-  is_active: boolean;
 }
 
-export default function AdminCourses() {
+export default function AdminCoursesWorking() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [courseSections, setCourseSections] = useState<CourseSection[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
 
-  // Estados dos formulários
   const [courseForm, setCourseForm] = useState({
     title: '',
     slug: '',
@@ -73,11 +73,16 @@ export default function AdminCourses() {
   if (user?.email !== 'admin@templodoabismo.com.br') {
     return (
       <PageTransition>
-        <div className="min-h-screen bg-black flex items-center justify-center">
-          <Card className="bg-red-900/20 border-red-600/30">
-            <CardContent className="p-6 text-center">
-              <h1 className="text-2xl font-bold text-red-400 mb-4">Acesso Negado</h1>
-              <p className="text-gray-300">Apenas administradores podem acessar esta área.</p>
+        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
+          <Card className="bg-black/80 border-red-600/50 backdrop-blur-sm shadow-2xl shadow-red-900/50">
+            <CardContent className="p-8 text-center">
+              <Settings className="w-16 h-16 mx-auto text-red-500 animate-pulse mb-6" />
+              <h1 className="text-3xl font-bold text-red-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+                Sanctum Clausum
+              </h1>
+              <p className="text-gray-300 text-lg" style={{ fontFamily: 'EB Garamond' }}>
+                Apenas o Magus Supremo pode adentrar nestes domínios sagrados
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -85,47 +90,139 @@ export default function AdminCourses() {
     );
   }
 
-  // Hooks para admin
-  const { data: courses = [], isLoading: coursesLoading } = useAdminCourses();
-  const { data: courseSections = [] } = useCourseSections();
-  const createCourseMutation = useCreateCourse();
-  const updateCourseMutation = useUpdateCourse();
-  const deleteCourseMutation = useDeleteCourse();
+  // Carregar dados
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('auth_token');
+        
+        // Buscar cursos
+        const coursesResponse = await fetch('/api/admin/courses', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (coursesResponse.ok) {
+          const coursesData = await coursesResponse.json();
+          setCourses(coursesData);
+        }
 
-  const handleCreateCourse = (e: React.FormEvent) => {
+        // Buscar seções
+        const sectionsResponse = await fetch('/api/course-sections');
+        if (sectionsResponse.ok) {
+          const sectionsData = await sectionsResponse.json();
+          setCourseSections(sectionsData);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const handleCreateCourse = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('=== FRONTEND: Criando curso ===');
-    console.log('Form data:', courseForm);
     
-    if (!courseForm.title || !courseForm.description) {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const slug = courseForm.slug || courseForm.title
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+
+      const response = await fetch('/api/admin/courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ ...courseForm, slug })
+      });
+
+      if (response.ok) {
+        const newCourse = await response.json();
+        setCourses([newCourse, ...courses]);
+        setCourseForm({
+          title: '',
+          slug: '',
+          description: '',
+          image_url: '',
+          required_role: 'buscador',
+          price: 0,
+          is_paid: false,
+          course_section_id: 1
+        });
+        toast({ title: "Curso criado com sucesso!" });
+      } else {
+        throw new Error('Erro ao criar curso');
+      }
+    } catch (error: any) {
       toast({ 
-        title: "Campos obrigatórios", 
-        description: "Preencha título e descrição",
+        title: "Erro ao criar curso", 
+        description: error.message,
         variant: "destructive" 
       });
-      return;
     }
-    
-    // Gerar slug automaticamente se não fornecido
-    const slug = courseForm.slug || courseForm.title.toLowerCase()
-      .replace(/[^a-z0-9]/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/^-|-$/g, '');
-    
-    console.log('Slug gerado:', slug);
-    console.log('Dados finais:', { ...courseForm, slug });
-    
-    createCourseMutation.mutate({ ...courseForm, slug });
   };
 
-  const handleUpdateCourse = (course: Course) => {
+  const handleUpdateCourse = async (course: Course) => {
     if (!editingCourse) return;
-    updateCourseMutation.mutate({ id: course.id, data: editingCourse });
+    
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`/api/admin/courses/${course.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editingCourse)
+      });
+
+      if (response.ok) {
+        const updatedCourse = await response.json();
+        setCourses(courses.map(c => c.id === course.id ? updatedCourse : c));
+        setEditingCourse(null);
+        toast({ title: "Curso atualizado com sucesso!" });
+      } else {
+        throw new Error('Erro ao atualizar curso');
+      }
+    } catch (error: any) {
+      toast({ 
+        title: "Erro ao atualizar curso", 
+        description: error.message,
+        variant: "destructive" 
+      });
+    }
   };
 
-  const handleDeleteCourse = (id: number) => {
-    if (confirm('Tem certeza que deseja deletar este curso?')) {
-      deleteCourseMutation.mutate(id);
+  const handleDeleteCourse = async (id: number) => {
+    if (!confirm('Tem certeza que deseja deletar este curso?')) return;
+    
+    try {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`/api/admin/courses/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.ok) {
+        setCourses(courses.filter(c => c.id !== id));
+        toast({ title: "Curso deletado com sucesso!" });
+      } else {
+        throw new Error('Erro ao deletar curso');
+      }
+    } catch (error: any) {
+      toast({ 
+        title: "Erro ao deletar curso", 
+        description: error.message,
+        variant: "destructive" 
+      });
     }
   };
 
@@ -162,127 +259,93 @@ export default function AdminCourses() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            {/* Criar Novo Curso */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Formulário de Criação */}
             <Card className="bg-gray-900/50 border-amber-600/30">
               <CardHeader>
                 <CardTitle className="text-amber-400 flex items-center">
                   <Plus className="w-5 h-5 mr-2" />
-                  Criar Novo Curso
+                  Forjar Novo Cursus
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleCreateCourse} className="space-y-4">
                   <div>
-                    <Label htmlFor="title">Título *</Label>
+                    <Label htmlFor="title">Título do Curso</Label>
                     <Input
                       id="title"
                       value={courseForm.title}
                       onChange={(e) => setCourseForm({...courseForm, title: e.target.value})}
-                      className="bg-gray-800 border-gray-600"
+                      required
+                      className="bg-black/30 border-gray-600"
                     />
                   </div>
-                  
+
                   <div>
-                    <Label htmlFor="slug">Slug</Label>
+                    <Label htmlFor="slug">Slug (opcional)</Label>
                     <Input
                       id="slug"
                       value={courseForm.slug}
                       onChange={(e) => setCourseForm({...courseForm, slug: e.target.value})}
-                      className="bg-gray-800 border-gray-600"
-                      placeholder="Auto-gerado se vazio"
+                      className="bg-black/30 border-gray-600"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="description">Descrição *</Label>
+                    <Label htmlFor="description">Descrição</Label>
                     <Textarea
                       id="description"
                       value={courseForm.description}
                       onChange={(e) => setCourseForm({...courseForm, description: e.target.value})}
-                      className="bg-gray-800 border-gray-600"
-                      rows={3}
+                      required
+                      className="bg-black/30 border-gray-600"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="image_url">URL da Imagem</Label>
-                    <Input
-                      id="image_url"
-                      value={courseForm.image_url}
-                      onChange={(e) => setCourseForm({...courseForm, image_url: e.target.value})}
-                      className="bg-gray-800 border-gray-600"
-                      placeholder="https://..."
-                    />
+                    <Label htmlFor="course_section_id">Seção do Curso</Label>
+                    <Select 
+                      value={courseForm.course_section_id.toString()} 
+                      onValueChange={(value) => setCourseForm({...courseForm, course_section_id: parseInt(value)})}
+                    >
+                      <SelectTrigger className="bg-black/30 border-gray-600">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {courseSections.map((section) => (
+                          <SelectItem key={section.id} value={section.id.toString()}>
+                            {section.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="required_role">Role Necessário</Label>
-                      <Select value={courseForm.required_role} onValueChange={(value) => setCourseForm({...courseForm, required_role: value})}>
-                        <SelectTrigger className="bg-gray-800 border-gray-600">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="buscador">Buscador</SelectItem>
-                          <SelectItem value="iniciado">Iniciado</SelectItem>
-                          <SelectItem value="portador_veu">Portador do Véu</SelectItem>
-                          <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
-                          <SelectItem value="guardiao_nome">Guardião do Nome Perdido</SelectItem>
-                          <SelectItem value="arauto_queda">Arauto da Queda</SelectItem>
-                          <SelectItem value="portador_coroa">Portador da Coroa Flamejante</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="course_section">Seção</Label>
-                      <Select value={courseForm.course_section_id.toString()} onValueChange={(value) => setCourseForm({...courseForm, course_section_id: parseInt(value)})}>
-                        <SelectTrigger className="bg-gray-800 border-gray-600">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {courseSections.map((section) => (
-                            <SelectItem key={section.id} value={section.id.toString()}>
-                              {section.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="price">Preço (R$)</Label>
+                      <Label htmlFor="price">Preço</Label>
                       <Input
                         id="price"
                         type="number"
                         value={courseForm.price}
-                        onChange={(e) => setCourseForm({...courseForm, price: parseFloat(e.target.value) || 0})}
-                        className="bg-gray-800 border-gray-600"
+                        onChange={(e) => setCourseForm({...courseForm, price: parseFloat(e.target.value)})}
+                        className="bg-black/30 border-gray-600"
                       />
                     </div>
-                    
                     <div className="flex items-center space-x-2 pt-6">
                       <input
                         type="checkbox"
                         id="is_paid"
                         checked={courseForm.is_paid}
                         onChange={(e) => setCourseForm({...courseForm, is_paid: e.target.checked})}
-                        className="rounded"
                       />
                       <Label htmlFor="is_paid">Curso Pago</Label>
                     </div>
                   </div>
 
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-amber-600 hover:bg-amber-700 text-black"
-                    disabled={createCourseMutation.isPending}
-                  >
-                    {createCourseMutation.isPending ? 'Criando...' : 'Criar Curso'}
+                  <Button type="submit" className="w-full bg-amber-600 hover:bg-amber-700 text-black font-bold">
+                    <Save className="w-4 h-4 mr-2" />
+                    Forjar Cursus
                   </Button>
                 </form>
               </CardContent>
@@ -293,55 +356,57 @@ export default function AdminCourses() {
               <CardHeader>
                 <CardTitle className="text-amber-400 flex items-center">
                   <BookOpen className="w-5 h-5 mr-2" />
-                  Cursos Existentes
+                  Cursus Existentes ({courses.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 {loading ? (
-                  <div className="text-center py-8">Carregando...</div>
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400 mx-auto"></div>
+                    <p className="mt-2 text-gray-400">Carregando cursus...</p>
+                  </div>
                 ) : (
                   <div className="space-y-4 max-h-96 overflow-y-auto">
                     {courses.map((course) => (
-                      <div key={course.id} className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                      <div key={course.id} className="p-4 bg-black/30 rounded-lg border border-gray-700">
                         <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h3 className="font-semibold text-amber-300">{course.title}</h3>
-                            <p className="text-sm text-gray-400">{course.description}</p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <Badge variant="outline" style={{ borderColor: course.course_sections?.color }}>
-                                {course.course_sections?.name}
-                              </Badge>
-                              <Badge variant={course.is_paid ? "default" : "secondary"}>
-                                {course.is_paid ? `R$ ${course.price}` : 'Gratuito'}
-                              </Badge>
-                            </div>
-                          </div>
+                          <h3 className="font-semibold text-amber-300">{course.title}</h3>
                           <div className="flex gap-2">
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => setLocation(`/admin-modules?course=${course.id}`)}
-                              className="text-blue-400 border-blue-400"
-                            >
-                              <FileText className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
                               onClick={() => setEditingCourse(course)}
-                              className="text-amber-400 border-amber-400"
+                              className="text-blue-400 border-blue-400 hover:bg-blue-400/10"
                             >
-                              <Edit className="w-4 h-4" />
+                              <Edit className="w-3 h-3" />
                             </Button>
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => handleDeleteCourse(course.id)}
-                              className="text-red-400 border-red-400"
+                              className="text-red-400 border-red-400 hover:bg-red-400/10"
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3 h-3" />
                             </Button>
                           </div>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-2">{course.description}</p>
+                        <div className="flex justify-between items-center">
+                          <Badge 
+                            variant="outline" 
+                            className="text-xs"
+                            style={{ 
+                              color: course.course_sections?.color,
+                              borderColor: course.course_sections?.color 
+                            }}
+                          >
+                            {course.course_sections?.name}
+                          </Badge>
+                          {course.is_paid && (
+                            <span className="text-green-400 text-sm font-medium">
+                              R$ {course.price.toFixed(2)}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -353,8 +418,8 @@ export default function AdminCourses() {
 
           {/* Modal de Edição */}
           {editingCourse && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-              <Card className="bg-gray-900 border-amber-600/30 max-w-md w-full mx-4">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <Card className="bg-gray-900 border-amber-600/30 w-full max-w-md mx-4">
                 <CardHeader>
                   <CardTitle className="text-amber-400">Editar Curso</CardTitle>
                 </CardHeader>
@@ -364,7 +429,7 @@ export default function AdminCourses() {
                     <Input
                       value={editingCourse.title}
                       onChange={(e) => setEditingCourse({...editingCourse, title: e.target.value})}
-                      className="bg-gray-800 border-gray-600"
+                      className="bg-black/30 border-gray-600"
                     />
                   </div>
                   <div>
@@ -372,25 +437,21 @@ export default function AdminCourses() {
                     <Textarea
                       value={editingCourse.description}
                       onChange={(e) => setEditingCourse({...editingCourse, description: e.target.value})}
-                      className="bg-gray-800 border-gray-600"
-                      rows={3}
+                      className="bg-black/30 border-gray-600"
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => setEditingCourse(null)}
+                    >
+                      Cancelar
+                    </Button>
                     <Button
                       onClick={() => handleUpdateCourse(editingCourse)}
                       className="bg-amber-600 hover:bg-amber-700 text-black"
-                      disabled={updateCourseMutation.isPending}
                     >
-                      <Save className="w-4 h-4 mr-2" />
                       Salvar
-                    </Button>
-                    <Button
-                      onClick={() => setEditingCourse(null)}
-                      variant="outline"
-                      className="border-gray-600"
-                    >
-                      Cancelar
                     </Button>
                   </div>
                 </CardContent>
