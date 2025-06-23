@@ -200,16 +200,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Cursos do usuário
-  app.get("/api/user/courses", authenticateToken, async (req: any, res) => {
-    try {
-      const courses = await supabaseServiceNew.getUserCourses(req.user.id);
-      res.json(courses);
-    } catch (error: any) {
-      console.error("Error fetching user courses:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
-    }
-  });
+  // Rota removida - implementada mais abaixo com progresso
 
   // Grimórios do usuário
   app.get("/api/user/grimoires", authenticateToken, async (req: any, res) => {
@@ -2306,6 +2297,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error fetching courses:", error);
       console.error("Error stack:", error.stack);
       res.status(500).json({ error: "Erro interno do servidor", details: error.message });
+    }
+  });
+
+  // Buscar cursos do usuário (com progresso)
+  app.get("/api/user/courses", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      console.log('=== API USER COURSES CALLED ===');
+      console.log('User ID:', userId);
+      
+      const { data: coursesWithProgress, error } = await supabaseServiceNew.getClient()
+        .from('user_course_progress')
+        .select(`
+          *,
+          courses!course_id (
+            id,
+            title,
+            slug,
+            description,
+            image_url,
+            required_role,
+            is_paid,
+            price,
+            course_section_id,
+            course_sections!course_section_id (
+              name,
+              color
+            )
+          )
+        `)
+        .eq('user_id', userId)
+        .order('started_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching user courses:', error);
+        throw error;
+      }
+
+      console.log('Courses with progress:', coursesWithProgress?.length || 0);
+      res.json(coursesWithProgress || []);
+    } catch (error: any) {
+      console.error("Error fetching user courses:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
 

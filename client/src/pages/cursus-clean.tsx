@@ -139,7 +139,8 @@ export default function CursusClean() {
   // Função para determinar o estado do curso
   const getCourseState = (course: Course) => {
     const progress = userProgress.find(p => p.course_id === course.id);
-    const progressPercentage = progress ? parseFloat(progress.progress_percentage?.toString() || '0') : 0;
+    // Calcular progresso baseado nos módulos (se existir progresso)
+    const progressPercentage = progress ? (progress.current_module / 10) * 100 : 0; // Estimativa
     
     // Admin tem acesso total
     const isAdmin = user?.email === 'admin@templodoabismo.com.br' || user?.role === 'magus_supremo';
@@ -155,8 +156,8 @@ export default function CursusClean() {
       };
     }
 
-    // Verificar se tem progresso
-    if (progressPercentage > 0) {
+    // Verificar se tem progresso (qualquer progresso iniciado)
+    if (progress) {
       return { 
         text: 'Continuar', 
         action: 'continue', 
