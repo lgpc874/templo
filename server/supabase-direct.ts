@@ -1,5 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Carregar variáveis de ambiente
+import dotenv from "dotenv";
+dotenv.config();
+
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -13,6 +17,16 @@ export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, s
 
 if (supabase) {
   console.log('✅ Supabase conectado com credenciais válidas');
+  
+  // Teste inicial de conectividade
+  supabase.from('users').select('count', { count: 'exact', head: true })
+    .then(({ data, error }) => {
+      if (error) {
+        console.error('❌ Erro na conexão inicial com Supabase:', error.message);
+      } else {
+        console.log('🔄 Conexão com Supabase verificada - banco acessível');
+      }
+    });
 } else {
   console.warn('⚠️  Aguardando configuração das credenciais do Supabase no arquivo .env');
 }

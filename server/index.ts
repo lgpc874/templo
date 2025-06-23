@@ -1,6 +1,15 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+
+// Carregar variáveis de ambiente
+import dotenv from "dotenv";
+dotenv.config();
+
+console.log('=== VERIFICAÇÃO DE VARIÁVEIS DE AMBIENTE ===');
+console.log('SUPABASE_URL:', process.env.SUPABASE_URL ? 'Configurada' : 'Não configurada');
+console.log('SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Configurada' : 'Não configurada');
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Configurada' : 'Não configurada');
 import { SupabaseDirect } from "./supabase-direct";
 
 const app = express();

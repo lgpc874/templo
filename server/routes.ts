@@ -165,6 +165,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // =====================
+  // ROTAS DE TESTE SUPABASE
+  // =====================
+
+  app.get("/api/test-supabase", async (req, res) => {
+    try {
+      console.log('=== TESTE DE CONEXÃO SUPABASE ===');
+      const result = await SupabaseDirect.testConnection();
+      console.log('Resultado do teste:', result);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error testing Supabase:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // =====================
   // ROTAS DE COURSE SECTIONS
   // =====================
 
