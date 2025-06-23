@@ -13,6 +13,11 @@ import LectorGrimorio from "@/pages/lector-grimorio";
 import Bibliotheca from "@/pages/bibliotheca";
 import OracleChat from "@/pages/oracle-chat";
 import AdminOraculum from "@/pages/admin-oraculum";
+import OracleEspelhoNegro from "@/pages/oracle-espelho-negro";
+import OracleTarotInfernal from "@/pages/oracle-tarot-infernal";
+import OracleChamasInfernais from "@/pages/oracle-chamas-infernais";
+import OracleAguasSombrias from "@/pages/oracle-aguas-sombrias";
+import OracleGuardiaoAbismo from "@/pages/oracle-guardiao-abismo";
 
 import Profilus from "@/pages/profilus";
 import Initiatio from "@/pages/initiatio";
@@ -95,7 +100,12 @@ function App() {
                 <Route path="/admin/libri" component={AdminLibri} />
                 <Route path="/admin/oraculum" component={AdminOraculum} />
                 <Route path="/oraculum" component={Oraculum} />
-                <Route path="/oraculum/:id" component={OracleChat} />
+                <Route path="/speculum-nigrum" component={OracleEspelhoNegro} />
+                <Route path="/tarotum-infernalis" component={OracleTarotInfernal} />
+                <Route path="/flammae-infernales" component={OracleChamasInfernais} />
+                <Route path="/aquae-tenebrosae" component={OracleAguasSombrias} />
+                <Route path="/custos-abyssi" component={OracleGuardiaoAbismo} />
+                <Route path="/oracle-chat" component={OracleChat} />
                 <Route path="/vox-pluma" component={VoxPluma} />
                 <Route path="/de-templo" component={DeTemplo} />
                 <Route>

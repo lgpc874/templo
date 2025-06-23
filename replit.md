@@ -66,8 +66,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - ✅ Editor completo de módulos com requisitos de conclusão
 - ✅ Sistema de bloqueio por submissão inicial
 - ✅ Componentes interativos para conclusão de módulos
-- ⏳ Aguardando execução do SQL para adicionar colunas sequenciais
-- ⏳ Teste do sistema completo de módulos interativos
+- ✅ Sistema Oraculum com 5 oráculos em nomes latinos funcionais
+- ✅ Páginas individuais para cada oráculo criadas
 
 ## Preferências do Usuário
 - Comunicação direta, sem enrolação
@@ -121,6 +121,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 21:22**: Sistema de pagamento e roles configurável por oráculo
 - **23/06/2025 21:22**: Página de administração completa para oráculos
 - **23/06/2025 21:22**: APIs completas para sessões, mensagens e configurações
+- **23/06/2025 22:10**: Páginas individuais dos oráculos com nomes latinos implementadas
+- **23/06/2025 22:10**: 5 botões funcionais na página Oraculum direcionando para consultas específicas
 
 ## Sistema Oraculum Implementado ✅
 - **5 Oráculos Criados**: Espelho Negro, Tarot Infernal, Chamas Infernais, Águas Sombrias, Guardião do Abismo
