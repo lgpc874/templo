@@ -80,13 +80,9 @@ export default function AdminModules() {
 
   // Buscar cursos
   const { data: courses = [] } = useQuery<Course[]>({
-    queryKey: ['/api/courses'],
+    queryKey: ['/api/admin/courses'],
     queryFn: async () => {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/courses', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error('Erro ao buscar cursos');
+      const response = await apiRequest('/api/admin/courses');
       return response.json();
     }
   });
@@ -95,11 +91,8 @@ export default function AdminModules() {
   const { data: modules = [], isLoading: modulesLoading } = useQuery<Module[]>({
     queryKey: ['/api/courses', selectedCourseId, 'modules'],
     queryFn: async () => {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch(`/api/courses/${selectedCourseId}/modules`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error('Erro ao buscar módulos');
+      if (!selectedCourseId) return [];
+      const response = await apiRequest(`/api/courses/${selectedCourseId}/modules`);
       return response.json();
     },
     enabled: !!selectedCourseId
@@ -108,10 +101,11 @@ export default function AdminModules() {
   // Mutação para criar módulo
   const createModuleMutation = useMutation({
     mutationFn: async (data: typeof moduleForm & { course_id: number }) => {
-      return apiRequest('/api/admin/modules', {
+      const response = await apiRequest('/api/admin/modules', {
         method: 'POST',
         body: JSON.stringify(data)
       });
+      return response.json();
     },
     onSuccess: () => {
       toast({ 
@@ -137,10 +131,11 @@ export default function AdminModules() {
   // Mutação para atualizar módulo
   const updateModuleMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<Module> }) => {
-      return apiRequest(`/api/admin/modules/${id}`, {
+      const response = await apiRequest(`/api/admin/modules/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
       });
+      return response.json();
     },
     onSuccess: () => {
       toast({ 
@@ -162,9 +157,10 @@ export default function AdminModules() {
   // Mutação para deletar módulo
   const deleteModuleMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/admin/modules/${id}`, {
+      const response = await apiRequest(`/api/admin/modules/${id}`, {
         method: 'DELETE'
       });
+      return response.json();
     },
     onSuccess: () => {
       toast({ 
