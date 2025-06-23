@@ -112,7 +112,7 @@ export default function Profilus() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("cursos");
+  const [activeTab, setActiveTab] = useState("grimorios");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -156,22 +156,7 @@ export default function Profilus() {
     retry: false
   });
 
-  // Buscar cursos
-  const { data: courses = [] } = useQuery<Course[]>({
-    queryKey: ['/api/user/courses'],
-    queryFn: async () => {
-      const token = localStorage.getItem("auth_token");
-      if (!token) throw new Error("Token não encontrado");
-      
-      const response = await fetch('/api/user/courses', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      
-      if (!response.ok) throw new Error(`Erro ${response.status}`);
-      return response.json();
-    },
-    enabled: !!user
-  });
+
 
   // Buscar grimórios
   const { data: grimoires = [] } = useQuery<Grimoire[]>({
@@ -468,13 +453,21 @@ export default function Profilus() {
             </CardContent>
           </Card>
 
+          {/* Botão Meus Cursos */}
+          <div className="mb-6">
+            <Button
+              onClick={() => setLocation('/meus-cursos')}
+              className="w-full sm:w-auto bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-black font-bold py-3 px-6 text-lg border-2 border-amber-500/30 shadow-lg hover:shadow-amber-500/20 transition-all duration-300"
+              style={{ fontFamily: 'Cinzel Decorative' }}
+            >
+              <GraduationCap className="w-5 h-5 mr-3" />
+              Meus Cursos
+            </Button>
+          </div>
+
           {/* Tabs de Conteúdo */}
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-transparent border-0">
-              <TabsTrigger value="cursos" className="data-[state=active]:bg-amber-600/20 data-[state=active]:text-amber-400">
-                <GraduationCap className="w-4 h-4 mr-2" />
-                Cursos
-              </TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 bg-transparent border-0">
               <TabsTrigger value="grimorios" className="data-[state=active]:bg-amber-600/20 data-[state=active]:text-amber-400">
                 <BookOpen className="w-4 h-4 mr-2" />
                 Grimórios
@@ -489,76 +482,7 @@ export default function Profilus() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Aba Cursos */}
-            <TabsContent value="cursos" className="mt-6">
-              <Card className="content-section">
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle className="text-red-700">Seus Cursos</CardTitle>
-                  <Button
-                    onClick={() => setLocation('/meus-cursos')}
-                    variant="outline"
-                    size="sm"
-                    className="text-amber-400 border-amber-400 hover:bg-amber-400 hover:text-black"
-                  >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    Ver Todos os Cursos
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  {courses.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-amber-400 mb-4">
-                        Nenhum curso adquirido ainda.
-                      </p>
-                      <Button
-                        onClick={() => setLocation('/cursus')}
-                        className="bg-amber-600 hover:bg-amber-700 text-black font-semibold"
-                      >
-                        <BookOpen className="w-4 h-4 mr-2" />
-                        Explorar Cursos
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="grid gap-4">
-                      {courses.map((course) => (
-                        <div
-                          key={course.id}
-                          className="flex items-center justify-between p-4 content-section rounded-lg"
-                        >
-                          <div>
-                            <h3 className="text-amber-400 font-medium">{course.titulo}</h3>
-                            {course.progresso !== undefined && (
-                              <div className="mt-2">
-                                <div className="w-48 bg-slate-700 rounded-full h-2">
-                                  <div
-                                    className="bg-amber-500 h-2 rounded-full transition-all"
-                                    style={{ width: `${course.progresso}%` }}
-                                  />
-                                </div>
-                                <p className="text-xs text-amber-400 mt-1">{course.progresso}% concluído</p>
-                              </div>
-                            )}
-                          </div>
-                          <Badge
-                            variant={course.status === 'concluido' ? 'default' : 'outline'}
-                            className={
-                              course.status === 'concluido'
-                                ? 'bg-green-600/20 text-green-400 border-green-500/50'
-                                : course.status === 'em_andamento'
-                                ? 'bg-amber-600/20 text-amber-400 border-amber-500/50'
-                                : 'border-slate-500/50 text-slate-400'
-                            }
-                          >
-                            {course.status === 'concluido' ? 'Concluído' : 
-                             course.status === 'em_andamento' ? 'Em Andamento' : 'Comprado'}
-                          </Badge>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
+
 
             {/* Aba Grimórios */}
             <TabsContent value="grimorios" className="mt-6">
