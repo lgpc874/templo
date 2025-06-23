@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import RichTextEditor from "@/components/rich-text-editor";
@@ -22,7 +25,12 @@ import {
   Scroll,
   Crown,
   Flame,
-  RefreshCw
+  RefreshCw,
+  Settings,
+  Eye,
+  Target,
+  CheckCircle,
+  Zap
 } from "lucide-react";
 
 interface Course {
@@ -74,8 +82,7 @@ export default function AdminModulesFinal() {
     submission_text: '',
     ritual_text: '',
     custom_css: '',
-    submission_position: 'before',
-    completion_requirements: '[]'
+    submission_position: 'before'
   });
 
   // Verificar se é admin
