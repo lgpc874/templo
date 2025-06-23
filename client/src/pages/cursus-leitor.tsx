@@ -216,8 +216,10 @@ export default function CursusLeitor() {
     mutationFn: async (moduleId: number) => {
       const token = localStorage.getItem('auth_token');
       const response = await fetch(`/api/modules/${moduleId}/complete`, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
       if (!response.ok) {
@@ -225,7 +227,8 @@ export default function CursusLeitor() {
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Module completion result:', data);
       queryClient.invalidateQueries({ queryKey: ['/api/user/course-progress'] });
       queryClient.invalidateQueries({ queryKey: ['/api/user/courses'] });
     },

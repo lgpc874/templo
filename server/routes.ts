@@ -399,10 +399,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (existingProgress) {
         // Atualizar progresso existente
-        const updates = {
+        const updates: any = {
           current_module,
-          is_completed,
-          updated_at: new Date().toISOString()
+          is_completed
         };
         
         if (is_completed) {
@@ -425,14 +424,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         result = data;
       } else {
         // Criar novo progresso
-        const progressData = {
+        const progressData: any = {
           user_id: userId,
           course_id,
           current_module,
           is_completed,
-          started_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          started_at: new Date().toISOString()
         };
         
         if (is_completed) {
@@ -505,7 +502,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Completar módulo
-  app.get("/api/modules/:moduleId/complete", authenticateToken, async (req: any, res) => {
+  app.post("/api/modules/:moduleId/complete", authenticateToken, async (req: any, res) => {
     try {
       const moduleId = parseInt(req.params.moduleId);
       const userId = req.user.id;
@@ -513,94 +510,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('=== COMPLETING MODULE ===');
       console.log('User ID:', userId, 'Module ID:', moduleId);
       
-      // Determinar course_id dinamicamente baseado no módulo
-      let courseId = 1; // Default
-      
-      // Buscar módulo para obter course_id correto
-      const { data: moduleData } = await supabase
-        .from('course_modules')
-        .select('course_id, order_number')
-        .eq('id', moduleId)
-        .single();
-      
-      if (moduleData) {
-        courseId = moduleData.course_id;
-      }
-      
-      // Buscar total de módulos do curso
-      const { data: allModules } = await supabase
-        .from('course_modules')
-        .select('id')
-        .eq('course_id', courseId);
-      
-      const totalModules = allModules?.length || 3;
-      const currentModuleOrder = moduleData?.order_number || moduleId;
-      const isLastModule = currentModuleOrder >= totalModules;
-      
-      // Buscar ou criar progresso
-      let { data: currentProgress } = await supabase
+      // Buscar progresso existente
+      const { data: currentProgress } = await supabase
         .from('user_course_progress')
         .select('*')
         .eq('user_id', userId)
-        .eq('course_id', courseId)
+        .eq('course_id', 1)
         .single();
       
       if (!currentProgress) {
-        // Criar progresso inicial
-        const { data: newProgress, error: insertError } = await supabase
-          .from('user_course_progress')
-          .insert({
-            user_id: userId,
-            course_id: courseId,
-            current_module: 1,
-            is_completed: false,
-            started_at: new Date().toISOString(),
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .select()
-          .single();
-          
-        if (insertError) {
-          console.error('Error creating progress:', insertError);
-          return res.status(500).json({ error: "Erro ao criar progresso" });
-        }
-        
-        currentProgress = newProgress;
+        return res.status(404).json({ error: "Progresso não encontrado" });
       }
       
-      // Atualizar progresso
-      const nextModule = isLastModule ? totalModules : Math.max(currentProgress.current_module, currentModuleOrder) + 1;
-      const updates: any = {
-        current_module: nextModule,
-        is_completed: isLastModule,
-        updated_at: new Date().toISOString()
-      };
+      // Calcular próximo módulo
+      const totalModules = 4;
+      const nextModule = Math.max(currentProgress.current_module, moduleId) + 1;
+      const isLastModule = nextModule > totalModules;
+      const finalModule = isLastModule ? totalModules : nextModule;
       
-      if (isLastModule) {
-        updates.completed_at = new Date().toISOString();
-      }
+      console.log(`Current: ${currentProgress.current_module}, Next: ${finalModule}, IsLast: ${isLastModule}`);
       
-      const { data: updatedProgress, error: updateError } = await supabase
-        .from('user_course_progress')
-        .update(updates)
-        .eq('user_id', userId)
-        .eq('course_id', courseId)
-        .select()
-        .single();
+      // Usar raw SQL para evitar problemas de schema cache
+      const { data: updatedProgress, error: updateError } = await supabase.rpc('update_course_progress', {
+        p_user_id: userId,
+        p_course_id: 1,
+        p_current_module: finalModule,
+        p_is_completed: isLastModule
+      });
         
       if (updateError) {
-        console.error('Error updating progress:', updateError);
-        return res.status(500).json({ error: "Erro ao atualizar progresso" });
+        console.error('RPC Error:', updateError);
+        // Fallback para update direto
+        try {
+          const { data: fallbackData, error: fallbackError } = await supabase
+            .from('user_course_progress')
+            .update({
+              current_module: finalModule,
+              is_completed: isLastModule
+            })
+            .eq('user_id', userId)
+            .eq('course_id', 1)
+            .select()
+            .single();
+            
+          if (fallbackError) {
+            console.error('Fallback update error:', fallbackError);
+            return res.status(500).json({ error: "Erro ao atualizar progresso" });
+          }
+          
+          res.json({ success: true, isLastModule, updatedProgress: fallbackData });
+        } catch (fallbackErr) {
+          return res.status(500).json({ error: "Erro interno do servidor" });
+        }
+      } else {
+        res.json({ success: true, isLastModule, updatedProgress });
       }
       
-      console.log('Module completed successfully. Is last module:', isLastModule);
-      console.log('Updated progress:', updatedProgress);
-      
-      res.json({ success: true, isLastModule, updatedProgress });
     } catch (error: any) {
       console.error("Error completing module:", error);
-      res.status(500).json({ error: "Erro interno do servidor", details: error.message });
+      res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
 
