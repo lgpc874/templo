@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +22,8 @@ import {
   Eye,
   EyeOff,
   Mail,
-  Lock
+  Lock,
+  ExternalLink
 } from "lucide-react";
 
 interface UserProfile {
@@ -108,6 +110,7 @@ const getRoleColorFromHex = (hexColor: string) => {
 
 export default function Profilus() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("cursos");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -489,14 +492,32 @@ export default function Profilus() {
             {/* Aba Cursos */}
             <TabsContent value="cursos" className="mt-6">
               <Card className="content-section">
-                <CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
                   <CardTitle className="text-red-700">Seus Cursos</CardTitle>
+                  <Button
+                    onClick={() => setLocation('/meus-cursos')}
+                    variant="outline"
+                    size="sm"
+                    className="text-amber-400 border-amber-400 hover:bg-amber-400 hover:text-black"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    Ver Todos os Cursos
+                  </Button>
                 </CardHeader>
                 <CardContent>
                   {courses.length === 0 ? (
-                    <p className="text-amber-400 text-center py-8">
-                      Nenhum curso adquirido ainda.
-                    </p>
+                    <div className="text-center py-8">
+                      <p className="text-amber-400 mb-4">
+                        Nenhum curso adquirido ainda.
+                      </p>
+                      <Button
+                        onClick={() => setLocation('/cursus')}
+                        className="bg-amber-600 hover:bg-amber-700 text-black font-semibold"
+                      >
+                        <BookOpen className="w-4 h-4 mr-2" />
+                        Explorar Cursos
+                      </Button>
+                    </div>
                   ) : (
                     <div className="grid gap-4">
                       {courses.map((course) => (
