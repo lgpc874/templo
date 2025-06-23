@@ -91,8 +91,8 @@ export default function OracleEspelhoNegro() {
 
           {/* Header */}
           <div className="relative z-10 border-b border-purple-500/30 bg-transparent">
-            <div className="max-w-4xl mx-auto px-4 py-8">
-              <div className="flex items-center justify-between mb-6">
+            <div className="max-w-4xl mx-auto px-4 py-4">
+              <div className="flex items-center justify-between mb-4">
                 <Link href="/oraculum">
                   <Button size="sm" className="bg-purple-500 hover:bg-purple-600 text-black font-medium">
                     <ArrowLeft className="w-4 h-4 mr-2" />
@@ -102,21 +102,16 @@ export default function OracleEspelhoNegro() {
               </div>
               
               <div className="text-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-500/50 shadow-lg shadow-purple-900/50">
-                  <Eye className="w-12 h-12 text-purple-400" />
+                <div className="w-16 h-16 bg-transparent rounded-full flex items-center justify-center mx-auto mb-3 border border-purple-500/50">
+                  <Eye className="w-8 h-8 text-purple-400" />
                 </div>
                 
-                <h1 className="text-4xl font-bold text-purple-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+                <h1 className="text-2xl font-bold text-purple-400 mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
                   Speculum Nigrum
                 </h1>
-                <p className="text-ritualistic-beige leading-relaxed max-w-xl mx-auto text-sm" style={{ fontFamily: 'EB Garamond' }}>
-                  Revela as verdades ocultas através das sombras refletidas da alma
+                <p className="text-ritualistic-beige text-xs max-w-md mx-auto" style={{ fontFamily: 'EB Garamond' }}>
+                  Revela as verdades ocultas através das sombras
                 </p>
-                
-                {/* Linha decorativa */}
-                <div className="flex justify-center mt-6">
-                  <div className="h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent w-64"></div>
-                </div>
               </div>
             </div>
           </div>
