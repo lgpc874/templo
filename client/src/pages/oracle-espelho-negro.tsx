@@ -71,24 +71,8 @@ export default function OracleEspelhoNegro() {
   return (
     <PageTransition>
       <ContentProtection enableScreenshotProtection>
-        <div className="min-h-screen bg-black text-white relative overflow-hidden">
-          {/* Background rotating seal */}
-          <div className="fixed inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-            <img 
-              src="https://i.postimg.cc/g20gqmdX/IMG-20250527-182235-1.png" 
-              alt="Templo do Abismo" 
-              className="w-96 h-96 opacity-5 animate-spin"
-              style={{ animationDuration: '120s' }}
-            />
-          </div>
-
-          {/* Efeitos místicos de fundo */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-20 left-20 w-96 h-96 bg-golden-amber/5 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-20 right-20 w-80 h-80 bg-purple-900/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-            <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-golden-amber/3 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-          </div>
-
+        <div className="min-h-screen bg-transparent">
+          
           {/* Botão Voltar */}
           <div className="relative z-10 p-4">
             <Link href="/oraculum">
@@ -101,22 +85,24 @@ export default function OracleEspelhoNegro() {
 
           {/* Conteúdo Principal */}
           <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
-            <div className="border border-purple-500/50 rounded-lg p-6 shadow-2xl shadow-purple-900/30">
-              <div className="text-center pb-6">
-                <div className="w-20 h-20 bg-transparent rounded-full flex items-center justify-center mx-auto mb-6 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
+            <div className="border border-purple-500/50 rounded-lg p-6 shadow-1xl shadow-purple-900/30 bg-black">
+              <div className="text-center pb-6 bg-black">
+                <div className="w-20 h-20 bg-black rounded-full flex items-center justify-center mx-auto mb-6 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
                   <Eye className="w-10 h-10 text-purple-400" />
                   <Sparkles className="w-5 h-5 text-purple-300 absolute -top-2 -right-2 animate-pulse" />
                 </div>
                 
                 <CardTitle className="text-2xl text-purple-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
-                  Iniciar Consulta
+                  Speculum Nigrum
+            
                 </CardTitle>
+                <p><div className="h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent w-48 mx-auto"></div></p>
                 <CardDescription className="text-ritualistic-beige text-sm max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
                   Para consultar o Speculum Nigrum, ofereça sua identidade verdadeira e o momento de sua manifestação neste plano.
                 </CardDescription>
                 
                 {/* Citação mística */}
-                <div className="mt-6 p-3 bg-transparent border-l-2 border-purple-500/50 rounded-r">
+                <div className="mt-6 p-3 bg-black border-l-2 border-purple-500/50 rounded-r">
                   <p className="text-purple-300 italic text-sm" style={{ fontFamily: 'EB Garamond' }}>
                     "Veritas in tenebris revelatur"
                   </p>
@@ -159,7 +145,7 @@ export default function OracleEspelhoNegro() {
                   <Button
                     onClick={handleStartConsultation}
                     disabled={!userName || !birthDate || isStarting}
-                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-sm transition-all duration-300 disabled:opacity-50 shadow-lg shadow-purple-900/50"
+                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-black font-bold text-sm transition-all duration-300 disabled:opacity-50 shadow-lg shadow-purple-900/50"
                     style={{ fontFamily: 'Cinzel' }}
                   >
                     {isStarting ? (
