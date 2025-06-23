@@ -21,6 +21,8 @@ import RitualInicial from "@/pages/ritual-inicial";
 import CursusLeitor from "@/pages/cursus-leitor";
 import MeusCursos from "@/pages/meus-cursos";
 import Admin from "@/pages/admin";
+import AdminCourses from "@/pages/admin-courses";
+import AdminModules from "@/pages/admin-modules";
 import Oraculum from "@/pages/oraculum";
 import VoxPluma from "@/pages/vox-pluma";
 import DeTemplo from "@/pages/de-templo";
@@ -85,6 +87,8 @@ function App() {
                 <Route path="/cursus-leitor/:slug" component={CursusLeitor} />
                 <Route path="/meus-cursos" component={MeusCursos} />
                 <Route path="/admin" component={Admin} />
+                <Route path="/admin-courses" component={AdminCourses} />
+                <Route path="/admin-modules" component={AdminModules} />
                 <Route path="/oraculum" component={Oraculum} />
                 <Route path="/vox-pluma" component={VoxPluma} />
                 <Route path="/de-templo" component={DeTemplo} />
