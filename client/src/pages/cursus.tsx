@@ -50,6 +50,16 @@ interface CourseSection {
 
 interface UserCourseProgress {
   id: number;
+  user_id: number;
+  course_id: number;
+  current_module: number;
+  is_completed: boolean;
+  started_at: string;
+  completed_at?: string;
+}
+
+interface UserCourseProgress {
+  id: number;
   course_id: number;
   current_module: number;
   is_completed: boolean;
@@ -162,14 +172,27 @@ export default function Cursus() {
     // Admin tem acesso total
     const isAdmin = user?.email === 'admin@templodoabismo.com.br' || user?.role === 'magus_supremo';
     
+    // Verificar se o curso foi concluído
+    if (progress?.is_completed) {
+      return { 
+        text: 'Concluído', 
+        action: 'completed', 
+        isLocked: false,
+        progress: 100,
+        icon: CheckCircle,
+        variant: 'secondary' as const
+      };
+    }
+    
     // Verificar se tem progresso (qualquer progresso iniciado)
-    if (progress) {
+    if (progress && progress.current_module > 1) {
       return { 
         text: 'Continuar', 
         action: 'continue', 
         isLocked: false,
         progress: (progress.current_module / 10) * 100, // Estimativa
-        icon: Play
+        icon: Play,
+        variant: 'default' as const
       };
     }
 
@@ -179,11 +202,12 @@ export default function Cursus() {
     
     if (isAdmin || userRoleLevel >= courseRoleLevel) {
       return { 
-        text: 'Iniciar', 
+        text: 'Ver Curso', 
         action: 'start', 
         isLocked: false,
         progress: 0,
-        icon: Play
+        icon: BookOpen,
+        variant: 'default' as const
       };
     }
 
@@ -193,7 +217,8 @@ export default function Cursus() {
       action: 'locked', 
       isLocked: true,
       progress: 0,
-      icon: Lock
+      icon: Lock,
+      variant: 'outline' as const
     };
   };
 
@@ -290,6 +315,8 @@ export default function Cursus() {
           {/* Grid de Cursos */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeSectionCourses.map((course) => {
+              const courseState = getCourseState(course);
+              const progress = userProgress.find(p => p.course_id === course.id);
               
               return (
                 <Card 
@@ -323,6 +350,7 @@ export default function Cursus() {
                           )}
                         </div>
                       </div>
+                      <courseState.icon className="w-5 h-5 text-amber-400" />
                     </div>
                   </CardHeader>
                   
@@ -342,17 +370,52 @@ export default function Cursus() {
                       {course.description}
                     </p>
 
+                    {/* Barra de progresso se houver progresso */}
+                    {progress && progress.current_module > 1 && (
+                      <div className="mb-4">
+                        <div className="flex justify-between text-xs text-gray-400 mb-1">
+                          <span>Progresso</span>
+                          <span>Módulo {progress.current_module}</span>
+                        </div>
+                        <Progress 
+                          value={courseState.progress} 
+                          className="h-2"
+                        />
+                      </div>
+                    )}
                     
-                    <Link href={`/curso-detalhe/${course.id}`}>
+                    {courseState.action === 'locked' ? (
                       <Button 
-                        className="w-full text-white font-semibold"
-                        style={{
-                          backgroundColor: course.course_sections?.color
-                        }}
+                        variant={courseState.variant}
+                        className="w-full"
+                        disabled
                       >
-                        Ver Curso
+                        <Lock className="w-4 h-4 mr-2" />
+                        {courseState.text}
                       </Button>
-                    </Link>
+                    ) : courseState.action === 'completed' ? (
+                      <Link href={`/cursus-leitor/${course.slug}`}>
+                        <Button 
+                          variant="secondary"
+                          className="w-full text-green-400 border-green-400 hover:bg-green-400/10"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Concluído
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link href={`/cursus-leitor/${course.slug}`}>
+                        <Button 
+                          className="w-full text-white font-semibold"
+                          style={{
+                            backgroundColor: course.course_sections?.color
+                          }}
+                        >
+                          <courseState.icon className="w-4 h-4 mr-2" />
+                          {courseState.text}
+                        </Button>
+                      </Link>
+                    )}
                   </CardContent>
                 </Card>
               );
