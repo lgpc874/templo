@@ -19,7 +19,7 @@ import {
   type InsertUserCourseProgress,
   type InsertSubmission,
   type UserCourseProgress,
-} from "@shared/schema-new";
+} from "@shared/schema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { supabaseService } from "./supabase-service";
@@ -2553,7 +2553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Criar novo progresso
-      const progressData: InsertUserCourseProgress = {
+      const progressData = {
         user_id: userId,
         course_id: courseId,
         current_module: 1,
@@ -2622,7 +2622,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Submissão já realizada" });
       }
 
-      const submissionData: InsertSubmission = {
+      const submissionData = {
         user_id: req.user.id,
         module_id: moduleId,
         text_response,

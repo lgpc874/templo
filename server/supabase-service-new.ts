@@ -27,7 +27,7 @@ import type {
   InsertBadge,
   UserBadge,
   InsertUserBadge
-} from '@shared/schema-new';
+} from '@shared/schema';
 
 // Inicializar OpenAI (opcional)
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
