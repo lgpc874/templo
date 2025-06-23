@@ -30,7 +30,9 @@ function authenticateToken(req: any, res: Response, next: NextFunction) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+    // Usar a chave JWT correta do ambiente
+    const jwtSecret = process.env.JWT_SECRET || process.env.SUPABASE_JWT_SECRET || 'fallback-key';
+    const decoded = jwt.verify(token, jwtSecret) as any;
     console.log('Token decodificado:', decoded);
     req.user = decoded;
     
@@ -625,13 +627,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Validação de admin passou, inserindo no Supabase...');
       
-      const course = await SupabaseDirect.createCourse(req.body);
+      // Criar curso usando conexão direta do Supabase
+      const courseData = {
+        title: req.body.title,
+        slug: req.body.slug,
+        description: req.body.description,
+        required_role: req.body.required_role || 'buscador',
+        price: req.body.price || 0,
+        is_paid: req.body.is_paid || false,
+        is_published: true,
+        course_section_id: req.body.course_section_id || 1,
+        sort_order: req.body.sort_order || 1,
+        image_url: req.body.image_url || null
+      };
+
+      console.log('Dados para inserção:', courseData);
+
+      // Usar SupabaseDirect que já tem a conexão correta
+      const course = await SupabaseDirect.createCourse(courseData);
 
       if (!course) {
-        console.error('Falha retornada pela função createCourse');
         throw new Error('Falha ao criar curso no Supabase');
       }
-      
+
       console.log('Curso criado com sucesso:', course);
       res.json(course);
     } catch (error: any) {
