@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
+import { useQueryClient } from "@tanstack/react-query";
 import { PageTransition } from "@/components/page-transition";
 import ContentProtection from "@/components/content-protection";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -141,11 +142,12 @@ export default function CursusNew() {
 
 
   // Buscar todos os cursos
-  const { data: courses = [], isLoading: coursesLoading } = useQuery<Course[]>({
+  const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useQuery<Course[]>({
     queryKey: ['/api/courses'],
-    retry: false,
+    retry: 1,
     enabled: !!user,
     staleTime: 0,
+    refetchOnMount: true,
   });
 
   // Buscar progresso do usuário
@@ -170,19 +172,44 @@ export default function CursusNew() {
 
   const userRoleLevel = getRoleLevel(user.role || 'buscador');
 
+  // Use manual courses if available, fallback to query courses
+  const activeCourses = manualCourses.length > 0 ? manualCourses : courses;
+  
   // Agrupar cursos por role
   const coursesByRole = courseSections.reduce((acc, section) => {
-    acc[section.required_role] = courses.filter(course => course.required_role === section.required_role);
+    acc[section.required_role] = activeCourses.filter(course => course.required_role === section.required_role);
     return acc;
   }, {} as Record<string, Course[]>);
 
-  // Debug log - only show in development
-  if (import.meta.env.DEV) {
-    console.log('Courses data:', courses);
-    console.log('Course sections:', courseSections);
-    console.log('Courses by role:', coursesByRole);
-    console.log('User role:', user?.role);
-  }
+  // Manual course fetch to bypass query cache issues
+  useEffect(() => {
+    if (user && courses.length === 0) {
+      const fetchCourses = async () => {
+        try {
+          const token = localStorage.getItem('auth_token');
+          const response = await fetch('/api/courses', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.ok) {
+            const coursesData = await response.json();
+            console.log('Manual fetch succeeded:', coursesData.length, 'courses');
+            setManualCourses(coursesData);
+          }
+        } catch (error) {
+          console.error('Manual fetch failed:', error);
+        }
+      };
+      fetchCourses();
+    }
+  }, [user, courses.length]);
+
+  // Debug log - show key information
+  console.log('Query courses length:', courses.length);
+  console.log('Manual courses length:', manualCourses.length);
+  console.log('Active courses length:', activeCourses.length);
+  console.log('User role:', user?.role);
 
   // Encontrar seção ativa - começar com o role do usuário
   useEffect(() => {
