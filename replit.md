@@ -89,6 +89,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 19:33**: Corrigidos problemas de edição e exclusão de módulos
 - **23/06/2025 19:33**: Adicionados logs detalhados para debug das operações CRUD
 - **23/06/2025 19:33**: Implementada sincronização automática após operações
+- **23/06/2025 19:41**: Editor de módulos avançado com abas completamente implementado
+- **23/06/2025 19:41**: Modal de edição substituído por sistema de abas (Conteúdo, Submissão, Conclusão, Preview)
 
 ## Próximos Passos
 1. Executar SQL para adicionar colunas sequenciais
