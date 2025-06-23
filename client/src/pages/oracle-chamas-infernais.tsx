@@ -94,12 +94,9 @@ export default function OracleChamasInfernais() {
                 </div>
                 
                 <div className="flex-1">
-                  <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
-                    Chamas Infernais
-                  </h1>
-                  <h2 className="text-xl text-orange-300 mb-3" style={{ fontFamily: 'Cinzel' }}>
+                  <h1 className="text-6xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
                     Flammae Infernales
-                  </h2>
+                  </h1>
                   <p className="text-gray-300 leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
                     As chamas eternas do inferno revelam paixões ocultas e desejos ardentes. 
                     Deixe que o fogo sagrado ilumine os caminhos de sua alma.

@@ -100,12 +100,9 @@ export default function OracleTarotInfernal() {
                 </div>
                 
                 <div className="flex-1">
-                  <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
-                    Tarot Infernal
-                  </h1>
-                  <h2 className="text-xl text-red-300 mb-3" style={{ fontFamily: 'Cinzel' }}>
+                  <h1 className="text-6xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
                     Tarotum Infernalis
-                  </h2>
+                  </h1>
                   <p className="text-gray-300 leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
                     As cartas infernais revelam os mistérios do destino através das chamas eternas. 
                     Descubra o que os arcanos sombrios têm a lhe dizer sobre seu futuro.

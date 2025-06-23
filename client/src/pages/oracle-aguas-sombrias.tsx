@@ -94,12 +94,9 @@ export default function OracleAguasSombrias() {
                 </div>
                 
                 <div className="flex-1">
-                  <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
-                    Águas Sombrias
-                  </h1>
-                  <h2 className="text-xl text-blue-300 mb-3" style={{ fontFamily: 'Cinzel' }}>
+                  <h1 className="text-6xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
                     Aquae Tenebrosae
-                  </h2>
+                  </h1>
                   <p className="text-gray-300 leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
                     As águas profundas dos abismos refletem os mistérios do inconsciente. 
                     Mergulhe nas correntes sombrias para descobrir verdades submersas.

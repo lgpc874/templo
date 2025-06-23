@@ -94,12 +94,9 @@ export default function OracleGuardiaoAbismo() {
                 </div>
                 
                 <div className="flex-1">
-                  <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
-                    Guardião do Abismo
-                  </h1>
-                  <h2 className="text-xl text-slate-300 mb-3" style={{ fontFamily: 'Cinzel' }}>
+                  <h1 className="text-6xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
                     Custos Abyssi
-                  </h2>
+                  </h1>
                   <p className="text-gray-300 leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
                     O Guardião ancestral do abismo protege os segredos mais profundos. 
                     Apenas os dignos podem acessar sua sabedoria milenár e receber sua proteção.
