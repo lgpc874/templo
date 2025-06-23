@@ -142,7 +142,7 @@ export default function CursusNew() {
 
   // Buscar todos os cursos
   const { data: courses = [], isLoading: coursesLoading } = useQuery<Course[]>({
-    queryKey: ['/api/courses', user?.role],
+    queryKey: ['/api/courses'],
     retry: false,
     enabled: !!user,
     staleTime: 0,
@@ -201,41 +201,27 @@ export default function CursusNew() {
   // Encontrar seção ativa
   const currentSection = courseSections.find(s => s.required_role === activeSection) || courseSections[0];
 
-  // Verificar se curso está liberado baseado na sequência
-  const isCourseUnlocked = (course: Course, roleKey: string): boolean => {
-    // Para buscador, todos os 3 cursos são liberados
-    if (roleKey === 'buscador') {
-      return true;
-    }
-
-    // Para outras abas, verificar sequência
-    const coursesInRole = coursesByRole[roleKey] || [];
-    const courseIndex = coursesInRole.findIndex(c => c.id === course.id);
+  // Verificar se curso está liberado baseado no role do usuário
+  const isCourseUnlocked = (course: Course): boolean => {
+    const userRoleLevel = getRoleLevel(user?.role || 'buscador');
+    const courseRoleLevel = getRoleLevel(course.required_role);
     
-    // Primeiro curso da aba sempre liberado se usuário tem o role
-    if (courseIndex === 0 && canAccessRole(user.role || 'buscador', roleKey)) {
-      return true;
-    }
-
-    // Verificar se curso anterior foi completado
-    if (courseIndex > 0) {
-      const previousCourse = coursesInRole[courseIndex - 1];
-      const previousProgress = userProgress.find(p => p.course_id === previousCourse.id);
-      return previousProgress?.is_completed === true;
-    }
-
-    return false;
+    // Usuário pode acessar cursos do seu nível e inferiores
+    return userRoleLevel >= courseRoleLevel;
   };
 
   const handleCourseClick = (course: Course) => {
-    if (isCourseUnlocked(course, course.required_role)) {
+    if (isCourseUnlocked(course)) {
       // Navegar para o curso
       window.location.href = `/cursus/${course.slug}`;
+    } else {
+      // Mostrar mensagem de bloqueio
+      alert(`Este curso requer o nível "${course.required_role}" ou superior. Continue progredindo nos cursos disponíveis para desbloquear este conteúdo.`);
     }
   };
 
-  const renderCourseCard = (course: Course, roleKey: string) => {
-    const isUnlocked = isCourseUnlocked(course, roleKey);
+  const renderCourseCard = (course: Course) => {
+    const isUnlocked = isCourseUnlocked(course);
     const progress = userProgress.find(p => p.course_id === course.id);
     const isCompleted = progress?.is_completed === true;
     const isStarted = !!progress && !isCompleted;
@@ -244,7 +230,7 @@ export default function CursusNew() {
       <Card 
         key={course.id}
         className={`bg-card-dark border-golden-amber/30 hover:border-golden-amber/60 transition-all cursor-pointer ${
-          !isUnlocked ? 'opacity-50' : ''
+          !isUnlocked ? 'opacity-60' : ''
         }`}
         onClick={() => handleCourseClick(course)}
       >
@@ -294,7 +280,7 @@ export default function CursusNew() {
             </div>
             {!isUnlocked && (
               <Badge variant="destructive" className="bg-red-900/20 text-red-400 border-red-400/30">
-                Bloqueado
+                Requer: {course.required_role}
               </Badge>
             )}
           </div>
@@ -404,8 +390,8 @@ export default function CursusNew() {
 
               <div className="grid gap-6">
                 {coursesByRole[currentSection?.required_role]?.length ? (
-                  coursesByRole[currentSection.required_role].map(course => renderCourseCard(course, currentSection.required_role))
-                ) : (
+                  coursesByRole[currentSection.required_role].map(course => renderCourseCard(course))
+                ) : currentSection ? (
                   <Card className="bg-card-dark border-golden-amber/30">
                     <CardContent className="p-8 text-center">
                       <p className="text-ritualistic-beige/50">
@@ -418,7 +404,7 @@ export default function CursusNew() {
                       )}
                     </CardContent>
                   </Card>
-                )}
+                ) : null}
               </div>
             </div>
           )}

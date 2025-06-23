@@ -2221,6 +2221,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Função auxiliar para verificar níveis de role
+  function getRoleLevel(role: string): number {
+    const roleLevels: Record<string, number> = {
+      'buscador': 1,
+      'iniciado': 2,
+      'portador_veu': 3,
+      'discipulo_chamas': 4,
+      'guardiao_nome': 5,
+      'arauto_queda': 6,
+      'portador_coroa': 7,
+      'magus_supremo': 8,
+      'admin': 9
+    };
+    return roleLevels[role] || 0;
+  }
+
   // Inicializar seções padrão e atualizar schema
   await supabaseServiceNew.initializeDefaultSections();
 
@@ -2250,7 +2266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Listar cursos por role do usuário
+  // Listar todos os cursos (visíveis para todos, mas com controle de acesso)
   app.get("/api/courses", authenticateToken, async (req: any, res) => {
     try {
       console.log('=== COURSES API CALLED ===');
@@ -2264,13 +2280,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('Role atual do usuário:', user.role);
       
-      // Buscar todos os cursos (admin pode ver todos)
-      const courses = user.email === 'admin@templodoabismo.com.br' 
-        ? await supabaseServiceNew.getCourses()
-        : await supabaseServiceNew.getCoursesByRole(user.role);
-      console.log(`Cursos encontrados para role ${user.role}:`, courses.length);
+      // Buscar todos os cursos com informações da seção
+      const { data: courses, error } = await supabaseServiceNew.getClient()
+        .from('courses')
+        .select(`
+          *,
+          course_sections!course_section_id (
+            name,
+            color,
+            required_role
+          )
+        `)
+        .eq('is_published', true)
+        .order('sort_order');
       
-      res.json(courses);
+      if (error) {
+        console.error('Erro ao buscar cursos:', error);
+        throw error;
+      }
+      
+      console.log(`Cursos encontrados:`, courses?.length || 0);
+      
+      res.json(courses || []);
     } catch (error: any) {
       console.error("Error fetching courses:", error);
       console.error("Error stack:", error.stack);
@@ -2313,9 +2344,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
 
-      // Verificar role mínimo
-      if (course.required_role !== user.role && user.email !== 'admin@templodoabismo.com.br') {
-        return res.status(403).json({ error: "Acesso negado - role insuficiente" });
+      // Verificar se usuário tem acesso ao curso (role atual >= role requerido)
+      const userRoleLevel = getRoleLevel(user.role);
+      const courseRoleLevel = getRoleLevel(course.required_role);
+      
+      if (userRoleLevel < courseRoleLevel && user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: `Acesso negado - requer nível "${course.required_role}" ou superior` });
       }
 
       // Buscar módulos do curso
