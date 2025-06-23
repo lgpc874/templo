@@ -862,7 +862,7 @@ O conteúdo deve ser um grimório completo e substancial em HTML formatado.`;
   // ======================
   async checkAndCreateCourseTables(): Promise<{ status: string; details: any }> {
     try {
-      console.log('=== VERIFICANDO ESTRUTURA DE TABELAS DE CURSOS ===');
+      console.log('=== VERIFICANDO E CRIANDO TABELAS DE CURSOS NO SUPABASE ===');
       
       const tablesToCheck = [
         'courses',
@@ -883,8 +883,23 @@ O conteúdo deve ser um grimório completo e substancial em HTML formatado.`;
             
           if (error) {
             if (error.message.includes('does not exist')) {
-              results[tableName] = 'NOT_EXISTS';
-              console.log(`❌ Tabela ${tableName} NÃO EXISTE`);
+              results[tableName] = 'NOT_EXISTS - CRIANDO...';
+              console.log(`❌ Tabela ${tableName} NÃO EXISTE - Tentando criar...`);
+              
+              // Tentar criar a tabela usando SQL raw
+              if (tableName === 'course_modules') {
+                const createResult = await this.createCourseModulesTable();
+                results[tableName] += ` | ${createResult}`;
+              } else if (tableName === 'course_progress') {
+                const createResult = await this.createCourseProgressTable();
+                results[tableName] += ` | ${createResult}`;
+              } else if (tableName === 'course_challenges') {
+                const createResult = await this.createCourseChallengesTable();
+                results[tableName] += ` | ${createResult}`;
+              } else if (tableName === 'course_certificates') {
+                const createResult = await this.createCourseCertificatesTable();
+                results[tableName] += ` | ${createResult}`;
+              }
             } else {
               results[tableName] = `ERROR: ${error.message}`;
               console.log(`⚠️  Tabela ${tableName} erro: ${error.message}`);
@@ -902,6 +917,64 @@ O conteúdo deve ser um grimório completo e substancial em HTML formatado.`;
       return { status: 'completed', details: results };
     } catch (error) {
       console.error('Erro ao verificar tabelas:', error);
+      return { status: 'error', details: error.message };
+    }
+  }
+
+  async createMissingCourseTables(): Promise<{ status: string; details: any }> {
+    try {
+      console.log('=== CRIANDO TABELAS FALTANTES NO SUPABASE ===');
+      
+      const results = {};
+      
+      // Criar course_modules
+      try {
+        const { error: error1 } = await this.adminClient.from('course_modules').select('id').limit(1);
+        if (error1 && error1.message.includes('does not exist')) {
+          // Usar o client admin para executar SQL direto
+          const createModulesSQL = `
+            CREATE TABLE course_modules (
+              id SERIAL PRIMARY KEY,
+              course_id INTEGER NOT NULL,
+              title VARCHAR(255) NOT NULL,
+              html_content TEXT,
+              order_number INTEGER NOT NULL,
+              requires_submission BOOLEAN DEFAULT FALSE,
+              ritual_mandatory BOOLEAN DEFAULT FALSE,
+              created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+              updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+            );
+            CREATE INDEX idx_course_modules_course_id ON course_modules(course_id);
+          `;
+          
+          // Como não podemos executar SQL direto, vamos inserir dados de exemplo que forcem a criação
+          results['course_modules'] = 'NEEDS_MANUAL_CREATION';
+          console.log('❌ course_modules precisa ser criada manualmente no Supabase');
+        } else {
+          results['course_modules'] = 'EXISTS';
+        }
+      } catch (err) {
+        results['course_modules'] = `ERROR: ${err.message}`;
+      }
+      
+      // Similar para outras tabelas...
+      const tables = ['course_progress', 'course_challenges', 'course_certificates'];
+      for (const table of tables) {
+        try {
+          const { error } = await this.adminClient.from(table).select('id').limit(1);
+          if (error && error.message.includes('does not exist')) {
+            results[table] = 'NEEDS_MANUAL_CREATION';
+            console.log(`❌ ${table} precisa ser criada manualmente no Supabase`);
+          } else {
+            results[table] = 'EXISTS';
+          }
+        } catch (err) {
+          results[table] = `ERROR: ${err.message}`;
+        }
+      }
+      
+      return { status: 'completed', details: results };
+    } catch (error) {
       return { status: 'error', details: error.message };
     }
   }
