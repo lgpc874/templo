@@ -271,7 +271,7 @@ export class SupabaseDirect {
     }
 
     try {
-      // Limpar dados e converter 'none' para null
+      // Dados para inserção incluindo novas colunas
       const cleanData = {
         title: courseData.title,
         slug: courseData.slug,
@@ -281,9 +281,9 @@ export class SupabaseDirect {
         is_paid: courseData.is_paid || false,
         is_published: true,
         course_section_id: courseData.course_section_id || 1,
+        sort_order: courseData.sort_order || 1,
         sequential_order: courseData.sequential_order || 1,
         is_sequential: courseData.is_sequential || false,
-        sort_order: courseData.sort_order || courseData.sequential_order || 1,
         reward_role_id: courseData.reward_role_id === 'none' ? null : courseData.reward_role_id,
         image_url: courseData.image_url || null
       };
