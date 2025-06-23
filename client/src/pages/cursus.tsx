@@ -94,20 +94,59 @@ export default function Cursus() {
   // Buscar seções dos cursos
   const { data: courseSections = [], isLoading: sectionsLoading } = useQuery<CourseSection[]>({
     queryKey: ['/api/course-sections'],
+    queryFn: async () => {
+      const response = await fetch('/api/course-sections');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch sections: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!user,
   });
 
   // Buscar todos os cursos
   const { data: courses = [], isLoading: coursesLoading } = useQuery<Course[]>({
     queryKey: ['/api/courses'],
+    queryFn: async () => {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/courses', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch courses: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!user,
   });
 
   // Buscar progresso do usuário
   const { data: userProgress = [] } = useQuery<UserCourseProgress[]>({
     queryKey: ['/api/user/course-progress'],
+    queryFn: async () => {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/user/course-progress', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch progress: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!user,
   });
+
+  // Debug logs
+  console.log('Course sections:', courseSections);
+  console.log('Courses:', courses);
+  console.log('User progress:', userProgress);
+  console.log('User:', user);
+  console.log('Sections loading:', sectionsLoading);
+  console.log('Courses loading:', coursesLoading);
 
   // Definir seção ativa quando dados carregarem
   useEffect(() => {
