@@ -87,20 +87,12 @@ export default function AdminCourses() {
 
   // Buscar cursos
   const { data: courses = [], isLoading: coursesLoading } = useQuery({
-    queryKey: ['/api/admin/courses'],
-    queryFn: async () => {
-      const response = await apiRequest('/api/admin/courses');
-      return response.json();
-    }
+    queryKey: ['/api/admin/courses']
   });
 
   // Buscar seções
   const { data: courseSections = [] } = useQuery({
-    queryKey: ['/api/course-sections'],
-    queryFn: async () => {
-      const response = await apiRequest('/api/course-sections');
-      return response.json();
-    }
+    queryKey: ['/api/course-sections']
   });
 
   // Mutação para criar curso

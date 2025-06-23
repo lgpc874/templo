@@ -86,21 +86,12 @@ export default function AdminModules() {
 
   // Buscar cursos  
   const { data: courses = [] } = useQuery({
-    queryKey: ['/api/admin/courses'],
-    queryFn: async () => {
-      const response = await apiRequest('/api/admin/courses');
-      return response.json();
-    }
+    queryKey: ['/api/admin/courses']
   });
 
   // Buscar módulos do curso selecionado
   const { data: modules = [], isLoading: modulesLoading } = useQuery({
-    queryKey: ['/api/courses', selectedCourseId, 'modules'],
-    queryFn: async () => {
-      if (!selectedCourseId) return [];
-      const response = await apiRequest(`/api/courses/${selectedCourseId}/modules`);
-      return response.json();
-    },
+    queryKey: [`/api/courses/${selectedCourseId}/modules`],
     enabled: !!selectedCourseId
   });
 
