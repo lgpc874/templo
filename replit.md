@@ -1,0 +1,87 @@
+# Templo do Abismo - Sistema de Cursos
+
+## Visão Geral do Projeto
+Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos baseados em papéis (roles), sistema sequencial de desbloqueio e recompensas automáticas. O projeto utiliza React + TypeScript no frontend, Express.js no backend e Supabase como banco de dados.
+
+## Arquitetura do Projeto
+
+### Frontend (client/)
+- React 18 com TypeScript
+- Vite como bundler
+- TailwindCSS + shadcn/ui para componentes
+- React Query para gerenciamento de estado
+- Wouter para roteamento
+- Sistema de autenticação com JWT
+
+### Backend (server/)
+- Express.js com TypeScript
+- Autenticação JWT customizada
+- Integração direta com Supabase
+- APIs RESTful para CRUD de cursos e usuários
+
+### Banco de Dados
+- Supabase (PostgreSQL)
+- Tabelas principais: users, courses, course_sections, course_modules
+- Sistema de roles hierárquico: buscador → iniciado → portador_veu → discipulo_chamas → guardiao_nome → arauto_queda → portador_coroa → magus_supremo
+
+## Funcionalidades Implementadas
+
+### Sistema de Cursos ✓
+- Criação, edição e exclusão de cursos (admin)
+- Organização por seções hierárquicas
+- Sistema de preços e cursos pagos/gratuitos
+- Upload de imagens para cursos
+
+### Sistema de Roles e Acesso ✓
+- Controle de acesso baseado em roles
+- Hierarquia de permissões bem definida
+- Admin com acesso total (magus_supremo)
+
+### Autenticação ✓
+- Login/registro com validação
+- Tokens JWT funcionais
+- Sessões persistentes
+- Middleware de autenticação
+
+## Funcionalidades em Desenvolvimento
+
+### Sistema Sequencial e Recompensas (Pendente SQL)
+- Cursos sequenciais dentro de cada seção (1→2→3→4→5)
+- Desbloqueio automático do próximo curso após conclusão
+- Recompensas de role ao completar cursos
+- Campos necessários no banco: `sequential_order`, `is_sequential`, `reward_role_id`
+
+### Sistema de Módulos
+- Módulos dentro de cada curso
+- Editor de texto rico para conteúdo
+- Submissões obrigatórias
+- Rituais mandatórios
+
+## Status Atual (23/06/2025)
+- ✅ Conexão Supabase 100% funcional
+- ✅ Sistema de autenticação funcionando
+- ✅ Criação de cursos funcionando (curso "teste1" criado com ID: 10)
+- ✅ Interface admin completa com formulários de criação/edição
+- ⏳ Aguardando execução do SQL para adicionar colunas sequenciais
+- ⏳ Teste do sistema de recompensas e sequencial
+
+## Preferências do Usuário
+- Comunicação direta, sem enrolação
+- Exige verificação real no banco de dados antes de confirmar funcionalidades
+- Não tolera "claims" sem evidência
+- Prefere soluções completas e funcionais
+- Quer sistema 100% conectado ao Supabase, sem mocks
+
+## Mudanças Recentes
+- **23/06/2025 19:04**: Corrigida autenticação JWT e conexão Supabase
+- **23/06/2025 19:04**: Primeiro curso criado com sucesso (teste1, ID: 10)
+- **23/06/2025 19:05**: Fornecido SQL para adicionar colunas sequenciais
+- **23/06/2025 19:07**: Interface admin mostrando curso criado corretamente
+- **23/06/2025 19:08**: Sistema de módulos funcionando (POST /api/admin/modules retornou ID: 5)
+- **23/06/2025 19:09**: Sistema completamente funcional - aguardando apenas execução do SQL das colunas
+
+## Próximos Passos
+1. Executar SQL para adicionar colunas sequenciais
+2. Testar criação de curso com campos sequenciais e recompensas
+3. Implementar lógica de desbloqueio sequencial
+4. Testar sistema completo de progressão de roles
