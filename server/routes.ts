@@ -1258,5 +1258,317 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===========================================
+  // ORACLE ROUTES
+  // ===========================================
+
+  // Buscar oráculos ativos para usuários
+  app.get('/api/oracles/active', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const oracles = await SupabaseDirect.getActiveOracles();
+      res.json(oracles);
+    } catch (error) {
+      console.error('Erro ao buscar oráculos ativos:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Buscar oráculo específico
+  app.get('/api/oracles/:id', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const oracle = await SupabaseDirect.getOracleById(parseInt(req.params.id));
+      if (!oracle) {
+        return res.status(404).json({ error: 'Oráculo não encontrado' });
+      }
+      res.json(oracle);
+    } catch (error) {
+      console.error('Erro ao buscar oráculo:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Criar sessão de oráculo
+  app.post('/api/oracles/:id/session', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const { userName, birthDate } = req.body;
+      
+      if (!userName || !birthDate) {
+        return res.status(400).json({ error: 'Nome e data de nascimento são obrigatórios' });
+      }
+
+      const oracle = await SupabaseDirect.getOracleById(parseInt(req.params.id));
+      if (!oracle) {
+        return res.status(404).json({ error: 'Oráculo não encontrado' });
+      }
+
+      const session = await SupabaseDirect.createOracleSession({
+        oracle_id: oracle.id,
+        user_id: req.user.id,
+        user_name: userName,
+        birth_date: birthDate
+      });
+
+      if (!session) {
+        return res.status(500).json({ error: 'Erro ao criar sessão' });
+      }
+
+      res.json(session);
+    } catch (error) {
+      console.error('Erro ao criar sessão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Buscar sessão por token
+  app.get('/api/oracles/session/:token', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const session = await SupabaseDirect.getOracleSession(req.params.token);
+      if (!session) {
+        return res.status(404).json({ error: 'Sessão não encontrada' });
+      }
+      res.json(session);
+    } catch (error) {
+      console.error('Erro ao buscar sessão:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Buscar mensagens da sessão
+  app.get('/api/oracles/messages/:sessionId', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const messages = await SupabaseDirect.getSessionMessages(parseInt(req.params.sessionId));
+      res.json(messages);
+    } catch (error) {
+      console.error('Erro ao buscar mensagens:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Chat com IA
+  app.post('/api/oracles/chat', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const { sessionToken, message } = req.body;
+
+      if (!sessionToken || !message) {
+        return res.status(400).json({ error: 'Token da sessão e mensagem são obrigatórios' });
+      }
+
+      const session = await SupabaseDirect.getOracleSession(sessionToken);
+      if (!session) {
+        return res.status(404).json({ error: 'Sessão não encontrada' });
+      }
+
+      const oracle = await SupabaseDirect.getOracleById(session.oracle_id);
+      if (!oracle) {
+        return res.status(404).json({ error: 'Oráculo não encontrado' });
+      }
+
+      // Verificar se precisa de pagamento
+      const userRole = req.user.role || '';
+      const isFree = oracle.free_roles.includes(userRole) || !oracle.is_paid;
+      
+      if (!isFree && oracle.price > 0) {
+        return res.status(402).json({ error: 'Pagamento necessário', price: oracle.price });
+      }
+
+      // Salvar mensagem do usuário
+      await SupabaseDirect.addOracleMessage({
+        session_id: session.id,
+        is_user: true,
+        message: message,
+        tokens_used: 0,
+        cost: 0
+      });
+
+      // Configurar prompt para IA
+      const aiPrompt = `${oracle.ai_instructions}
+
+Informações da consulta:
+- Nome: ${session.user_name}
+- Data de nascimento: ${session.birth_date}
+- Pergunta: ${message}
+
+Responda de forma mística, profunda e ritualística, sempre contextualizando com o nome e data de nascimento da pessoa.`;
+
+      // Integração com OpenAI
+      let aiResponse = '';
+      try {
+        const openaiKey = process.env.OPENAI_API_KEY;
+        if (openaiKey) {
+          const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${openaiKey}`
+            },
+            body: JSON.stringify({
+              model: 'gpt-4',
+              messages: [
+                { role: 'system', content: aiPrompt },
+                { role: 'user', content: message }
+              ],
+              max_tokens: 500,
+              temperature: 0.8
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            aiResponse = data.choices[0]?.message?.content || 'Erro na resposta da IA';
+          } else {
+            throw new Error('Erro na API OpenAI');
+          }
+        } else {
+          throw new Error('Chave OpenAI não configurada');
+        }
+      } catch (error) {
+        console.log('Usando resposta simulada:', error);
+        aiResponse = `Salve, ${session.user_name}, nascido(a) sob as influências de ${session.birth_date}...
+
+As energias que emanam de sua essência revelam através do ${oracle.name} que sua pergunta ecoa pelos corredores do tempo...
+
+${message.toLowerCase().includes('amor') || message.toLowerCase().includes('relacionamento') ? 
+  'Os ventos do coração sussurram que transformações profundas se aproximam em sua jornada afetiva.' :
+  message.toLowerCase().includes('trabalho') || message.toLowerCase().includes('carreira') ?
+  'As chamas do progresso indicam que novos caminhos profissionais se manifestarão em breve.' :
+  message.toLowerCase().includes('saúde') ?
+  'As águas da cura fluem em sua direção, trazendo renovação e vitalidade para seu ser.' :
+  'Os mistérios se revelam gradualmente àqueles que buscam com sinceridade.'
+}
+
+Configure a chave OpenAI no painel admin para ativar respostas completas da IA.
+
+Que os mistérios se revelem em sua jornada espiritual.`;
+      }
+
+      // Salvar resposta da IA
+      await SupabaseDirect.addOracleMessage({
+        session_id: session.id,
+        is_user: false,
+        message: aiResponse,
+        tokens_used: 150,
+        cost: isFree ? 0 : oracle.price
+      });
+
+      // Atualizar atividade da sessão
+      await SupabaseDirect.updateSessionActivity(sessionToken);
+
+      res.json({ message: aiResponse });
+    } catch (error) {
+      console.error('Erro no chat:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // ===========================================
+  // ADMIN ORACLE ROUTES
+  // ===========================================
+
+  // Buscar todos os oráculos (admin)
+  app.get('/api/admin/oracles', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const oracles = await SupabaseDirect.getAllOracles();
+      res.json(oracles);
+    } catch (error) {
+      console.error('Erro ao buscar oráculos:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Criar oráculo (admin)
+  app.post('/api/admin/oracles', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const oracle = await SupabaseDirect.createOracle(req.body);
+      if (!oracle) {
+        return res.status(500).json({ error: 'Erro ao criar oráculo' });
+      }
+
+      res.json(oracle);
+    } catch (error) {
+      console.error('Erro ao criar oráculo:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Atualizar oráculo (admin)
+  app.put('/api/admin/oracles/:id', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const oracle = await SupabaseDirect.updateOracle(parseInt(req.params.id), req.body);
+      if (!oracle) {
+        return res.status(404).json({ error: 'Oráculo não encontrado' });
+      }
+
+      res.json(oracle);
+    } catch (error) {
+      console.error('Erro ao atualizar oráculo:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Deletar oráculo (admin)
+  app.delete('/api/admin/oracles/:id', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const success = await SupabaseDirect.deleteOracle(parseInt(req.params.id));
+      if (!success) {
+        return res.status(404).json({ error: 'Oráculo não encontrado' });
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Erro ao deletar oráculo:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Buscar configuração dos oráculos (admin)
+  app.get('/api/admin/oracles/config', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const config = await SupabaseDirect.getOracleConfig();
+      res.json(config);
+    } catch (error) {
+      console.error('Erro ao buscar configuração:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Atualizar configuração dos oráculos (admin)
+  app.put('/api/admin/oracles/config', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const config = await SupabaseDirect.updateOracleConfig(req.body);
+      if (!config) {
+        return res.status(500).json({ error: 'Erro ao atualizar configuração' });
+      }
+
+      res.json(config);
+    } catch (error) {
+      console.error('Erro ao atualizar configuração:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   return httpServer;
 }

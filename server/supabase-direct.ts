@@ -127,6 +127,59 @@ export interface CourseChallenge {
   updated_at?: string;
 }
 
+export interface Oracle {
+  id: number;
+  name: string;
+  latin_name: string;
+  description?: string;
+  icon_url?: string;
+  theme_color: string;
+  is_active: boolean;
+  is_paid: boolean;
+  price: number;
+  free_roles: string[];
+  restricted_roles: string[];
+  role_discounts: any;
+  sort_order: number;
+  ai_personality?: string;
+  ai_instructions?: string;
+  auto_presentation: boolean;
+  custom_presentation?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface OracleSession {
+  id: number;
+  oracle_id: number;
+  user_id: number;
+  user_name: string;
+  birth_date: string;
+  session_token: string;
+  started_at: string;
+  last_activity: string;
+  is_active: boolean;
+}
+
+export interface OracleMessage {
+  id: number;
+  session_id: number;
+  is_user: boolean;
+  message: string;
+  tokens_used: number;
+  cost: number;
+  created_at: string;
+}
+
+export interface OracleConfig {
+  id: number;
+  openai_api_key?: string;
+  default_model: string;
+  max_tokens: number;
+  temperature: number;
+  updated_at: string;
+}
+
 // Funções diretas do Supabase
 export class SupabaseDirect {
   
@@ -539,5 +592,284 @@ export class SupabaseDirect {
     
     if (error || !data) return null;
     return data;
+  }
+
+  // ORACLE METHODS
+  static async getAllOracles(): Promise<Oracle[]> {
+    try {
+      const { data, error } = await supabase
+        .from('oracles')
+        .select('*')
+        .order('sort_order', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao buscar oráculos:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Erro ao buscar oráculos:', error);
+      return [];
+    }
+  }
+
+  static async getActiveOracles(): Promise<Oracle[]> {
+    try {
+      const { data, error } = await supabase
+        .from('oracles')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao buscar oráculos ativos:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Erro ao buscar oráculos ativos:', error);
+      return [];
+    }
+  }
+
+  static async getOracleById(id: number): Promise<Oracle | null> {
+    try {
+      const { data, error } = await supabase
+        .from('oracles')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar oráculo:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao buscar oráculo:', error);
+      return null;
+    }
+  }
+
+  static async createOracle(oracleData: Partial<Oracle>): Promise<Oracle | null> {
+    try {
+      const { data, error } = await supabase
+        .from('oracles')
+        .insert([{
+          ...oracleData,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao criar oráculo:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao criar oráculo:', error);
+      return null;
+    }
+  }
+
+  static async updateOracle(id: number, updates: Partial<Oracle>): Promise<Oracle | null> {
+    try {
+      const { data, error } = await supabase
+        .from('oracles')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao atualizar oráculo:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao atualizar oráculo:', error);
+      return null;
+    }
+  }
+
+  static async deleteOracle(id: number): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('oracles')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        console.error('Erro ao deletar oráculo:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Erro ao deletar oráculo:', error);
+      return false;
+    }
+  }
+
+  static async createOracleSession(sessionData: Partial<OracleSession>): Promise<OracleSession | null> {
+    try {
+      const { data, error } = await supabase
+        .from('oracle_sessions')
+        .insert([{
+          ...sessionData,
+          session_token: Math.random().toString(36).substring(7) + Date.now().toString(),
+          started_at: new Date().toISOString(),
+          last_activity: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao criar sessão do oráculo:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao criar sessão do oráculo:', error);
+      return null;
+    }
+  }
+
+  static async getOracleSession(sessionToken: string): Promise<OracleSession | null> {
+    try {
+      const { data, error } = await supabase
+        .from('oracle_sessions')
+        .select('*')
+        .eq('session_token', sessionToken)
+        .eq('is_active', true)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar sessão do oráculo:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao buscar sessão do oráculo:', error);
+      return null;
+    }
+  }
+
+  static async updateSessionActivity(sessionToken: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('oracle_sessions')
+        .update({ last_activity: new Date().toISOString() })
+        .eq('session_token', sessionToken);
+
+      if (error) {
+        console.error('Erro ao atualizar atividade da sessão:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Erro ao atualizar atividade da sessão:', error);
+      return false;
+    }
+  }
+
+  static async addOracleMessage(messageData: Partial<OracleMessage>): Promise<OracleMessage | null> {
+    try {
+      const { data, error } = await supabase
+        .from('oracle_messages')
+        .insert([{
+          ...messageData,
+          created_at: new Date().toISOString()
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao adicionar mensagem do oráculo:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao adicionar mensagem do oráculo:', error);
+      return null;
+    }
+  }
+
+  static async getSessionMessages(sessionId: number): Promise<OracleMessage[]> {
+    try {
+      const { data, error } = await supabase
+        .from('oracle_messages')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        console.error('Erro ao buscar mensagens da sessão:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Erro ao buscar mensagens da sessão:', error);
+      return [];
+    }
+  }
+
+  static async getOracleConfig(): Promise<OracleConfig | null> {
+    try {
+      const { data, error } = await supabase
+        .from('oracle_config')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+      if (error) {
+        console.error('Erro ao buscar configuração dos oráculos:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao buscar configuração dos oráculos:', error);
+      return null;
+    }
+  }
+
+  static async updateOracleConfig(updates: Partial<OracleConfig>): Promise<OracleConfig | null> {
+    try {
+      const { data, error } = await supabase
+        .from('oracle_config')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', 1)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao atualizar configuração dos oráculos:', error);
+        return null;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Erro ao atualizar configuração dos oráculos:', error);
+      return null;
+    }
   }
 }

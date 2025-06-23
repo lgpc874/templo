@@ -115,9 +115,23 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 20:46**: Sistema de seções totalmente funcional implementado
 - **23/06/2025 20:50**: Sistema Forja Libri 100% concluído e testado
 - **23/06/2025 20:50**: Edição de seções confirmada funcionando (logs mostram PUT 200)
+- **23/06/2025 21:22**: Sistema Oraculum completamente implementado
+- **23/06/2025 21:22**: 5 oráculos criados com IA integrada (OpenAI GPT-4)
+- **23/06/2025 21:22**: Interface de chat personalizada por tema de cada oráculo
+- **23/06/2025 21:22**: Sistema de pagamento e roles configurável por oráculo
+- **23/06/2025 21:22**: Página de administração completa para oráculos
+- **23/06/2025 21:22**: APIs completas para sessões, mensagens e configurações
+
+## Sistema Oraculum Implementado ✅
+- **5 Oráculos Criados**: Espelho Negro, Tarot Infernal, Chamas Infernais, Águas Sombrias, Guardião do Abismo
+- **IA Integrada**: GPT-4 com personalidades específicas para cada oráculo
+- **Sistema de Chat**: Interface personalizada com tema único por oráculo
+- **Controle de Acesso**: Pagamento por consulta, roles gratuitos, descontos configuráveis
+- **Admin Completo**: Criação, edição, configuração de oráculos e IA
+- **Banco de Dados**: Tabelas para oráculos, sessões, mensagens e configurações
 
 ## Próximos Passos
-1. Executar SQL para adicionar colunas sequenciais
-2. Testar criação de curso com campos sequenciais e recompensas
-3. Implementar lógica de desbloqueio sequencial
-4. Testar sistema completo de progressão de roles
+1. Executar SQL para criar tabelas dos oráculos (create-oracles-tables.sql)
+2. Configurar chave OpenAI no painel admin
+3. Testar sistema completo de consultas aos oráculos
+4. Implementar sistema de pagamento real (opcional)

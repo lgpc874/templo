@@ -11,6 +11,8 @@ import Auth from "@/pages/auth";
 import LibriTenebris from "@/pages/libri-tenebris";
 import LectorGrimorio from "@/pages/lector-grimorio";
 import Bibliotheca from "@/pages/bibliotheca";
+import OracleChat from "@/pages/oracle-chat";
+import AdminOraculum from "@/pages/admin-oraculum";
 
 import Profilus from "@/pages/profilus";
 import Initiatio from "@/pages/initiatio";
@@ -91,7 +93,9 @@ function App() {
                 <Route path="/admin-courses" component={AdminCourses} />
                 <Route path="/admin-modules" component={AdminModules} />
                 <Route path="/admin/libri" component={AdminLibri} />
+                <Route path="/admin/oraculum" component={AdminOraculum} />
                 <Route path="/oraculum" component={Oraculum} />
+                <Route path="/oraculum/:id" component={OracleChat} />
                 <Route path="/vox-pluma" component={VoxPluma} />
                 <Route path="/de-templo" component={DeTemplo} />
                 <Route>
