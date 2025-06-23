@@ -15,8 +15,11 @@ import Bibliotheca from "@/pages/bibliotheca";
 import Profilus from "@/pages/profilus";
 import Initiatio from "@/pages/initiatio";
 import Cursus from "@/pages/cursus";
-import CursusDetalhe from "@/pages/cursus-detalhe";
+// import CursusDetalhe from "@/pages/cursus-detalhe"; // Arquivo não existe mais
+import CursoDetalhe from "@/pages/curso-detalhe";
+import RitualInicial from "@/pages/ritual-inicial";
 import CursusLeitor from "@/pages/cursus-leitor";
+import MeusCursos from "@/pages/meus-cursos";
 import Oraculum from "@/pages/oraculum";
 import VoxPluma from "@/pages/vox-pluma";
 import DeTemplo from "@/pages/de-templo";
@@ -75,12 +78,11 @@ function App() {
                   }}
                 </Route>
                 <Route path="/cursus" component={Cursus} />
-                <Route path="/cursus/:courseSlug">
-                  {(params) => <CursusDetalhe courseSlug={params.courseSlug} />}
-                </Route>
-                <Route path="/cursus/:courseSlug/leitor">
-                  {(params) => <CursusLeitor courseSlug={params.courseSlug} />}
-                </Route>
+                {/* <Route path="/cursus-detalhe/:slug" component={CursusDetalhe} /> */}
+                <Route path="/curso-detalhe/:id" component={CursoDetalhe} />
+                <Route path="/ritual-inicial/:curso_id" component={RitualInicial} />
+                <Route path="/cursus-leitor/:slug" component={CursusLeitor} />
+                <Route path="/meus-cursos" component={MeusCursos} />
                 <Route path="/oraculum" component={Oraculum} />
                 <Route path="/vox-pluma" component={VoxPluma} />
                 <Route path="/de-templo" component={DeTemplo} />

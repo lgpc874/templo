@@ -343,7 +343,7 @@ export default function Cursus() {
                       </div>
                     )}
                     
-                    <Link href={`/cursus/${course.slug}`}>
+                    <Link href={`/curso-detalhe/${course.id}`}>
                       <Button 
                         className={`w-full ${
                           courseState.isLocked 

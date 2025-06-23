@@ -2386,39 +2386,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/courses/:id", authenticateToken, async (req: any, res) => {
     try {
       const courseId = parseInt(req.params.id);
-      const course = await supabaseServiceNew.getCourseById(courseId);
+      console.log('=== FETCHING COURSE BY ID ===');
+      console.log('Course ID:', courseId);
       
-      if (!course) {
+      const { data: course, error } = await supabaseServiceNew.getClient()
+        .from('courses')
+        .select(`
+          *,
+          course_sections!course_section_id (
+            name,
+            color,
+            required_role
+          )
+        `)
+        .eq('id', courseId)
+        .eq('is_published', true)
+        .single();
+        
+      if (error || !course) {
+        console.error('Error fetching course:', error);
         return res.status(404).json({ error: "Curso não encontrado" });
       }
 
-      // Verificar se o usuário tem acesso ao curso
-      const user = await supabaseServiceNew.getUserById(req.user.id);
-      if (!user) {
-        return res.status(404).json({ error: "Usuário não encontrado" });
-      }
-
-      // Verificar se usuário tem acesso ao curso (role atual >= role requerido)
-      const userRoleLevel = getRoleLevel(user.role);
-      const courseRoleLevel = getRoleLevel(course.required_role);
-      
-      if (userRoleLevel < courseRoleLevel && user.email !== 'admin@templodoabismo.com.br') {
-        return res.status(403).json({ error: `Acesso negado - requer nível "${course.required_role}" ou superior` });
-      }
-
-      // Buscar módulos do curso
-      const modules = await supabaseServiceNew.getModulesByCourse(courseId);
-      
-      // Buscar progresso do usuário
-      const progress = await supabaseServiceNew.getUserCourseProgress(req.user.id, courseId);
-
-      res.json({
-        ...course,
-        modules,
-        progress
-      });
+      console.log('Course found:', course.title);
+      res.json(course);
     } catch (error: any) {
       console.error("Error fetching course:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/courses/:id/modules", authenticateToken, async (req: any, res) => {
+    try {
+      const courseId = parseInt(req.params.id);
+      console.log('=== FETCHING COURSE MODULES ===');
+      console.log('Course ID:', courseId);
+      
+      const { data: modules, error } = await supabaseServiceNew.getClient()
+        .from('course_modules')
+        .select('*')
+        .eq('course_id', courseId)
+        .eq('is_published', true)
+        .order('sort_order');
+        
+      if (error) {
+        console.error('Error fetching modules:', error);
+        throw error;
+      }
+
+      console.log('Modules found:', modules?.length || 0);
+      res.json(modules || []);
+    } catch (error: any) {
+      console.error("Error fetching course modules:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Obter progresso específico de um curso
+  app.get("/api/user/course-progress/:courseId", authenticateToken, async (req: any, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const userId = req.user.id;
+      console.log('=== FETCHING USER COURSE PROGRESS ===');
+      console.log('User ID:', userId, 'Course ID:', courseId);
+      
+      const { data: progress, error } = await supabaseServiceNew.getClient()
+        .from('user_course_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('course_id', courseId)
+        .single();
+        
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Error fetching progress:', error);
+        throw error;
+      }
+
+      console.log('Progress found:', !!progress);
+      res.json(progress || null);
+    } catch (error: any) {
+      console.error("Error fetching user course progress:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Obter desafios de um módulo
+  app.get("/api/modules/:id/challenges", authenticateToken, async (req: any, res) => {
+    try {
+      const moduleId = parseInt(req.params.id);
+      console.log('=== FETCHING MODULE CHALLENGES ===');
+      console.log('Module ID:', moduleId);
+      
+      const { data: challenges, error } = await supabaseServiceNew.getClient()
+        .from('course_challenges')
+        .select('*')
+        .eq('module_id', moduleId)
+        .order('created_at');
+        
+      if (error) {
+        console.error('Error fetching challenges:', error);
+        throw error;
+      }
+
+      console.log('Challenges found:', challenges?.length || 0);
+      res.json(challenges || []);
+    } catch (error: any) {
+      console.error("Error fetching module challenges:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Marcar módulo como concluído
+  app.post("/api/modules/:id/complete", authenticateToken, async (req: any, res) => {
+    try {
+      const moduleId = parseInt(req.params.id);
+      const userId = req.user.id;
+      console.log('=== COMPLETING MODULE ===');
+      console.log('User ID:', userId, 'Module ID:', moduleId);
+      
+      // Buscar o módulo para obter o curso_id
+      const { data: module, error: moduleError } = await supabaseServiceNew.getClient()
+        .from('course_modules')
+        .select('course_id, sort_order')
+        .eq('id', moduleId)
+        .single();
+        
+      if (moduleError || !module) {
+        return res.status(404).json({ error: "Módulo não encontrado" });
+      }
+
+      // Atualizar progresso do usuário
+      const { data: progress, error: progressError } = await supabaseServiceNew.getClient()
+        .from('user_course_progress')
+        .upsert({
+          user_id: userId,
+          course_id: module.course_id,
+          current_module: module.sort_order + 1,
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (progressError) {
+        console.error('Error updating progress:', progressError);
+        throw progressError;
+      }
+
+      console.log('Module completed successfully');
+      res.json({ success: true, progress });
+    } catch (error: any) {
+      console.error("Error completing module:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
