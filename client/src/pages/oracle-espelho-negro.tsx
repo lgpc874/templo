@@ -90,7 +90,7 @@ export default function OracleEspelhoNegro() {
           </div>
 
           {/* Header */}
-          <div className="relative z-10 border-b border-purple-500/30 bg-black/40">
+          <div className="relative z-10 border-b border-purple-500/30 bg-transparent">
             <div className="max-w-4xl mx-auto px-4 py-8">
               <div className="flex items-center justify-between mb-6">
                 <Link href="/oraculum">
@@ -123,7 +123,7 @@ export default function OracleEspelhoNegro() {
 
           {/* Conteúdo Principal */}
           <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
-            <Card className="bg-black/40 border-purple-500/50 backdrop-blur-sm shadow-2xl shadow-purple-900/30">
+            <Card className="bg-transparent border-purple-500/50 backdrop-blur-sm shadow-2xl shadow-purple-900/30">
               <CardHeader className="text-center pb-6">
                 <div className="w-20 h-20 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-6 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
                   <Eye className="w-10 h-10 text-purple-400" />
@@ -157,7 +157,7 @@ export default function OracleEspelhoNegro() {
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
                       placeholder="Revele sua identidade..."
-                      className="bg-black/40 border-purple-500/30 text-white placeholder-ritualistic-beige/60 focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 h-10 text-sm"
+                      className="bg-transparent border-purple-500/30 text-white placeholder-ritualistic-beige/60 focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 h-10 text-sm"
                       style={{ fontFamily: 'EB Garamond' }}
                     />
                   </div>
@@ -171,7 +171,7 @@ export default function OracleEspelhoNegro() {
                       type="date"
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
-                      className="bg-black/40 border-purple-500/30 text-white focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 h-10 text-sm"
+                      className="bg-transparent border-purple-500/30 text-white focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 h-10 text-sm"
                       style={{ fontFamily: 'EB Garamond' }}
                     />
                   </div>
