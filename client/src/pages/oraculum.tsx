@@ -1,12 +1,9 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { PageTransition } from '@/components/page-transition';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Sparkles, Crown, Eye, Flame, Droplets, Shield, Lock } from 'lucide-react';
+import { Sparkles, Crown, Eye, Flame, Droplets, Shield } from 'lucide-react';
 import ContentProtection from '@/components/content-protection';
 
 interface Oracle {
@@ -100,33 +97,7 @@ export default function Oraculum() {
     );
   }
 
-  if (isLoading) {
-    return (
-      <PageTransition>
-        <ContentProtection>
-          <div className="min-h-screen bg-black flex items-center justify-center relative">
-            {/* Background rotating seal */}
-            <div className="fixed inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
-              <img 
-                src="https://i.postimg.cc/g20gqmdX/IMG-20250527-182235-1.png" 
-                alt="Templo do Abismo" 
-                className="w-96 h-96 opacity-5 animate-spin"
-                style={{ animationDuration: '120s' }}
-              />
-            </div>
-            
-            <div className="text-center relative">
-              <Eye className="w-16 h-16 text-golden-amber mx-auto mb-4 animate-pulse" />
-              <div className="w-16 h-16 border-4 border-golden-amber/30 border-t-golden-amber rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-golden-amber" style={{ fontFamily: 'EB Garamond' }}>
-                Carregando os Mistérios Ancestrais...
-              </p>
-            </div>
-          </div>
-        </ContentProtection>
-      </PageTransition>
-    );
-  }
+
 
   return (
     <PageTransition>
