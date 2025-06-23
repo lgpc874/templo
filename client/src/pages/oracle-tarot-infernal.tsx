@@ -94,9 +94,9 @@ export default function OracleTarotInfernal() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <Link href="/oraculum">
-                    <Button variant="ghost" size="sm" className="text-ritualistic-beige hover:text-red-400 hover:bg-red-500/10 transition-colors">
+                    <Button size="sm" className="bg-red-500 hover:bg-red-600 text-black font-medium">
                       <ArrowLeft className="w-4 h-4 mr-2" />
-                      Voltar aos Oráculos
+                      Voltar
                     </Button>
                   </Link>
                 </div>

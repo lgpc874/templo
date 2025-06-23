@@ -94,9 +94,9 @@ export default function OracleEspelhoNegro() {
             <div className="max-w-4xl mx-auto px-4 py-8">
               <div className="flex items-center justify-between mb-6">
                 <Link href="/oraculum">
-                  <Button variant="ghost" size="sm" className="text-ritualistic-beige hover:text-purple-400 hover:bg-purple-500/10 transition-colors">
+                  <Button size="sm" className="bg-purple-500 hover:bg-purple-600 text-black font-medium">
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar ao Oraculum
+                    Voltar
                   </Button>
                 </Link>
               </div>
