@@ -74,7 +74,7 @@ export default function AdminCoursesFinal() {
     course_section_id: 1,
     sequential_order: 1,
     is_sequential: false,
-    reward_role_id: ''
+    reward_role_id: 'none'
   });
 
   // Verificar se é admin
@@ -175,7 +175,7 @@ export default function AdminCoursesFinal() {
           course_section_id: 1,
           sequential_order: 1,
           is_sequential: false,
-          reward_role_id: ''
+          reward_role_id: 'none'
         });
         toast({ title: "Curso criado com sucesso!" });
       } else {
@@ -375,14 +375,14 @@ export default function AdminCoursesFinal() {
                   <div>
                     <Label htmlFor="reward_role_id">Role Recompensa (após conclusão)</Label>
                     <Select 
-                      value={courseForm.reward_role_id} 
-                      onValueChange={(value) => setCourseForm({...courseForm, reward_role_id: value})}
+                      value={courseForm.reward_role_id || 'none'} 
+                      onValueChange={(value) => setCourseForm({...courseForm, reward_role_id: value === 'none' ? '' : value})}
                     >
                       <SelectTrigger className="bg-black/30 border-gray-600">
                         <SelectValue placeholder="Selecione um role de recompensa (opcional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Nenhum</SelectItem>
+                        <SelectItem value="none">Nenhum</SelectItem>
                         <SelectItem value="iniciado">Iniciado</SelectItem>
                         <SelectItem value="portador_veu">Portador do Véu</SelectItem>
                         <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
@@ -610,14 +610,14 @@ export default function AdminCoursesFinal() {
                     <div>
                       <Label>Role Recompensa</Label>
                       <Select 
-                        value={editingCourse.reward_role_id || ''} 
-                        onValueChange={(value) => setEditingCourse({...editingCourse, reward_role_id: value || undefined})}
+                        value={editingCourse.reward_role_id || 'none'} 
+                        onValueChange={(value) => setEditingCourse({...editingCourse, reward_role_id: value === 'none' ? undefined : value})}
                       >
                         <SelectTrigger className="bg-black/30 border-gray-600">
                           <SelectValue placeholder="Nenhum" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Nenhum</SelectItem>
+                          <SelectItem value="none">Nenhum</SelectItem>
                           <SelectItem value="iniciado">Iniciado</SelectItem>
                           <SelectItem value="portador_veu">Portador do Véu</SelectItem>
                           <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
