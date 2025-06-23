@@ -89,17 +89,33 @@ export default function Oraculum() {
     return (
       <PageTransition>
         <ContentProtection>
-          <div className="min-h-screen bg-gradient-to-b from-black via-purple-950 to-black flex items-center justify-center p-4">
-            <Card className="w-full max-w-md bg-gray-900/80 border-purple-500/30">
+          <div className="min-h-screen bg-black flex items-center justify-center p-4 relative">
+            {/* Background rotating seal */}
+            <div className="fixed inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <img 
+                src="https://i.postimg.cc/g20gqmdX/IMG-20250527-182235-1.png" 
+                alt="Templo do Abismo" 
+                className="w-96 h-96 opacity-5 animate-spin"
+                style={{ animationDuration: '120s' }}
+              />
+            </div>
+            
+            <Card className="w-full max-w-md bg-black/80 border-ritualistic-gold/30 backdrop-blur-sm relative">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl text-purple-300">Acesso Restrito</CardTitle>
-                <CardDescription className="text-gray-400">
+                <Eye className="w-16 h-16 text-ritualistic-gold mx-auto mb-4 animate-pulse" />
+                <CardTitle className="text-2xl text-ritualistic-gold" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  Acesso Restrito
+                </CardTitle>
+                <CardDescription className="text-ritualistic-beige" style={{ fontFamily: 'EB Garamond' }}>
                   Faça login para acessar os Oráculos Infernais
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <Link href="/auth">
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                  <Button 
+                    className="w-full bg-gradient-to-r from-ritualistic-gold/80 to-ritualistic-gold hover:from-ritualistic-gold hover:to-ritualistic-gold/80 text-black font-bold"
+                    style={{ fontFamily: 'Cinzel' }}
+                  >
                     Fazer Login
                   </Button>
                 </Link>
@@ -115,10 +131,23 @@ export default function Oraculum() {
     return (
       <PageTransition>
         <ContentProtection>
-          <div className="min-h-screen bg-gradient-to-b from-black via-purple-950 to-black flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-purple-300">Carregando os Mistérios...</p>
+          <div className="min-h-screen bg-black flex items-center justify-center relative">
+            {/* Background rotating seal */}
+            <div className="fixed inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+              <img 
+                src="https://i.postimg.cc/g20gqmdX/IMG-20250527-182235-1.png" 
+                alt="Templo do Abismo" 
+                className="w-96 h-96 opacity-5 animate-spin"
+                style={{ animationDuration: '120s' }}
+              />
+            </div>
+            
+            <div className="text-center relative">
+              <Eye className="w-16 h-16 text-ritualistic-gold mx-auto mb-4 animate-pulse" />
+              <div className="w-16 h-16 border-4 border-ritualistic-gold/30 border-t-ritualistic-gold rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-ritualistic-gold" style={{ fontFamily: 'EB Garamond' }}>
+                Carregando os Mistérios Ancestrais...
+              </p>
             </div>
           </div>
         </ContentProtection>
@@ -129,47 +158,66 @@ export default function Oraculum() {
   return (
     <PageTransition>
       <ContentProtection enableScreenshotProtection={true}>
-        <div className="min-h-screen bg-gradient-to-b from-black via-purple-950 to-black">
+        <div className="min-h-screen bg-black relative">
+          {/* Background rotating seal */}
+          <div className="fixed inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+            <img 
+              src="https://i.postimg.cc/g20gqmdX/IMG-20250527-182235-1.png" 
+              alt="Templo do Abismo" 
+              className="w-96 h-96 opacity-5 animate-spin"
+              style={{ animationDuration: '120s' }}
+            />
+          </div>
+
           {/* Header místico */}
-          <div className="relative overflow-hidden bg-gradient-to-r from-purple-900/50 to-black/80 border-b border-purple-500/30">
-            <div className="absolute inset-0 opacity-50" style={{backgroundImage: "url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%238B5CF6\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"1\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')"}}></div>
-            <div className="relative max-w-7xl mx-auto px-4 py-16 text-center">
-              <div className="mb-6">
-                <Crown className="w-16 h-16 text-purple-400 mx-auto mb-4" />
-                <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-2">
-                  ORACULUM INFERNALE
+          <div className="relative">
+            <div className="container mx-auto px-4 py-20">
+              {/* Header Section */}
+              <div className="text-center mb-16">
+                <div className="mb-8">
+                  <div className="relative inline-block">
+                    <Eye className="w-20 h-20 mx-auto text-ritualistic-gold animate-pulse" />
+                    <div className="absolute inset-0 bg-ritualistic-gold/20 blur-xl rounded-full"></div>
+                  </div>
+                </div>
+                
+                <h1 className="text-5xl md:text-7xl font-bold text-ritualistic-gold mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  Oraculum Infernale
                 </h1>
-                <div className="w-32 h-1 bg-gradient-to-r from-purple-500 to-pink-500 mx-auto"></div>
-              </div>
-              
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                Adentre os mistérios ancestrais através dos cinco oráculos sagrados do Templo do Abismo. 
-                Cada portal revela segredos únicos através de artes divinatórias milenares, 
-                guiados por mestres especializados em suas respectivas tradições esotéricas.
-              </p>
-              
-              <div className="mt-8 flex justify-center items-center space-x-4 text-purple-300">
-                <div className="flex items-center space-x-2">
-                  <Eye className="w-5 h-5" />
-                  <span className="text-sm">Visões Reveladoras</span>
-                </div>
-                <div className="w-1 h-6 bg-purple-500/50"></div>
-                <div className="flex items-center space-x-2">
-                  <Sparkles className="w-5 h-5" />
-                  <span className="text-sm">Sabedoria Ancestral</span>
-                </div>
-                <div className="w-1 h-6 bg-purple-500/50"></div>
-                <div className="flex items-center space-x-2">
-                  <Shield className="w-5 h-5" />
-                  <span className="text-sm">Proteção Ritual</span>
+                
+                <div className="max-w-4xl mx-auto">
+                  <p className="text-xl md:text-2xl text-ritualistic-beige mb-6" style={{ fontFamily: 'EB Garamond' }}>
+                    Adentre os mistérios ancestrais através dos cinco oráculos sagrados do Templo do Abismo. 
+                    Cada portal revela segredos únicos através de artes divinatórias milenares, 
+                    guiados por mestres especializados em suas respectivas tradições esotéricas.
+                  </p>
+                  
+                  <div className="flex justify-center mb-8">
+                    <div className="h-px bg-gradient-to-r from-transparent via-ritualistic-gold to-transparent w-96"></div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center text-ritualistic-gold/80 space-x-8">
+                    <div className="flex items-center space-x-2">
+                      <Eye className="w-5 h-5 animate-pulse" />
+                      <span style={{ fontFamily: 'EB Garamond' }}>Visões Reveladoras</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Sparkles className="w-5 h-5 animate-pulse" />
+                      <span style={{ fontFamily: 'EB Garamond' }}>Sabedoria Ancestral</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Shield className="w-5 h-5 animate-pulse" />
+                      <span style={{ fontFamily: 'EB Garamond' }}>Proteção Ritual</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Grid de Oráculos */}
-          <div className="max-w-7xl mx-auto px-4 py-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="relative container mx-auto px-4 pb-20">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
               {oracles.map((oracle) => {
                 const userPrice = getUserPrice(oracle);
                 const hasAccess = canAccess(oracle);
@@ -177,22 +225,19 @@ export default function Oraculum() {
                 return (
                   <Card 
                     key={oracle.id} 
-                    className="group relative overflow-hidden bg-gray-900/60 border-2 hover:border-purple-500/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20"
-                    style={{
-                      borderColor: oracle.theme_color + '40',
-                      background: `linear-gradient(145deg, ${oracle.theme_color}10, rgba(17, 24, 39, 0.8))`
-                    }}
+                    className="group relative bg-black/60 border-ritualistic-gold/30 backdrop-blur-sm hover:bg-black/80 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-ritualistic-gold/20 hover:scale-105"
+                    style={{ fontFamily: 'EB Garamond' }}
                   >
                     {/* Efeito de brilho no hover */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-ritualistic-gold/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     
                     <CardHeader className="text-center pb-4">
-                      <div className="flex justify-center mb-4">
+                      <div className="flex justify-center mb-6">
                         <div 
-                          className="w-20 h-20 rounded-full flex items-center justify-center bg-gradient-to-br shadow-lg group-hover:shadow-xl transition-all duration-300"
+                          className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-ritualistic-gold/30"
                           style={{
-                            background: `linear-gradient(135deg, ${oracle.theme_color}30, ${oracle.theme_color}60)`,
-                            boxShadow: `0 8px 32px ${oracle.theme_color}40`
+                            background: `radial-gradient(circle, ${oracle.theme_color}20, black)`,
+                            boxShadow: `0 0 30px ${oracle.theme_color}40`
                           }}
                         >
                           {oracle.icon_url ? (
@@ -209,15 +254,15 @@ export default function Oraculum() {
                         </div>
                       </div>
                       
-                      <CardTitle className="text-xl text-white mb-2">
+                      <CardTitle className="text-2xl text-ritualistic-gold mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
                         {oracle.name}
                       </CardTitle>
                       
-                      <div className="text-sm text-gray-400 italic mb-3">
+                      <div className="text-sm text-ritualistic-gold/60 italic mb-4" style={{ fontFamily: 'EB Garamond' }}>
                         {oracle.latin_name}
                       </div>
                       
-                      <CardDescription className="text-gray-300 text-sm leading-relaxed">
+                      <CardDescription className="text-ritualistic-beige text-sm leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
                         {oracle.description}
                       </CardDescription>
                     </CardHeader>
@@ -225,45 +270,44 @@ export default function Oraculum() {
                     <CardContent className="pt-0">
                       <div className="space-y-4">
                         {/* Preço e badges */}
-                        <div className="flex justify-between items-center">
+                        <div className="flex justify-center items-center space-x-4">
                           {oracle.is_paid ? (
                             <div className="flex items-center space-x-2">
                               {userPrice === 0 ? (
-                                <Badge variant="secondary" className="bg-green-600/20 text-green-400 border-green-400/30">
+                                <Badge className="bg-green-900/50 text-green-400 border-green-400/30">
                                   Gratuito para seu role
                                 </Badge>
                               ) : (
-                                <Badge 
-                                  variant="outline" 
-                                  className="border-purple-500/50 text-purple-300"
-                                >
+                                <Badge className="bg-ritualistic-gold/20 text-ritualistic-gold border-ritualistic-gold/30">
                                   R$ {userPrice.toFixed(2)}
                                 </Badge>
                               )}
                             </div>
                           ) : (
-                            <Badge variant="secondary" className="bg-green-600/20 text-green-400 border-green-400/30">
+                            <Badge className="bg-green-900/50 text-green-400 border-green-400/30">
                               Gratuito
                             </Badge>
                           )}
                           
                           {!hasAccess && (
-                            <Badge variant="destructive" className="bg-red-600/20 text-red-400 border-red-400/30">
+                            <Badge variant="destructive" className="bg-red-900/50 text-red-400 border-red-400/30">
                               <Lock className="w-3 h-3 mr-1" />
                               Restrito
                             </Badge>
                           )}
                         </div>
 
+                        {/* Linha decorativa */}
+                        <div className="flex justify-center">
+                          <div className="h-px bg-gradient-to-r from-transparent via-ritualistic-gold/50 to-transparent w-32"></div>
+                        </div>
+
                         {/* Botão de acesso */}
                         {hasAccess ? (
                           <Link href={`/oraculum/${oracle.id}`}>
                             <Button 
-                              className="w-full bg-gradient-to-r hover:scale-105 transition-all duration-300 shadow-lg"
-                              style={{
-                                background: `linear-gradient(135deg, ${oracle.theme_color}, ${oracle.theme_color}CC)`,
-                                boxShadow: `0 4px 20px ${oracle.theme_color}30`
-                              }}
+                              className="w-full bg-gradient-to-r from-ritualistic-gold/80 to-ritualistic-gold hover:from-ritualistic-gold hover:to-ritualistic-gold/80 text-black font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 border border-ritualistic-gold/30"
+                              style={{ fontFamily: 'Cinzel' }}
                             >
                               <Eye className="w-4 h-4 mr-2" />
                               Consultar Oráculo
@@ -272,7 +316,8 @@ export default function Oraculum() {
                         ) : (
                           <Button 
                             disabled 
-                            className="w-full bg-gray-700 text-gray-400 cursor-not-allowed"
+                            className="w-full bg-gray-900/50 text-gray-500 cursor-not-allowed border border-gray-700"
+                            style={{ fontFamily: 'Cinzel' }}
                           >
                             <Lock className="w-4 h-4 mr-2" />
                             Acesso Restrito
@@ -284,16 +329,23 @@ export default function Oraculum() {
                 );
               })}
             </div>
-          </div>
 
-          {/* Footer místico */}
-          <div className="border-t border-purple-500/30 bg-black/50 py-8">
-            <div className="max-w-7xl mx-auto px-4 text-center">
-              <p className="text-gray-400 text-sm">
+            {/* Footer místico */}
+            <div className="text-center mt-20">
+              <div className="flex justify-center mb-6">
+                <div className="h-px bg-gradient-to-r from-transparent via-ritualistic-gold/50 to-transparent w-96"></div>
+              </div>
+              
+              <p className="text-ritualistic-beige/60 text-lg italic mb-4" style={{ fontFamily: 'EB Garamond' }}>
                 "Os mistérios se revelam àqueles que buscam com sinceridade e reverência aos antigos caminhos."
               </p>
-              <div className="mt-4 text-xs text-gray-500">
-                Templo do Abismo • Oráculos Infernais • Tradições Ancestrais
+              
+              <div className="flex items-center justify-center space-x-4 text-ritualistic-gold/60 text-sm">
+                <span style={{ fontFamily: 'Cinzel' }}>TEMPLO DO ABISMO</span>
+                <span>•</span>
+                <span style={{ fontFamily: 'Cinzel' }}>ORÁCULOS INFERNAIS</span>
+                <span>•</span>
+                <span style={{ fontFamily: 'Cinzel' }}>TRADIÇÕES ANCESTRAIS</span>
               </div>
             </div>
           </div>
