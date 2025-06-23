@@ -1,21 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.DATABASE_URL;
+const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
-}
-
 // Cliente Supabase com service role para acesso total
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
   }
-});
+}) : null;
 
-console.log('✅ Supabase cliente direto inicializado');
+if (supabase) {
+  console.log('✅ Supabase conectado com credenciais válidas');
+} else {
+  console.warn('⚠️  Aguardando configuração das credenciais do Supabase no arquivo .env');
+}
 
 // Tipos básicos
 export interface User {
@@ -72,8 +72,33 @@ export interface CourseModule {
 // Funções diretas do Supabase
 export class SupabaseDirect {
   
+  static async testConnection(): Promise<{ status: string; details: any }> {
+    if (!supabase) {
+      return { 
+        status: 'error', 
+        details: 'Supabase não configurado. Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY no arquivo .env' 
+      };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('count', { count: 'exact', head: true });
+      
+      if (error) {
+        return { status: 'error', details: error };
+      }
+      
+      return { status: 'success', details: 'Conexão direta com Supabase funcionando' };
+    } catch (error) {
+      return { status: 'error', details: error };
+    }
+  }
+
   // Usuários
   static async getUserById(id: number): Promise<User | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -85,6 +110,8 @@ export class SupabaseDirect {
   }
 
   static async getUserByEmail(email: string): Promise<User | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('users')
       .select('*')
@@ -96,6 +123,8 @@ export class SupabaseDirect {
   }
 
   static async createUser(userData: Partial<User>): Promise<User | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('users')
       .insert(userData)
@@ -107,6 +136,8 @@ export class SupabaseDirect {
   }
 
   static async updateUser(id: number, updates: Partial<User>): Promise<User | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('users')
       .update(updates)
@@ -120,6 +151,8 @@ export class SupabaseDirect {
 
   // Course Sections
   static async getCourseSections(): Promise<CourseSection[]> {
+    if (!supabase) return [];
+
     const { data, error } = await supabase
       .from('course_sections')
       .select('*')
@@ -132,6 +165,8 @@ export class SupabaseDirect {
 
   // Courses
   static async getAllCourses(): Promise<Course[]> {
+    if (!supabase) return [];
+
     const { data, error } = await supabase
       .from('courses')
       .select(`
@@ -149,6 +184,8 @@ export class SupabaseDirect {
   }
 
   static async getAdminCourses(): Promise<Course[]> {
+    if (!supabase) return [];
+
     const { data, error } = await supabase
       .from('courses')
       .select(`
@@ -165,6 +202,8 @@ export class SupabaseDirect {
   }
 
   static async getCourseById(id: number): Promise<Course | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('courses')
       .select(`
@@ -184,6 +223,8 @@ export class SupabaseDirect {
   }
 
   static async createCourse(courseData: Partial<Course>): Promise<Course | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('courses')
       .insert(courseData)
@@ -195,6 +236,8 @@ export class SupabaseDirect {
   }
 
   static async updateCourse(id: number, updates: Partial<Course>): Promise<Course | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('courses')
       .update(updates)
@@ -207,6 +250,8 @@ export class SupabaseDirect {
   }
 
   static async deleteCourse(id: number): Promise<boolean> {
+    if (!supabase) return false;
+
     const { error } = await supabase
       .from('courses')
       .delete()
@@ -217,6 +262,8 @@ export class SupabaseDirect {
 
   // Course Modules
   static async getCourseModules(courseId: number): Promise<CourseModule[]> {
+    if (!supabase) return [];
+
     const { data, error } = await supabase
       .from('course_modules')
       .select('*')
@@ -228,6 +275,8 @@ export class SupabaseDirect {
   }
 
   static async createModule(moduleData: Partial<CourseModule>): Promise<CourseModule | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('course_modules')
       .insert(moduleData)
@@ -239,6 +288,8 @@ export class SupabaseDirect {
   }
 
   static async updateModule(id: number, updates: Partial<CourseModule>): Promise<CourseModule | null> {
+    if (!supabase) return null;
+
     const { data, error } = await supabase
       .from('course_modules')
       .update(updates)
@@ -251,28 +302,13 @@ export class SupabaseDirect {
   }
 
   static async deleteModule(id: number): Promise<boolean> {
+    if (!supabase) return false;
+
     const { error } = await supabase
       .from('course_modules')
       .delete()
       .eq('id', id);
     
     return !error;
-  }
-
-  // Teste de conexão
-  static async testConnection(): Promise<{ status: string; details: any }> {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('count', { count: 'exact', head: true });
-      
-      if (error) {
-        return { status: 'error', details: error };
-      }
-      
-      return { status: 'success', details: 'Conexão direta com Supabase funcionando' };
-    } catch (error) {
-      return { status: 'error', details: error };
-    }
   }
 }

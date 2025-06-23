@@ -3,7 +3,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { registerSchema, loginSchema, type RegisterData, type LoginData } from "@shared/schema";
+import { z } from "zod";
+
+const registerSchema = z.object({
+  username: z.string().min(3, "Username deve ter pelo menos 3 caracteres"),
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres")
+});
+
+const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(1, "Senha é obrigatória")
+});
+
+type RegisterData = z.infer<typeof registerSchema>;
+type LoginData = z.infer<typeof loginSchema>;
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

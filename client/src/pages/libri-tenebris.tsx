@@ -67,7 +67,7 @@ const TemploLogo = ({ size = 20, className = "" }) => (
     />
   </div>
 );
-import type { Grimoire, LibrarySection } from "@shared/schema";
+
 
 export default function Biblioteca() {
   const [activeSection, setActiveSection] = useState(1);
