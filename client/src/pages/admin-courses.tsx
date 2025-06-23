@@ -87,10 +87,10 @@ export default function AdminCourses() {
 
   // Buscar cursos
   const { data: courses = [], isLoading: coursesLoading } = useQuery<Course[]>({
-    queryKey: ['/api/courses'],
+    queryKey: ['/api/admin/courses'],
     queryFn: async () => {
       const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/courses', {
+      const response = await fetch('/api/admin/courses', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!response.ok) throw new Error('Erro ao buscar cursos');
@@ -118,7 +118,7 @@ export default function AdminCourses() {
     },
     onSuccess: () => {
       toast({ title: "Curso criado com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
       setCourseForm({
         title: '',
         slug: '',
@@ -149,7 +149,7 @@ export default function AdminCourses() {
     },
     onSuccess: () => {
       toast({ title: "Curso atualizado com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
       setEditingCourse(null);
     },
     onError: (error: any) => {
@@ -170,7 +170,7 @@ export default function AdminCourses() {
     },
     onSuccess: () => {
       toast({ title: "Curso deletado com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/courses'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
     },
     onError: (error: any) => {
       toast({ 
