@@ -81,7 +81,7 @@ export default function OracleAguasSombrias() {
             <div className="max-w-4xl mx-auto px-4 py-6">
               <div className="flex items-center justify-between">
                 <Link href="/oraculum">
-                  <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                  <Button variant="ghost" size="sm" className="text-ritualistic-beige hover:text-blue-400 hover:bg-blue-500/10 transition-colors">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Voltar ao Oraculum
                   </Button>
