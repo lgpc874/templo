@@ -71,7 +71,16 @@ export default function OracleTarotInfernal() {
   return (
     <PageTransition>
       <ContentProtection enableScreenshotProtection>
-        <div className="min-h-screen bg-gradient-to-b from-black via-red-950 to-black text-white relative overflow-hidden">
+        <div className="min-h-screen bg-black text-white relative overflow-hidden">
+          {/* Background rotating seal */}
+          <div className="fixed inset-0 flex items-center justify-center pointer-events-none overflow-hidden">
+            <img 
+              src="https://i.postimg.cc/g20gqmdX/IMG-20250527-182235-1.png" 
+              alt="Templo do Abismo" 
+              className="w-96 h-96 opacity-5 animate-spin"
+              style={{ animationDuration: '120s' }}
+            />
+          </div>
           {/* Efeitos místicos de fundo */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute top-20 left-20 w-96 h-96 bg-red-900/10 rounded-full blur-3xl animate-pulse"></div>
@@ -80,12 +89,12 @@ export default function OracleTarotInfernal() {
           </div>
 
           {/* Header */}
-          <div className="relative z-10 border-b border-red-500/30 bg-gradient-to-r from-red-900/50 to-black/80">
+          <div className="relative z-10 border-b border-red-500/50 bg-black/90">
             <div className="max-w-4xl mx-auto px-4 py-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <Link href="/oraculum">
-                    <Button variant="ghost" size="sm" className="text-gray-400 hover:text-white">
+                    <Button variant="ghost" size="sm" className="text-ritualistic-beige hover:text-red-400 transition-colors">
                       <ArrowLeft className="w-4 h-4 mr-2" />
                       Voltar aos Oráculos
                     </Button>
@@ -100,7 +109,7 @@ export default function OracleTarotInfernal() {
                 </div>
                 
                 <div className="flex-1">
-                  <h1 className="text-6xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  <h1 className="text-6xl font-bold text-red-400 mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
                     Tarotum Infernalis
                   </h1>
                   <p className="text-gray-300 leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
