@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { PageTransition } from '@/components/page-transition';
@@ -111,18 +111,20 @@ export default function AdminOraculum() {
 
   const { data: config } = useQuery({
     queryKey: ['/api/admin/oracles/config'],
-    enabled: isAuthenticated && user?.role === 'magus_supremo',
-    onSuccess: (data: OracleConfig) => {
-      if (data) {
-        setConfigForm({
-          openai_api_key: data.openai_api_key || '',
-          default_model: data.default_model,
-          max_tokens: data.max_tokens,
-          temperature: data.temperature
-        });
-      }
-    }
+    enabled: isAuthenticated && user?.role === 'magus_supremo'
   });
+
+  // Update config form when data changes
+  useEffect(() => {
+    if (config) {
+      setConfigForm({
+        openai_api_key: config.openai_api_key || '',
+        default_model: config.default_model,
+        max_tokens: config.max_tokens,
+        temperature: config.temperature
+      });
+    }
+  }, [config]);
 
   // Mutations
   const createOracleMutation = useMutation({
