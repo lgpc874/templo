@@ -78,14 +78,14 @@ export default function Admin() {
     },
     {
       id: 'grimoires',
-      title: 'Bibliotheca Arcana',
-      subtitle: 'Guardar os Grimórios Proibidos',
+      title: 'Libri Tenebris',
+      subtitle: 'Forjar os Grimórios Ancestrais',
       description: 'Administre a vasta coleção de textos ocultos e conhecimento ancestral',
       icon: BookOpen,
       color: 'from-purple-600 to-indigo-600',
       borderColor: 'border-purple-500/30',
       shadowColor: 'shadow-purple-900/30',
-      route: '/admin-grimoires'
+      route: '/admin/libri'
     },
     {
       id: 'initiates',

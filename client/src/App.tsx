@@ -23,6 +23,7 @@ import MeusCursos from "@/pages/meus-cursos";
 import Admin from "@/pages/admin";
 import AdminCourses from "@/pages/admin-courses";
 import AdminModules from "@/pages/admin-modules";
+import AdminLibri from "@/pages/admin-libri";
 import Oraculum from "@/pages/oraculum";
 import VoxPluma from "@/pages/vox-pluma";
 import DeTemplo from "@/pages/de-templo";

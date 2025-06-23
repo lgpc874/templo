@@ -106,6 +106,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 20:15**: Sistema CRUD completo para grimórios e seções de biblioteca
 - **23/06/2025 20:15**: Editor avançado com suporte a HTML/CSS, cores, preços e roles
 - **23/06/2025 20:15**: Botão adicionado no painel admin e rotas configuradas
+- **23/06/2025 20:27**: Corrigido nome do botão para "Libri Tenebris" e rota para /admin/libri
+- **23/06/2025 20:27**: Sistema Forja Libri totalmente integrado ao painel administrativo
 
 ## Próximos Passos
 1. Executar SQL para adicionar colunas sequenciais
