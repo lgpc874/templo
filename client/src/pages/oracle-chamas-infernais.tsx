@@ -20,11 +20,14 @@ export default function OracleChamasInfernais() {
     
     setIsStarting(true);
     try {
+      const token = localStorage.getItem('token');
+      console.log('Token do localStorage:', token ? 'Token presente' : 'Token ausente');
+      
       const response = await fetch('/api/oracles/3/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ userName, birthDate })
       });
@@ -32,9 +35,14 @@ export default function OracleChamasInfernais() {
       if (response.ok) {
         const { sessionToken } = await response.json();
         window.location.href = `/chat/${sessionToken}`;
+      } else {
+        const errorData = await response.json();
+        console.error('Erro na resposta:', errorData);
+        alert('Erro ao iniciar consulta: ' + errorData.error);
       }
     } catch (error) {
       console.error('Erro ao iniciar consulta:', error);
+      alert('Erro ao iniciar consulta: ' + error.message);
     } finally {
       setIsStarting(false);
     }
