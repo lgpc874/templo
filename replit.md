@@ -75,6 +75,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - Não tolera "claims" sem evidência
 - Prefere soluções completas e funcionais
 - Quer sistema 100% conectado ao Supabase, sem mocks
+- **CRÍTICO**: Backend é Supabase, NUNCA usar banco local ou psql
+- **CRÍTICO**: Sempre usar APIs do servidor para verificar dados no Supabase
 
 ## Mudanças Recentes
 - **23/06/2025 19:04**: Corrigida autenticação JWT e conexão Supabase
