@@ -443,40 +443,153 @@ export default function AdminCoursesFinal() {
 
           {/* Modal de Edição */}
           {editingCourse && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <Card className="bg-gray-900 border-amber-600/30 w-full max-w-md mx-4">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <Card className="bg-gray-900 border-amber-600/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <CardHeader>
-                  <CardTitle className="text-amber-400">Editar Curso</CardTitle>
+                  <CardTitle className="text-amber-400 flex items-center">
+                    <Edit className="w-5 h-5 mr-2" />
+                    Editar Curso: {editingCourse.title}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>Título</Label>
-                    <Input
-                      value={editingCourse.title}
-                      onChange={(e) => setEditingCourse({...editingCourse, title: e.target.value})}
-                      className="bg-black/30 border-gray-600"
-                    />
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Título</Label>
+                      <Input
+                        value={editingCourse.title}
+                        onChange={(e) => setEditingCourse({...editingCourse, title: e.target.value})}
+                        className="bg-black/30 border-gray-600"
+                      />
+                    </div>
+                    <div>
+                      <Label>Slug</Label>
+                      <Input
+                        value={editingCourse.slug}
+                        onChange={(e) => setEditingCourse({...editingCourse, slug: e.target.value})}
+                        className="bg-black/30 border-gray-600"
+                      />
+                    </div>
                   </div>
+
                   <div>
                     <Label>Descrição</Label>
                     <Textarea
                       value={editingCourse.description}
                       onChange={(e) => setEditingCourse({...editingCourse, description: e.target.value})}
                       className="bg-black/30 border-gray-600"
+                      rows={4}
                     />
                   </div>
-                  <div className="flex justify-end gap-2 pt-4">
+
+                  <div>
+                    <Label>URL da Imagem (opcional)</Label>
+                    <Input
+                      value={editingCourse.image_url || ''}
+                      onChange={(e) => setEditingCourse({...editingCourse, image_url: e.target.value})}
+                      className="bg-black/30 border-gray-600"
+                      placeholder="https://exemplo.com/imagem.jpg"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>Seção do Curso</Label>
+                    <Select 
+                      value={editingCourse.course_section_id.toString()} 
+                      onValueChange={(value) => setEditingCourse({...editingCourse, course_section_id: parseInt(value)})}
+                    >
+                      <SelectTrigger className="bg-black/30 border-gray-600">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {courseSections.map((section) => (
+                          <SelectItem key={section.id} value={section.id.toString()}>
+                            {section.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label>Role Necessário</Label>
+                    <Select 
+                      value={editingCourse.required_role} 
+                      onValueChange={(value) => setEditingCourse({...editingCourse, required_role: value})}
+                    >
+                      <SelectTrigger className="bg-black/30 border-gray-600">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="buscador">Buscador</SelectItem>
+                        <SelectItem value="iniciado">Iniciado</SelectItem>
+                        <SelectItem value="portador_veu">Portador do Véu</SelectItem>
+                        <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
+                        <SelectItem value="guardiao_nome">Guardião do Nome</SelectItem>
+                        <SelectItem value="arauto_queda">Arauto da Queda</SelectItem>
+                        <SelectItem value="portador_coroa">Portador da Coroa</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Preço</Label>
+                      <Input
+                        type="number"
+                        value={editingCourse.price}
+                        onChange={(e) => setEditingCourse({...editingCourse, price: parseFloat(e.target.value) || 0})}
+                        className="bg-black/30 border-gray-600"
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                    <div>
+                      <Label>Ordem de Exibição</Label>
+                      <Input
+                        type="number"
+                        value={editingCourse.sort_order}
+                        onChange={(e) => setEditingCourse({...editingCourse, sort_order: parseInt(e.target.value) || 0})}
+                        className="bg-black/30 border-gray-600"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="edit_is_paid"
+                        checked={editingCourse.is_paid}
+                        onChange={(e) => setEditingCourse({...editingCourse, is_paid: e.target.checked})}
+                      />
+                      <Label htmlFor="edit_is_paid">Curso Pago</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="edit_is_published"
+                        checked={editingCourse.is_published}
+                        onChange={(e) => setEditingCourse({...editingCourse, is_published: e.target.checked})}
+                      />
+                      <Label htmlFor="edit_is_published">Curso Publicado</Label>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-6 border-t border-gray-700">
                     <Button
                       variant="outline"
                       onClick={() => setEditingCourse(null)}
+                      className="text-gray-400 border-gray-600"
                     >
                       Cancelar
                     </Button>
                     <Button
                       onClick={() => handleUpdateCourse(editingCourse)}
-                      className="bg-amber-600 hover:bg-amber-700 text-black"
+                      className="bg-amber-600 hover:bg-amber-700 text-black font-bold"
                     >
-                      Salvar
+                      <Save className="w-4 h-4 mr-2" />
+                      Salvar Alterações
                     </Button>
                   </div>
                 </CardContent>

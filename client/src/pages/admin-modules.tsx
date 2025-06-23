@@ -48,6 +48,8 @@ interface Module {
   title: string;
   html_content: string;
   order_number: number;
+  requires_submission?: boolean;
+  ritual_mandatory?: boolean;
 }
 
 export default function AdminModulesFinal() {
@@ -66,7 +68,9 @@ export default function AdminModulesFinal() {
   const [moduleForm, setModuleForm] = useState({
     title: '',
     html_content: '',
-    order_number: 1
+    order_number: 1,
+    requires_submission: false,
+    ritual_mandatory: false
   });
 
   // Verificar se é admin
@@ -177,7 +181,9 @@ export default function AdminModulesFinal() {
         setModuleForm({
           title: '',
           html_content: '',
-          order_number: modules.length + 1
+          order_number: modules.length + 1,
+          requires_submission: false,
+          ritual_mandatory: false
         });
         toast({ 
           title: "Módulo forjado com sucesso!", 
@@ -402,6 +408,31 @@ export default function AdminModulesFinal() {
                       />
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="requires_submission"
+                          checked={moduleForm.requires_submission || false}
+                          onChange={(e) => setModuleForm({...moduleForm, requires_submission: e.target.checked})}
+                        />
+                        <Label htmlFor="requires_submission" className="text-gray-300">
+                          Requer Submissão
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="ritual_mandatory"
+                          checked={moduleForm.ritual_mandatory || false}
+                          onChange={(e) => setModuleForm({...moduleForm, ritual_mandatory: e.target.checked})}
+                        />
+                        <Label htmlFor="ritual_mandatory" className="text-gray-300">
+                          Ritual Obrigatório
+                        </Label>
+                      </div>
+                    </div>
+
                     <Button 
                       type="submit" 
                       className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-3"
@@ -493,49 +524,88 @@ export default function AdminModulesFinal() {
           {/* Modal de Edição */}
           {editingModule && (
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <Card className="bg-gray-900 border-purple-600/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <Card className="bg-gray-900 border-purple-600/30 w-full max-w-4xl max-h-[95vh] overflow-y-auto">
                 <CardHeader>
-                  <CardTitle className="text-purple-400">Editar Módulo</CardTitle>
+                  <CardTitle className="text-purple-400 flex items-center">
+                    <Edit className="w-5 h-5 mr-2" />
+                    Editar Módulo: {editingModule.title}
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>Título</Label>
-                    <Input
-                      value={editingModule.title}
-                      onChange={(e) => setEditingModule({...editingModule, title: e.target.value})}
-                      className="bg-black/30 border-gray-600"
-                    />
+                <CardContent className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-gray-300">Título do Módulo</Label>
+                      <Input
+                        value={editingModule.title}
+                        onChange={(e) => setEditingModule({...editingModule, title: e.target.value})}
+                        className="bg-black/30 border-purple-500/50 text-white"
+                        placeholder="Ex: Introdução aos Mistérios"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-gray-300">Ordem do Módulo</Label>
+                      <Input
+                        type="number"
+                        value={editingModule.order_number}
+                        onChange={(e) => setEditingModule({...editingModule, order_number: parseInt(e.target.value) || 1})}
+                        className="bg-black/30 border-purple-500/50 text-white"
+                        min="1"
+                      />
+                    </div>
                   </div>
+
                   <div>
-                    <Label>Conteúdo</Label>
-                    <RichTextEditor
-                      value={editingModule.html_content}
-                      onChange={(value) => setEditingModule({...editingModule, html_content: value})}
-                      className="bg-black/30 border-gray-600"
-                      height="300px"
-                    />
+                    <Label className="text-gray-300">Conteúdo do Módulo</Label>
+                    <div className="mt-2">
+                      <RichTextEditor
+                        value={editingModule.html_content}
+                        onChange={(value) => setEditingModule({...editingModule, html_content: value})}
+                        placeholder="Escreva o conteúdo do módulo..."
+                        className="bg-black/30 border-purple-500/50"
+                        height="400px"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Label>Ordem</Label>
-                    <Input
-                      type="number"
-                      value={editingModule.order_number}
-                      onChange={(e) => setEditingModule({...editingModule, order_number: parseInt(e.target.value) || 1})}
-                      className="bg-black/30 border-gray-600"
-                    />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="edit_requires_submission"
+                        checked={editingModule.requires_submission || false}
+                        onChange={(e) => setEditingModule({...editingModule, requires_submission: e.target.checked})}
+                      />
+                      <Label htmlFor="edit_requires_submission" className="text-gray-300">
+                        Requer Submissão
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="edit_ritual_mandatory"
+                        checked={editingModule.ritual_mandatory || false}
+                        onChange={(e) => setEditingModule({...editingModule, ritual_mandatory: e.target.checked})}
+                      />
+                      <Label htmlFor="edit_ritual_mandatory" className="text-gray-300">
+                        Ritual Obrigatório
+                      </Label>
+                    </div>
                   </div>
-                  <div className="flex justify-end gap-2 pt-4">
+
+                  <div className="flex justify-end gap-2 pt-6 border-t border-gray-700">
                     <Button
                       variant="outline"
                       onClick={() => setEditingModule(null)}
+                      className="text-gray-400 border-gray-600"
                     >
                       Cancelar
                     </Button>
                     <Button
                       onClick={() => handleUpdateModule(editingModule)}
-                      className="bg-purple-600 hover:bg-purple-700 text-white"
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold"
                     >
-                      Salvar
+                      <Save className="w-4 h-4 mr-2" />
+                      Salvar Alterações
                     </Button>
                   </div>
                 </CardContent>
