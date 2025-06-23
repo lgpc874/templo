@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
@@ -10,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import RichTextEditor from "@/components/rich-text-editor";
 import { 
   FileText, 
   Plus, 

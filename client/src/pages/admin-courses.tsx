@@ -85,91 +85,12 @@ export default function AdminCourses() {
     );
   }
 
-  // Buscar cursos
-  const { data: courses = [], isLoading: coursesLoading } = useQuery({
-    queryKey: ['/api/admin/courses']
-  });
-
-  // Buscar seções
-  const { data: courseSections = [] } = useQuery({
-    queryKey: ['/api/course-sections']
-  });
-
-  // Mutação para criar curso
-  const createCourseMutation = useMutation({
-    mutationFn: async (data: typeof courseForm) => {
-      const response = await apiRequest('/api/admin/courses', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({ title: "Curso criado com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
-      setCourseForm({
-        title: '',
-        slug: '',
-        description: '',
-        image_url: '',
-        required_role: 'buscador',
-        price: 0,
-        is_paid: false,
-        course_section_id: 1
-      });
-    },
-    onError: (error: any) => {
-      toast({ 
-        title: "Erro ao criar curso", 
-        description: error.message,
-        variant: "destructive" 
-      });
-    }
-  });
-
-  // Mutação para atualizar curso
-  const updateCourseMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<Course> }) => {
-      const response = await apiRequest(`/api/admin/courses/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(data)
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({ title: "Curso atualizado com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
-      setEditingCourse(null);
-    },
-    onError: (error: any) => {
-      toast({ 
-        title: "Erro ao atualizar curso", 
-        description: error.message,
-        variant: "destructive" 
-      });
-    }
-  });
-
-  // Mutação para deletar curso
-  const deleteCourseMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await apiRequest(`/api/admin/courses/${id}`, {
-        method: 'DELETE'
-      });
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({ title: "Curso deletado com sucesso!" });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/courses'] });
-    },
-    onError: (error: any) => {
-      toast({ 
-        title: "Erro ao deletar curso", 
-        description: error.message,
-        variant: "destructive" 
-      });
-    }
-  });
+  // Hooks para admin
+  const { data: courses = [], isLoading: coursesLoading } = useAdminCourses();
+  const { data: courseSections = [] } = useCourseSections();
+  const createCourseMutation = useCreateCourse();
+  const updateCourseMutation = useUpdateCourse();
+  const deleteCourseMutation = useDeleteCourse();
 
   const handleCreateCourse = (e: React.FormEvent) => {
     e.preventDefault();
@@ -376,7 +297,7 @@ export default function AdminCourses() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {coursesLoading ? (
+                {loading ? (
                   <div className="text-center py-8">Carregando...</div>
                 ) : (
                   <div className="space-y-4 max-h-96 overflow-y-auto">
