@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
 import { ChevronLeft, ChevronRight, Lock, CheckCircle, Book, Award, Flame, Eye, Crown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -116,54 +116,7 @@ const getSectionStyles = (sectionName: string, color: string) => {
   return sectionSpecificStyles[sectionName as keyof typeof sectionSpecificStyles] || baseStyles;
 };
 
-// Componente para Ritual de Abertura
-const RitualAbertura = ({ course, onAccept }: { course: Course; onAccept: () => void }) => {
-  const sectionStyles = getSectionStyles(course.course_sections.name, course.course_sections.color);
-  
-  return (
-    <div className="text-center space-y-6 p-8" style={sectionStyles as any}>
-      <div className="mb-8">
-        <Flame className="w-16 h-16 mx-auto text-amber-400 mb-4" />
-        <h2 className="text-3xl font-bold text-amber-400 mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
-          Ritual de Abertura
-        </h2>
-        <p className="text-lg text-gray-300">
-          {course.course_sections.name}
-        </p>
-      </div>
 
-      <div className="space-y-4 text-gray-200" style={{ fontFamily: 'EB Garamond' }}>
-        <p className="text-lg italic">
-          "Que as sombras se afastem e a luz do conhecimento ilumine meu caminho."
-        </p>
-        
-        <div className="border-t border-b border-amber-600 py-6 my-6">
-          <p className="text-base leading-relaxed">
-            Antes de iniciar sua jornada através dos mistérios de <strong>{course.title}</strong>, 
-            é necessário realizar o ritual de abertura. Este momento marca o início de sua 
-            transformação e comprometimento com os ensinamentos que virão.
-          </p>
-        </div>
-
-        <p className="text-sm text-gray-400">
-          Ao aceitar, você declara estar preparado para receber os conhecimentos 
-          e aplicá-los com sabedoria e responsabilidade.
-        </p>
-      </div>
-
-      <div className="flex justify-center space-x-4 mt-8">
-        <Button
-          onClick={onAccept}
-          size="lg"
-          className="bg-amber-600 hover:bg-amber-700 text-black font-semibold px-8"
-          style={{ fontFamily: 'Cinzel Decorative' }}
-        >
-          Aceito o Compromisso
-        </Button>
-      </div>
-    </div>
-  );
-};
 
 export default function CursusLeitor() {
   const { slug } = useParams();
@@ -171,8 +124,7 @@ export default function CursusLeitor() {
   const [, setLocation] = useLocation();
   const [currentModuleIndex, setCurrentModuleIndex] = useState(0);
   const [showChallenge, setShowChallenge] = useState(false);
-  const [showRitual, setShowRitual] = useState(false);
-  const [ritualCompleted, setRitualCompleted] = useState(false);
+
   const queryClient = useQueryClient();
 
   // Buscar dados do curso
@@ -301,26 +253,19 @@ export default function CursusLeitor() {
     return Math.round((userProgress.current_module / modules.length) * 100);
   };
 
-  // Verificar se deve mostrar ritual de abertura
+  // Criar progresso inicial automaticamente se não existir
   useEffect(() => {
-    if (course && user && !userProgress && !ritualCompleted) {
-      setShowRitual(true);
-    }
-  }, [course, user, userProgress, ritualCompleted]);
-
-  const handleRitualAccept = async () => {
-    if (!course) return;
+    const createInitialProgress = async () => {
+      if (course && user && !userProgress) {
+        await updateProgressMutation.mutateAsync({
+          course_id: course.id,
+          current_module: 1,
+        });
+      }
+    };
     
-    // Criar progresso inicial
-    await updateProgressMutation.mutateAsync({
-      course_id: course.id,
-      current_module: 1,
-    });
-    
-    setRitualCompleted(true);
-    setShowRitual(false);
-    toast({ title: 'Ritual de abertura concluído!', description: 'Você pode agora iniciar o curso.' });
-  };
+    createInitialProgress();
+  }, [course, user, userProgress]);
 
   const handleCompleteModule = async () => {
     if (!course || !modules[currentModuleIndex]) return;
@@ -415,15 +360,7 @@ export default function CursusLeitor() {
   const sectionStyles = getSectionStyles(course.course_sections.name, sectionColor);
 
   return (
-    <>
-      {/* Ritual de Abertura Dialog */}
-      <Dialog open={showRitual} onOpenChange={() => {}}>
-        <DialogContent className="max-w-2xl bg-black border-amber-600">
-          <RitualAbertura course={course} onAccept={handleRitualAccept} />
-        </DialogContent>
-      </Dialog>
-
-      <div className="min-h-screen text-white" style={sectionStyles as any}>
+    <div className="min-h-screen text-white" style={sectionStyles as any}>
         {/* Header */}
         <div className="border-b border-gray-800 bg-black/50 sticky top-0 z-10 backdrop-blur-sm">
           <div className="container mx-auto px-4 py-3 md:py-4">
@@ -600,7 +537,6 @@ export default function CursusLeitor() {
             </div>
           </div>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

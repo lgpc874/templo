@@ -208,7 +208,7 @@ export default function CursoDetalhe() {
     if (!course.is_paid || user.email === 'admin@templodoabismo.com.br' || user.role === 'magus_supremo') {
       return {
         text: 'Iniciar Curso',
-        action: () => setLocation(`/ritual-inicial/${course.id}`),
+        action: () => setLocation(`/cursus-leitor/${course.slug}`),
         disabled: false
       };
     }

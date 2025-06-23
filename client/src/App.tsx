@@ -17,7 +17,7 @@ import Initiatio from "@/pages/initiatio";
 import Cursus from "@/pages/cursus";
 // import CursusDetalhe from "@/pages/cursus-detalhe"; // Arquivo não existe mais
 import CursoDetalhe from "@/pages/curso-detalhe";
-import RitualInicial from "@/pages/ritual-inicial";
+
 import CursusLeitor from "@/pages/cursus-leitor";
 import MeusCursos from "@/pages/meus-cursos";
 import Admin from "@/pages/admin";
@@ -83,7 +83,7 @@ function App() {
                 <Route path="/cursus" component={Cursus} />
                 {/* <Route path="/cursus-detalhe/:slug" component={CursusDetalhe} /> */}
                 <Route path="/curso-detalhe/:id" component={CursoDetalhe} />
-                <Route path="/ritual-inicial/:curso_id" component={RitualInicial} />
+
                 <Route path="/cursus-leitor/:slug" component={CursusLeitor} />
                 <Route path="/meus-cursos" component={MeusCursos} />
                 <Route path="/admin" component={Admin} />
