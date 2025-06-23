@@ -171,22 +171,22 @@ export default function Oraculum() {
 
           {/* Header místico */}
           <div className="relative">
-            <div className="container mx-auto px-4 py-20">
+            <div className="container mx-auto px-4 py-8">
               {/* Header Section */}
-              <div className="text-center mb-16">
-                <div className="mb-8">
+              <div className="text-center mb-8">
+                <div className="mb-4">
                   <div className="relative inline-block">
-                    <Eye className="w-20 h-20 mx-auto text-golden-amber animate-pulse" />
+                    <Eye className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 mx-auto text-golden-amber animate-pulse" />
                     <div className="absolute inset-0 bg-golden-amber/20 blur-xl rounded-full"></div>
                   </div>
                 </div>
                 
-                <h1 className="text-5xl md:text-7xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
-                  Oraculum Infernale
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel' }}>
+                  ORACULUM INFERNALE
                 </h1>
                 
                 <div className="max-w-4xl mx-auto">
-                  <p className="text-xl md:text-2xl text-ritualistic-beige mb-6" style={{ fontFamily: 'EB Garamond' }}>
+                  <p className="text-xs sm:text-sm text-ritualistic-beige/70 max-w-3xl mx-auto px-4 mb-6">
                     Adentre os mistérios ancestrais através dos cinco oráculos sagrados do Templo do Abismo. 
                     Cada portal revela segredos únicos através de artes divinatórias milenares, 
                     guiados por mestres especializados em suas respectivas tradições esotéricas.
@@ -196,18 +196,20 @@ export default function Oraculum() {
                     <div className="h-px bg-gradient-to-r from-transparent via-golden-amber to-transparent w-96"></div>
                   </div>
                   
-                  <div className="flex items-center justify-center text-golden-amber/80 space-x-8">
-                    <div className="flex items-center space-x-2">
-                      <Eye className="w-5 h-5 animate-pulse" />
-                      <span style={{ fontFamily: 'EB Garamond' }}>Visões Reveladoras</span>
+                  <div className="flex items-center justify-center text-golden-amber/80 space-x-4 text-xs">
+                    <div className="flex items-center space-x-1">
+                      <Eye className="w-3 h-3 animate-pulse" />
+                      <span>Visões Reveladoras</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Sparkles className="w-5 h-5 animate-pulse" />
-                      <span style={{ fontFamily: 'EB Garamond' }}>Sabedoria Ancestral</span>
+                    <span>•</span>
+                    <div className="flex items-center space-x-1">
+                      <Sparkles className="w-3 h-3 animate-pulse" />
+                      <span>Sabedoria Ancestral</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Shield className="w-5 h-5 animate-pulse" />
-                      <span style={{ fontFamily: 'EB Garamond' }}>Proteção Ritual</span>
+                    <span>•</span>
+                    <div className="flex items-center space-x-1">
+                      <Shield className="w-3 h-3 animate-pulse" />
+                      <span>Proteção Ritual</span>
                     </div>
                   </div>
                 </div>
@@ -216,7 +218,7 @@ export default function Oraculum() {
           </div>
 
           {/* Grid de Oráculos */}
-          <div className="relative container mx-auto px-4 pb-20">
+          <div className="relative container mx-auto px-4 pb-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
               {oracles.map((oracle) => {
                 const userPrice = getUserPrice(oracle);
@@ -232,9 +234,9 @@ export default function Oraculum() {
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-golden-amber/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     
                     <CardHeader className="text-center pb-4">
-                      <div className="flex justify-center mb-6">
+                      <div className="flex justify-center mb-4">
                         <div 
-                          className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-golden-amber/30"
+                          className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-golden-amber/30"
                           style={{
                             background: `radial-gradient(circle, ${oracle.theme_color}20, black)`,
                             boxShadow: `0 0 30px ${oracle.theme_color}40`
@@ -244,7 +246,7 @@ export default function Oraculum() {
                             <img 
                               src={oracle.icon_url} 
                               alt={oracle.name}
-                              className="w-10 h-10 object-contain"
+                              className="w-8 h-8 object-contain"
                             />
                           ) : (
                             <div style={{ color: oracle.theme_color }}>
@@ -254,15 +256,15 @@ export default function Oraculum() {
                         </div>
                       </div>
                       
-                      <CardTitle className="text-2xl text-golden-amber mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
+                      <CardTitle className="text-lg text-golden-amber mb-2" style={{ fontFamily: 'Cinzel' }}>
                         {oracle.name}
                       </CardTitle>
                       
-                      <div className="text-sm text-golden-amber/60 italic mb-4" style={{ fontFamily: 'EB Garamond' }}>
+                      <div className="text-xs text-golden-amber/60 italic mb-3" style={{ fontFamily: 'EB Garamond' }}>
                         {oracle.latin_name}
                       </div>
                       
-                      <CardDescription className="text-ritualistic-beige text-sm leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
+                      <CardDescription className="text-ritualistic-beige text-xs leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
                         {oracle.description}
                       </CardDescription>
                     </CardHeader>
@@ -331,16 +333,16 @@ export default function Oraculum() {
             </div>
 
             {/* Footer místico */}
-            <div className="text-center mt-20">
-              <div className="flex justify-center mb-6">
-                <div className="h-px bg-gradient-to-r from-transparent via-golden-amber/50 to-transparent w-96"></div>
+            <div className="text-center mt-12">
+              <div className="flex justify-center mb-4">
+                <div className="h-px bg-gradient-to-r from-transparent via-golden-amber/50 to-transparent w-64"></div>
               </div>
               
-              <p className="text-ritualistic-beige/60 text-lg italic mb-4" style={{ fontFamily: 'EB Garamond' }}>
+              <p className="text-ritualistic-beige/60 text-sm italic mb-3" style={{ fontFamily: 'EB Garamond' }}>
                 "Os mistérios se revelam àqueles que buscam com sinceridade e reverência aos antigos caminhos."
               </p>
               
-              <div className="flex items-center justify-center space-x-4 text-golden-amber/60 text-sm">
+              <div className="flex items-center justify-center space-x-2 text-golden-amber/60 text-xs">
                 <span style={{ fontFamily: 'Cinzel' }}>TEMPLO DO ABISMO</span>
                 <span>•</span>
                 <span style={{ fontFamily: 'Cinzel' }}>ORÁCULOS INFERNAIS</span>
