@@ -108,8 +108,7 @@ export default function Oraculum() {
             <img 
               src="https://i.postimg.cc/g20gqmdX/IMG-20250527-182235-1.png" 
               alt="Templo do Abismo" 
-              className="w-96 h-96 opacity-5 animate-spin"
-              style={{ animationDuration: '120s' }}
+              className="w-96 h-96 opacity-5"
             />
           </div>
 
@@ -120,7 +119,7 @@ export default function Oraculum() {
               <div className="text-center mb-8">
                 <div className="mb-4">
                   <div className="relative inline-block">
-                    <Eye className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 mx-auto text-golden-amber animate-pulse" />
+                    <Eye className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14 xl:w-16 xl:h-16 mx-auto text-golden-amber" />
                     <div className="absolute inset-0 bg-golden-amber/20 blur-xl rounded-full"></div>
                   </div>
                 </div>
@@ -142,12 +141,12 @@ export default function Oraculum() {
                   
                   <div className="flex items-center justify-center text-golden-amber/80 space-x-4 text-xs">
                     <div className="flex items-center space-x-1">
-                      <Eye className="w-3 h-3 animate-pulse" />
+                      <Eye className="w-3 h-3" />
                       <span>Visões Reveladoras</span>
                     </div>
                     <span>•</span>
                     <div className="flex items-center space-x-1">
-                      <Sparkles className="w-3 h-3 animate-pulse" />
+                      <Sparkles className="w-3 h-3" />
                       <span>Sabedoria Ancestral</span>
                     </div>
                     <span>•</span>
