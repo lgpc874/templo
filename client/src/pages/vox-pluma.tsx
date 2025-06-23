@@ -55,7 +55,7 @@ export default function VoxPluma() {
                 <div className="flex items-center gap-2 mb-2">
                   <Feather className="h-5 w-5 text-golden-amber" />
                   <Badge className="bg-golden-amber text-black font-cinzel">
-                    Reflexão de Hoje
+                    Canalização de hoje
                   </Badge>
                 </div>
                 <CardTitle className="text-2xl sm:text-3xl font-cinzel text-golden-amber">
@@ -85,7 +85,7 @@ export default function VoxPluma() {
         {/* Reflection Archive */}
         <div className="mb-8">
           <h2 className="text-2xl font-cinzel text-golden-amber mb-6 text-center">
-            Arquivo das Reflexões Sagradas
+            Canalizações registradas
           </h2>
           
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -163,7 +163,7 @@ export default function VoxPluma() {
             <Feather className="h-8 w-8 text-golden-amber mx-auto mb-3" />
             <h3 className="font-cinzel text-golden-amber mb-2">Sobre a Vox Pluma</h3>
             <p className="text-sm text-ritualistic-beige/70 max-w-md">
-              A Vox Pluma canaliza diariamente sabedorias ancestrais através da inteligência artificial,
+              A Vox Pluma canaliza diariamente sabedorias ancestrais através do contato direto com a força do Abismo,
               trazendo reflexões e conselhos para guiar sua jornada espiritual no caminho luciferiano.
             </p>
           </div>
