@@ -1074,6 +1074,22 @@ O conteúdo deve ser um grimório completo e substancial em HTML formatado.`;
     return data || [];
   }
 
+  async getCourseModules(courseId: number): Promise<any[]> {
+    try {
+      const { data, error } = await this.supabase
+        .from('course_modules')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('order_number');
+      
+      if (error) throw error;
+      return data || [];
+    } catch (error: any) {
+      console.error('Erro ao buscar módulos do curso:', error);
+      throw error;
+    }
+  }
+
   async getModulesByCourse(courseId: number): Promise<Module[]> {
     const { data, error } = await this.supabase
       .from('modules')

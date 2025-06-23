@@ -2589,13 +2589,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Buscar módulos de um curso
+  // Buscar módulos de um curso (usando nova tabela course_modules)
   app.get("/api/courses/:id/modules", authenticateToken, async (req: any, res) => {
     try {
       const courseId = parseInt(req.params.id);
-      const modules = await supabaseServiceNew.getModulesByCourse(courseId);
+      console.log('=== BUSCANDO MÓDULOS DO CURSO ===');
+      console.log('Course ID:', courseId);
       
-      res.json(modules);
+      const { data: modules, error } = await supabaseServiceNew.getClient()
+        .from('course_modules')
+        .select('*')
+        .eq('course_id', courseId)
+        .order('order_number');
+      
+      if (error) {
+        console.error('Erro ao buscar módulos:', error);
+        throw error;
+      }
+      
+      console.log('Módulos encontrados:', modules?.length || 0);
+      res.json(modules || []);
     } catch (error: any) {
       console.error("Error fetching course modules:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
