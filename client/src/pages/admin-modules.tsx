@@ -666,14 +666,24 @@ export default function AdminModulesFinal() {
             </div>
           )}
 
-          {/* Modal de Edição */}
+          {/* Modal de Edição Avançado com Abas */}
           {editingModule && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <Card className="bg-gray-900 border-purple-600/30 w-full max-w-4xl max-h-[95vh] overflow-y-auto">
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <Card className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-black/90 border-blue-500/30">
                 <CardHeader>
-                  <CardTitle className="text-purple-400 flex items-center">
-                    <Edit className="w-5 h-5 mr-2" />
-                    Editar Módulo: {editingModule.title}
+                  <CardTitle className="text-blue-400 flex items-center justify-between">
+                    <span className="flex items-center">
+                      <Edit className="w-5 h-5 mr-2" />
+                      Editor Avançado: {editingModule.title}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingModule(null)}
+                      className="text-gray-400 hover:text-white"
+                    >
+                      ✕
+                    </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -682,72 +692,187 @@ export default function AdminModulesFinal() {
                       <Label className="text-gray-300">Título do Módulo</Label>
                       <Input
                         value={editingModule.title}
-                        onChange={(e) => setEditingModule({...editingModule, title: e.target.value})}
-                        className="bg-black/30 border-purple-500/50 text-white"
-                        placeholder="Ex: Introdução aos Mistérios"
+                        onChange={(e) => setEditingModule({ ...editingModule, title: e.target.value })}
+                        className="bg-gray-800 border-gray-600 text-white"
                       />
                     </div>
                     <div>
-                      <Label className="text-gray-300">Ordem do Módulo</Label>
+                      <Label className="text-gray-300">Ordem</Label>
                       <Input
                         type="number"
                         value={editingModule.order_number}
-                        onChange={(e) => setEditingModule({...editingModule, order_number: parseInt(e.target.value) || 1})}
-                        className="bg-black/30 border-purple-500/50 text-white"
-                        min="1"
+                        onChange={(e) => setEditingModule({ ...editingModule, order_number: parseInt(e.target.value) })}
+                        className="bg-gray-800 border-gray-600 text-white"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <Label className="text-gray-300">Conteúdo do Módulo</Label>
-                    <div className="mt-2">
-                      <RichTextEditor
-                        value={editingModule.html_content}
-                        onChange={(value) => setEditingModule({...editingModule, html_content: value})}
-                        placeholder="Escreva o conteúdo do módulo..."
-                        className="bg-black/30 border-purple-500/50"
-                        height="400px"
-                      />
-                    </div>
-                  </div>
+                  <Tabs defaultValue="content" className="space-y-4">
+                    <TabsList className="grid w-full grid-cols-4 bg-gray-800">
+                      <TabsTrigger value="content">Conteúdo</TabsTrigger>
+                      <TabsTrigger value="submission">Submissão</TabsTrigger>
+                      <TabsTrigger value="completion">Conclusão</TabsTrigger>
+                      <TabsTrigger value="preview">Preview</TabsTrigger>
+                    </TabsList>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="edit_requires_submission"
-                        checked={editingModule.requires_submission || false}
-                        onChange={(e) => setEditingModule({...editingModule, requires_submission: e.target.checked})}
-                      />
-                      <Label htmlFor="edit_requires_submission" className="text-gray-300">
-                        Requer Submissão
-                      </Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="edit_ritual_mandatory"
-                        checked={editingModule.ritual_mandatory || false}
-                        onChange={(e) => setEditingModule({...editingModule, ritual_mandatory: e.target.checked})}
-                      />
-                      <Label htmlFor="edit_ritual_mandatory" className="text-gray-300">
-                        Ritual Obrigatório
-                      </Label>
-                    </div>
-                  </div>
+                    <TabsContent value="content" className="space-y-4">
+                      <div>
+                        <Label className="text-gray-300 mb-2 block">Conteúdo HTML do Módulo</Label>
+                        <RichTextEditor
+                          value={editingModule.html_content}
+                          onChange={(value) => setEditingModule({ ...editingModule, html_content: value })}
+                          placeholder="Edite o conteúdo HTML do módulo..."
+                          height="300px"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label className="text-gray-300 mb-2 block">CSS Customizado (Opcional)</Label>
+                        <Textarea
+                          value={editingModule.custom_css || ''}
+                          onChange={(e) => setEditingModule({ ...editingModule, custom_css: e.target.value })}
+                          placeholder="CSS personalizado para este módulo..."
+                          className="bg-gray-800 border-gray-600 text-white min-h-[100px] font-mono text-sm"
+                        />
+                      </div>
+                    </TabsContent>
 
-                  <div className="flex justify-end gap-2 pt-6 border-t border-gray-700">
+                    <TabsContent value="submission" className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="edit_requires_submission"
+                          checked={editingModule.requires_submission}
+                          onCheckedChange={(checked) => 
+                            setEditingModule({ ...editingModule, requires_submission: checked as boolean })
+                          }
+                        />
+                        <Label htmlFor="edit_requires_submission" className="text-gray-300">
+                          Este módulo requer submissão/aceitação
+                        </Label>
+                      </div>
+
+                      {editingModule.requires_submission && (
+                        <div className="space-y-4">
+                          <div>
+                            <Label className="text-gray-300 mb-2 block">Posição da Submissão</Label>
+                            <Select 
+                              value={editingModule.submission_position || 'before'}
+                              onValueChange={(value) => setEditingModule({ ...editingModule, submission_position: value })}
+                            >
+                              <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="before">Antes do conteúdo (bloqueia acesso)</SelectItem>
+                                <SelectItem value="after">Após o conteúdo</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className="text-sm text-gray-400 mt-1">
+                              {editingModule.submission_position === 'before' 
+                                ? 'O usuário deve aceitar antes de ver o conteúdo'
+                                : 'A submissão aparece no final do módulo'
+                              }
+                            </p>
+                          </div>
+
+                          <div>
+                            <Label className="text-gray-300 mb-2 block">Texto da Submissão</Label>
+                            <RichTextEditor
+                              value={editingModule.submission_text || ''}
+                              onChange={(value) => setEditingModule({ ...editingModule, submission_text: value })}
+                              placeholder="Texto do ritual de submissão e aceitação..."
+                              height="200px"
+                            />
+                            <p className="text-sm text-gray-400 mt-2">
+                              Este é o ritual onde a pessoa declara e aceita o caminho do templo
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center space-x-2 mt-4">
+                        <Checkbox 
+                          id="edit_ritual_mandatory"
+                          checked={editingModule.ritual_mandatory}
+                          onCheckedChange={(checked) => 
+                            setEditingModule({ ...editingModule, ritual_mandatory: checked as boolean })
+                          }
+                        />
+                        <Label htmlFor="edit_ritual_mandatory" className="text-gray-300">
+                          Ritual Obrigatório
+                        </Label>
+                      </div>
+
+                      {editingModule.ritual_mandatory && (
+                        <div>
+                          <Label className="text-gray-300 mb-2 block">Instruções do Ritual</Label>
+                          <RichTextEditor
+                            value={editingModule.ritual_text || ''}
+                            onChange={(value) => setEditingModule({ ...editingModule, ritual_text: value })}
+                            placeholder="Instruções detalhadas do ritual obrigatório..."
+                            height="200px"
+                          />
+                          <p className="text-sm text-gray-400 mt-2">
+                            Instruções específicas que o estudante deve seguir
+                          </p>
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="completion" className="space-y-4">
+                      <div className="text-center py-8 text-gray-400">
+                        <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                        <p>Sistema de requisitos de conclusão</p>
+                        <p className="text-sm">Em desenvolvimento - será implementado na próxima versão</p>
+                      </div>
+                    </TabsContent>
+
+                    <TabsContent value="preview" className="space-y-4">
+                      <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                        <h3 className="text-lg font-semibold text-white mb-4">Preview do Módulo</h3>
+                        
+                        {editingModule.requires_submission && editingModule.submission_position === 'before' && (
+                          <div className="mb-6 p-4 bg-red-950/30 border border-red-800 rounded-lg">
+                            <h4 className="text-red-200 font-medium mb-2">Submissão Inicial (Bloqueia Acesso)</h4>
+                            <div 
+                              className="prose prose-invert prose-sm"
+                              dangerouslySetInnerHTML={{ __html: editingModule.submission_text || 'Texto da submissão...' }}
+                            />
+                          </div>
+                        )}
+
+                        <div className="mb-6">
+                          <h4 className="text-white font-medium mb-2">Conteúdo Principal</h4>
+                          <div 
+                            className="prose prose-invert"
+                            dangerouslySetInnerHTML={{ __html: editingModule.html_content || 'Conteúdo do módulo...' }}
+                          />
+                        </div>
+
+                        {editingModule.ritual_mandatory && (
+                          <div className="border-t border-gray-700 pt-4">
+                            <h4 className="text-amber-200 font-medium mb-2">Ritual Obrigatório</h4>
+                            <div 
+                              className="prose prose-invert prose-sm text-amber-100"
+                              dangerouslySetInnerHTML={{ __html: editingModule.ritual_text || 'Instruções do ritual...' }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+
+                  <div className="flex justify-end space-x-4 pt-4 border-t border-gray-700">
                     <Button
                       variant="outline"
                       onClick={() => setEditingModule(null)}
-                      className="text-gray-400 border-gray-600"
+                      className="border-gray-600 text-gray-300"
                     >
                       Cancelar
                     </Button>
                     <Button
                       onClick={() => handleUpdateModule(editingModule)}
-                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold"
+                      className="bg-blue-600 hover:bg-blue-700"
                     >
                       <Save className="w-4 h-4 mr-2" />
                       Salvar Alterações
