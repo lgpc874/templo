@@ -111,10 +111,11 @@ export default function AdminCourses() {
   // Mutação para criar curso
   const createCourseMutation = useMutation({
     mutationFn: async (data: typeof courseForm) => {
-      return apiRequest('/api/admin/courses', {
+      const response = await apiRequest('/api/admin/courses', {
         method: 'POST',
         body: JSON.stringify(data)
       });
+      return response.json();
     },
     onSuccess: () => {
       toast({ title: "Curso criado com sucesso!" });
@@ -142,10 +143,11 @@ export default function AdminCourses() {
   // Mutação para atualizar curso
   const updateCourseMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<Course> }) => {
-      return apiRequest(`/api/admin/courses/${id}`, {
+      const response = await apiRequest(`/api/admin/courses/${id}`, {
         method: 'PUT',
         body: JSON.stringify(data)
       });
+      return response.json();
     },
     onSuccess: () => {
       toast({ title: "Curso atualizado com sucesso!" });
@@ -164,9 +166,10 @@ export default function AdminCourses() {
   // Mutação para deletar curso
   const deleteCourseMutation = useMutation({
     mutationFn: async (id: number) => {
-      return apiRequest(`/api/admin/courses/${id}`, {
+      const response = await apiRequest(`/api/admin/courses/${id}`, {
         method: 'DELETE'
       });
+      return response.json();
     },
     onSuccess: () => {
       toast({ title: "Curso deletado com sucesso!" });

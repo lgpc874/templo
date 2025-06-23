@@ -17,11 +17,14 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
-url: string, p0: string, p1: { course_id: number | undefined; current_module: number; }, options?: RequestInit): Promise<Response> {
+  url: string, 
+  options?: RequestInit
+): Promise<Response> {
   // Get token from localStorage
   const token = localStorage.getItem('auth_token');
   
   const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
     ...((options?.headers as Record<string, string>) || {}),
   };
   
