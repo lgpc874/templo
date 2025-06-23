@@ -267,27 +267,55 @@ export class SupabaseDirect {
   static async createCourse(courseData: Partial<Course>): Promise<Course | null> {
     if (!supabase) return null;
 
+    // Limpar dados e converter 'none' para null
+    const cleanData = {
+      ...courseData,
+      reward_role_id: courseData.reward_role_id === 'none' ? null : courseData.reward_role_id,
+      image_url: courseData.image_url || null,
+      is_published: true // Garantir que curso seja publicado por padrão
+    };
+
+    console.log('Dados limpos para inserção:', cleanData);
+
     const { data, error } = await supabase
       .from('courses')
-      .insert(courseData)
+      .insert(cleanData)
       .select()
       .single();
     
-    if (error || !data) return null;
+    if (error) {
+      console.error('Erro detalhado ao criar curso:', error);
+      return null;
+    }
+    
+    console.log('Curso criado com sucesso:', data);
     return data;
   }
 
   static async updateCourse(id: number, updates: Partial<Course>): Promise<Course | null> {
     if (!supabase) return null;
 
+    // Limpar dados e converter 'none' para null
+    const cleanUpdates = {
+      ...updates,
+      reward_role_id: updates.reward_role_id === 'none' ? null : updates.reward_role_id,
+      image_url: updates.image_url || null
+    };
+
+    console.log('Dados limpos para atualização:', cleanUpdates);
+
     const { data, error } = await supabase
       .from('courses')
-      .update(updates)
+      .update(cleanUpdates)
       .eq('id', id)
       .select()
       .single();
     
-    if (error || !data) return null;
+    if (error) {
+      console.error('Erro detalhado ao atualizar curso:', error);
+      return null;
+    }
+    
     return data;
   }
 
