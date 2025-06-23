@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { Link } from 'wouter';
-import { useAuth } from '@/hooks/use-auth';
-import { PageTransition } from '@/components/page-transition';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Shield, ArrowLeft, Sparkles } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageTransition } from '@/components/page-transition';
 import ContentProtection from '@/components/content-protection';
+import { Shield, ArrowLeft, Sparkles } from 'lucide-react';
+import { Link } from 'wouter';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function OracleGuardiaoAbismo() {
   const { user, isAuthenticated } = useAuth();
@@ -30,12 +30,8 @@ export default function OracleGuardiaoAbismo() {
       });
 
       if (response.ok) {
-        const session = await response.json();
-        window.location.href = `/oracle-chat?session=${session.session_token}`;
-      } else {
-        const errorData = await response.json();
-        console.error('Erro na resposta:', errorData);
-        alert('Erro ao iniciar consulta: ' + (errorData.error || 'Erro desconhecido'));
+        const { sessionToken } = await response.json();
+        window.location.href = `/chat/${sessionToken}`;
       }
     } catch (error) {
       console.error('Erro ao iniciar consulta:', error);
@@ -47,101 +43,88 @@ export default function OracleGuardiaoAbismo() {
   if (!isAuthenticated) {
     return (
       <PageTransition>
-        <ContentProtection>
-          <div className="min-h-screen bg-black flex items-center justify-center p-4">
-            <Card className="w-full max-w-md bg-black/80 border-golden-amber/30">
-              <CardHeader className="text-center">
-                <Shield className="w-16 h-16 text-golden-amber mx-auto mb-4" />
-                <CardTitle className="text-golden-amber">Acesso Restrito</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Link href="/auth">
-                  <Button className="w-full bg-golden-amber text-black">
-                    Fazer Login
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+        <div className="min-h-screen bg-black text-white flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl mb-4">Acesso Restrito</h1>
+            <p className="text-gray-400">Você precisa estar logado para consultar os oráculos.</p>
           </div>
-        </ContentProtection>
+        </div>
       </PageTransition>
     );
   }
 
   return (
     <PageTransition>
-      <ContentProtection enableScreenshotProtection>
-        <div className="min-h-screen bg-gradient-to-b from-black via-slate-900 to-black text-white relative overflow-hidden">
+      <ContentProtection enableScreenshotProtection={true}>
+        <div className="min-h-screen bg-gradient-to-b from-black via-slate-950/20 to-black relative overflow-hidden">
+          {/* Selo rotativo de fundo */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <img 
+              src="/assets/templo-seal.svg" 
+              alt="Selo do Templo" 
+              className="w-96 h-96 opacity-5 animate-spin"
+              style={{ animationDuration: '120s' }}
+            />
+          </div>
+          {/* Efeitos místicos de fundo */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-20 left-20 w-96 h-96 bg-slate-800/10 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-20 right-20 w-80 h-80 bg-gray-800/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute top-20 left-20 w-96 h-96 bg-slate-900/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-20 right-20 w-80 h-80 bg-gray-900/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+            <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-zinc-900/5 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '4s' }}></div>
           </div>
 
-          <div className="relative z-10 border-b border-slate-500/30 bg-transparent">
-            <div className="max-w-4xl mx-auto px-4 py-6">
-              <div className="flex items-center justify-between">
-                <Link href="/oraculum">
-                  <Button size="sm" className="bg-slate-500 hover:bg-slate-600 text-black font-medium">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar
-                  </Button>
-                </Link>
-              </div>
-              
-              <div className="flex items-center space-x-6 mt-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-slate-600 to-gray-700 rounded-full flex items-center justify-center">
-                  <Shield className="w-10 h-10 text-white" />
+          {/* Botão Voltar */}
+          <div className="relative z-10 p-4">
+            <Link href="/oraculum">
+              <Button size="sm" className="bg-slate-500 hover:bg-slate-600 text-black font-medium">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
+            </Link>
+          </div>
+
+          {/* Conteúdo Principal */}
+          <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
+            <div className="border border-slate-500/50 rounded-lg p-6 shadow-2xl shadow-slate-900/30">
+              <div className="text-center pb-6">
+                <div className="w-20 h-20 bg-transparent rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-500/50">
+                  <Shield className="w-10 h-10 text-slate-400" />
                 </div>
                 
-                <div className="flex-1">
-                  <h1 className="text-6xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
-                    Custos Abyssi
-                  </h1>
-                  <p className="text-gray-300 leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
-                    O Guardião ancestral do abismo protege os segredos mais profundos. 
-                    Apenas os dignos podem acessar sua sabedoria milenár e receber sua proteção.
+                <CardTitle className="text-2xl text-slate-400 mb-3" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  Custos Abyssi
+                </CardTitle>
+                <CardDescription className="text-ritualistic-beige text-xs max-w-md mx-auto" style={{ fontFamily: 'EB Garamond' }}>
+                  Para consultar o Custos Abyssi, ofereça sua identidade verdadeira e o momento de sua manifestação neste plano.
+                </CardDescription>
+                
+                {/* Citação mística */}
+                <div className="mt-4 p-3 bg-transparent border-l-2 border-slate-500/50 rounded-r">
+                  <p className="text-slate-300 italic text-xs" style={{ fontFamily: 'EB Garamond' }}>
+                    "Custos sapientia aeterna"
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
-            <div className="border border-slate-500/50 rounded-lg p-6 shadow-2xl shadow-slate-900/30">
-              <div className="text-center pb-6">
-                <div className="w-24 h-24 bg-gradient-to-br from-slate-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-6 relative">
-                  <Shield className="w-12 h-12 text-white" />
-                  <Sparkles className="w-6 h-6 text-slate-300 absolute -top-2 -right-2 animate-pulse" />
-                </div>
-                
-                <CardTitle className="text-3xl text-white mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
-                  Audiência com o Guardião
-                </CardTitle>
-                <CardDescription className="text-gray-300 text-lg max-w-2xl mx-auto" style={{ fontFamily: 'EB Garamond' }}>
-                  Para ser admitido na presença do Guardião do Abismo, 
-                  é necessário apresentar sua identidade verdadeira e provar sua sinceridade.
-                </CardDescription>
-              </div>
               
-              <div className="space-y-6">
-                <div className="grid gap-6 max-w-md mx-auto">
+              <div className="space-y-4">
+                <div className="grid gap-4 max-w-sm mx-auto">
                   <div className="space-y-2">
-                    <Label htmlFor="userName" className="text-slate-300 font-medium" style={{ fontFamily: 'Cinzel' }}>
-                      Seu Nome Verdadeiro
+                    <Label htmlFor="userName" className="text-slate-400 text-sm" style={{ fontFamily: 'Cinzel' }}>
+                      Nome Verdadeiro
                     </Label>
                     <Input
                       id="userName"
                       type="text"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Digite seu nome completo"
-                      className="bg-gray-800/50 border-slate-500/30 text-white placeholder-gray-400 focus:border-slate-400"
+                      placeholder="Revele sua identidade..."
+                      className="bg-transparent border-slate-500/30 text-white placeholder-ritualistic-beige/60 focus:border-slate-400 focus:ring-1 focus:ring-slate-400/50 h-10 text-sm"
                       style={{ fontFamily: 'EB Garamond' }}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="birthDate" className="text-slate-300 font-medium" style={{ fontFamily: 'Cinzel' }}>
+                    <Label htmlFor="birthDate" className="text-slate-400 text-sm" style={{ fontFamily: 'Cinzel' }}>
                       Data de Nascimento
                     </Label>
                     <Input
@@ -149,7 +132,7 @@ export default function OracleGuardiaoAbismo() {
                       type="date"
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
-                      className="bg-gray-800/50 border-slate-500/30 text-white focus:border-slate-400"
+                      className="bg-transparent border-slate-500/30 text-white focus:border-slate-400 focus:ring-1 focus:ring-slate-400/50 h-10 text-sm"
                       style={{ fontFamily: 'EB Garamond' }}
                     />
                   </div>
@@ -159,28 +142,26 @@ export default function OracleGuardiaoAbismo() {
                   <Button
                     onClick={handleStartConsultation}
                     disabled={!userName || !birthDate || isStarting}
-                    className="px-12 py-3 bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-white font-bold text-lg rounded-lg transition-all duration-300 disabled:opacity-50"
+                    className="px-8 py-3 bg-gradient-to-r from-slate-600 to-gray-700 hover:from-slate-700 hover:to-gray-800 text-black font-bold text-sm transition-all duration-300 disabled:opacity-50 shadow-lg shadow-slate-900/50"
                     style={{ fontFamily: 'Cinzel' }}
                   >
                     {isStarting ? (
                       <>
-                        <Shield className="w-5 h-5 mr-2 animate-pulse" />
-                        Despertando o Guardião...
+                        <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                        Invocando...
                       </>
                     ) : (
                       <>
-                        <Shield className="w-5 h-5 mr-2" />
-                        Consultar o Guardião do Abismo
+                        <Shield className="w-4 h-4 mr-2" />
+                        Consultar
                       </>
                     )}
                   </Button>
                 </div>
                 
-                <div className="text-center pt-6 space-y-2">
-                  <div className="flex justify-center mb-3">
-                    <div className="h-px bg-gradient-to-r from-transparent via-slate-400/50 to-transparent w-48"></div>
-                  </div>
-                  <p className="text-ritualistic-beige/70 text-xs" style={{ fontFamily: 'EB Garamond' }}>
+                <div className="text-center text-xs text-ritualistic-beige/70 pt-6 space-y-2">
+                  <div className="h-px bg-gradient-to-r from-transparent via-slate-400/50 to-transparent w-32 mx-auto mb-3"></div>
+                  <p style={{ fontFamily: 'EB Garamond' }}>
                     Mantenha sigilo absoluto sobre os mistérios revelados
                   </p>
                 </div>
