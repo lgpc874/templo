@@ -23,7 +23,7 @@ export default function OracleAguasSombrias() {
       const token = localStorage.getItem('token');
       console.log('Token do localStorage:', token ? 'Token presente' : 'Token ausente');
       
-      const response = await fetch('/api/oracles/4/session', {
+      const response = await fetch('/api/oracles/9/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

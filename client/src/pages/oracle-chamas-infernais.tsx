@@ -23,7 +23,7 @@ export default function OracleChamasInfernais() {
       const token = localStorage.getItem('token');
       console.log('Token do localStorage:', token ? 'Token presente' : 'Token ausente');
       
-      const response = await fetch('/api/oracles/3/session', {
+      const response = await fetch('/api/oracles/8/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

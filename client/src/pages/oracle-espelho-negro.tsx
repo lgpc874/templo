@@ -23,7 +23,7 @@ export default function OracleEspelhoNegro() {
       const token = localStorage.getItem('token');
       console.log('Token do localStorage:', token ? 'Token presente' : 'Token ausente');
       
-      const response = await fetch('/api/oracles/1/session', {
+      const response = await fetch('/api/oracles/6/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

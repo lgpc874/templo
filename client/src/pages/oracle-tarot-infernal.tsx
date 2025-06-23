@@ -23,7 +23,7 @@ export default function OracleTarotInfernal() {
       const token = localStorage.getItem('token');
       console.log('Token do localStorage:', token ? 'Token presente' : 'Token ausente');
       
-      const response = await fetch('/api/oracles/2/session', {
+      const response = await fetch('/api/oracles/7/session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
