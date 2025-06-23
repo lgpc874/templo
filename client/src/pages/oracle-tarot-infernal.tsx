@@ -123,7 +123,7 @@ export default function OracleTarotInfernal() {
 
           {/* Conteúdo Principal */}
           <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
-            <Card className="bg-gradient-to-br from-gray-900/80 to-black/80 border-red-500/30 backdrop-blur-sm">
+            <Card className="bg-transparent border-red-500/50 shadow-2xl shadow-red-900/30">
               <CardHeader className="text-center pb-8">
                 <div className="w-24 h-24 bg-gradient-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 relative">
                   <Sparkles className="w-12 h-12 text-white" />

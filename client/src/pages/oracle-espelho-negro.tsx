@@ -123,9 +123,9 @@ export default function OracleEspelhoNegro() {
 
           {/* Conteúdo Principal */}
           <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
-            <Card className="bg-transparent border-purple-500/50 backdrop-blur-sm shadow-2xl shadow-purple-900/30">
+            <Card className="bg-transparent border-purple-500/50 shadow-2xl shadow-purple-900/30">
               <CardHeader className="text-center pb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-6 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
+                <div className="w-20 h-20 bg-transparent rounded-full flex items-center justify-center mx-auto mb-6 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
                   <Eye className="w-10 h-10 text-purple-400" />
                   <Sparkles className="w-5 h-5 text-purple-300 absolute -top-2 -right-2 animate-pulse" />
                 </div>
@@ -138,7 +138,7 @@ export default function OracleEspelhoNegro() {
                 </CardDescription>
                 
                 {/* Citação mística */}
-                <div className="mt-6 p-3 bg-purple-400/5 border-l-2 border-purple-500/50 rounded-r">
+                <div className="mt-6 p-3 bg-transparent border-l-2 border-purple-500/50 rounded-r">
                   <p className="text-purple-300 italic text-sm" style={{ fontFamily: 'EB Garamond' }}>
                     "Veritas in tenebris revelatur"
                   </p>
