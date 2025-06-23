@@ -1100,5 +1100,163 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // =====================
+  // ROTAS ADMIN GRIMÓRIOS
+  // =====================
+
+  // Rota para criar grimório
+  app.post("/api/admin/grimoires", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { data: grimoire, error } = await supabase
+        .from('grimoires')
+        .insert([req.body])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao criar grimório:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      res.json(grimoire);
+    } catch (error: any) {
+      console.error("Error creating grimoire:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rota para atualizar grimório
+  app.put("/api/admin/grimoires/:id", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { data: grimoire, error } = await supabase
+        .from('grimoires')
+        .update(req.body)
+        .eq('id', req.params.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao atualizar grimório:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      res.json(grimoire);
+    } catch (error: any) {
+      console.error("Error updating grimoire:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rota para excluir grimório
+  app.delete("/api/admin/grimoires/:id", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { error } = await supabase
+        .from('grimoires')
+        .delete()
+        .eq('id', req.params.id);
+
+      if (error) {
+        console.error('Erro ao excluir grimório:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting grimoire:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // =====================
+  // ROTAS ADMIN SEÇÕES
+  // =====================
+
+  // Rota para criar seção
+  app.post("/api/admin/library-sections", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { data: section, error } = await supabase
+        .from('library_sections')
+        .insert([req.body])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao criar seção:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      res.json(section);
+    } catch (error: any) {
+      console.error("Error creating section:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rota para atualizar seção
+  app.put("/api/admin/library-sections/:id", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { data: section, error } = await supabase
+        .from('library_sections')
+        .update(req.body)
+        .eq('id', req.params.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao atualizar seção:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      res.json(section);
+    } catch (error: any) {
+      console.error("Error updating section:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rota para excluir seção
+  app.delete("/api/admin/library-sections/:id", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const { error } = await supabase
+        .from('library_sections')
+        .delete()
+        .eq('id', req.params.id);
+
+      if (error) {
+        console.error('Erro ao excluir seção:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      res.json({ success: true });
+    } catch (error: any) {
+      console.error("Error deleting section:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   return httpServer;
 }

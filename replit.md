@@ -102,6 +102,10 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 20:04**: Sistema de grimórios 100% funcional
 - **23/06/2025 20:04**: 6 grimórios e 5 seções carregando corretamente
 - **23/06/2025 20:04**: Rotas de progresso de grimórios implementadas
+- **23/06/2025 20:15**: Criada página Forja Libri completa para administração de grimórios
+- **23/06/2025 20:15**: Sistema CRUD completo para grimórios e seções de biblioteca
+- **23/06/2025 20:15**: Editor avançado com suporte a HTML/CSS, cores, preços e roles
+- **23/06/2025 20:15**: Botão adicionado no painel admin e rotas configuradas
 
 ## Próximos Passos
 1. Executar SQL para adicionar colunas sequenciais
