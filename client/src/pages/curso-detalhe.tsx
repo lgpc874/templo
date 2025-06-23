@@ -15,11 +15,10 @@ interface Module {
   id: number;
   course_id: number;
   title: string;
-  content: string;
-  module_order: number;
-  is_required: boolean;
-  estimated_duration: number;
-  is_active: boolean;
+  html_content: string;
+  order: number;
+  requires_submission: boolean;
+  ritual_mandatory: boolean;
 }
 
 interface Course {
@@ -99,6 +98,7 @@ export default function CursoDetalhe({ courseSlug }: CursoDetalheProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user/course-progress'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/course-progress', course?.id] });
       toast({
         title: "Módulo Completo",
         description: "Módulo finalizado com sucesso!",
@@ -136,7 +136,7 @@ export default function CursoDetalhe({ courseSlug }: CursoDetalheProps) {
     );
   }
 
-  const activeModuleData = modules.find(m => m.module_order === activeModule);
+  const activeModuleData = modules.find(m => m.order === activeModule);
   const currentProgress = userProgress?.current_module || 0;
   const totalModules = modules.length;
   const progressPercent = totalModules > 0 ? (currentProgress / totalModules) * 100 : 0;
@@ -201,14 +201,14 @@ export default function CursoDetalhe({ courseSlug }: CursoDetalheProps) {
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {modules.map((module) => {
-                    const isCompleted = currentProgress >= module.module_order;
-                    const isCurrent = activeModule === module.module_order;
-                    const isAccessible = module.module_order <= (currentProgress + 1);
+                    const isCompleted = currentProgress >= module.order;
+                    const isCurrent = activeModule === module.order;
+                    const isAccessible = module.order <= (currentProgress + 1);
 
                     return (
                       <button
                         key={module.id}
-                        onClick={() => isAccessible && setActiveModule(module.module_order)}
+                        onClick={() => isAccessible && setActiveModule(module.order)}
                         disabled={!isAccessible}
                         className={`w-full p-3 rounded-lg border text-left transition-all duration-200 ${
                           isCurrent
@@ -237,7 +237,7 @@ export default function CursoDetalhe({ courseSlug }: CursoDetalheProps) {
                               {module.title}
                             </div>
                             <div className="text-xs opacity-70">
-                              Módulo {module.module_order}
+                              Módulo {module.order}
                             </div>
                           </div>
                         </div>
@@ -258,14 +258,14 @@ export default function CursoDetalhe({ courseSlug }: CursoDetalheProps) {
                         {activeModuleData.title}
                       </CardTitle>
                       <Badge variant="outline">
-                        Módulo {activeModuleData.module_order} de {totalModules}
+                        Módulo {activeModuleData.order} de {totalModules}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div 
                       className="prose prose-invert max-w-none text-ritualistic-beige"
-                      dangerouslySetInnerHTML={{ __html: activeModuleData.content }}
+                      dangerouslySetInnerHTML={{ __html: activeModuleData.html_content }}
                     />
                     
                     <div className="mt-8 pt-6 border-t border-golden-amber/20">
@@ -300,7 +300,7 @@ export default function CursoDetalhe({ courseSlug }: CursoDetalheProps) {
                             </Button>
                           )}
                           
-                          {userProgress && currentProgress < activeModule && (
+                          {userProgress && activeModuleData && currentProgress >= activeModule && !userProgress.is_completed && (
                             <Button
                               onClick={() => completeModuleMutation.mutate(activeModuleData.id)}
                               disabled={completeModuleMutation.isPending}
@@ -324,7 +324,7 @@ export default function CursoDetalhe({ courseSlug }: CursoDetalheProps) {
                         <Button
                           variant="outline"
                           onClick={() => setActiveModule(Math.min(totalModules, activeModule + 1))}
-                          disabled={activeModule === totalModules || currentProgress < activeModule}
+                          disabled={activeModule === totalModules}
                         >
                           Próximo
                           <ArrowLeft className="w-4 h-4 ml-2 rotate-180" />
