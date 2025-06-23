@@ -1265,7 +1265,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Buscar oráculos ativos para usuários
   app.get('/api/oracles/active', authenticateToken, async (req: any, res: Response) => {
     try {
+      console.log('=== BUSCANDO ORÁCULOS ATIVOS ===');
       const oracles = await SupabaseDirect.getActiveOracles();
+      console.log(`Oráculos encontrados: ${oracles.length}`);
+      if (oracles.length > 0) {
+        console.log('Primeiro oráculo:', oracles[0].name);
+      }
       res.json(oracles);
     } catch (error) {
       console.error('Erro ao buscar oráculos ativos:', error);
@@ -1467,11 +1472,22 @@ Que os mistérios se revelem em sua jornada espiritual.`;
   // Buscar todos os oráculos (admin)
   app.get('/api/admin/oracles', authenticateToken, async (req: any, res: Response) => {
     try {
+      console.log('=== ADMIN ORÁCULOS REQUEST ===');
+      console.log('User role:', req.user.role);
+      
       if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        console.log('Acesso negado - role insuficiente');
         return res.status(403).json({ error: 'Acesso negado' });
       }
 
+      console.log('Buscando todos os oráculos...');
       const oracles = await SupabaseDirect.getAllOracles();
+      console.log(`Total de oráculos encontrados: ${oracles.length}`);
+      
+      if (oracles.length > 0) {
+        console.log('Primeiro oráculo:', oracles[0]);
+      }
+      
       res.json(oracles);
     } catch (error) {
       console.error('Erro ao buscar oráculos:', error);

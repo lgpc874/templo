@@ -597,25 +597,40 @@ export class SupabaseDirect {
   // ORACLE METHODS
   static async getAllOracles(): Promise<Oracle[]> {
     try {
+      console.log('Executando query para buscar todos os oráculos...');
+      
+      if (!supabase) {
+        console.error('Supabase client não está disponível');
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('oracles')
         .select('*')
         .order('sort_order', { ascending: true });
 
       if (error) {
-        console.error('Erro ao buscar oráculos:', error);
+        console.error('Erro na query de oráculos:', error);
         return [];
       }
 
+      console.log('Query executada com sucesso. Dados:', data);
       return data || [];
     } catch (error) {
-      console.error('Erro ao buscar oráculos:', error);
+      console.error('Erro geral ao buscar oráculos:', error);
       return [];
     }
   }
 
   static async getActiveOracles(): Promise<Oracle[]> {
     try {
+      console.log('Executando query para buscar oráculos ativos...');
+      
+      if (!supabase) {
+        console.error('Supabase client não está disponível');
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('oracles')
         .select('*')
@@ -623,13 +638,14 @@ export class SupabaseDirect {
         .order('sort_order', { ascending: true });
 
       if (error) {
-        console.error('Erro ao buscar oráculos ativos:', error);
+        console.error('Erro na query de oráculos ativos:', error);
         return [];
       }
 
+      console.log('Query de oráculos ativos executada com sucesso. Dados:', data);
       return data || [];
     } catch (error) {
-      console.error('Erro ao buscar oráculos ativos:', error);
+      console.error('Erro geral ao buscar oráculos ativos:', error);
       return [];
     }
   }
