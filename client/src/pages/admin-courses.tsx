@@ -312,6 +312,9 @@ export default function AdminCourses() {
                           <SelectItem value="iniciado">Iniciado</SelectItem>
                           <SelectItem value="portador_veu">Portador do Véu</SelectItem>
                           <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
+                          <SelectItem value="guardiao_nome">Guardião do Nome Perdido</SelectItem>
+                          <SelectItem value="arauto_queda">Arauto da Queda</SelectItem>
+                          <SelectItem value="portador_coroa">Portador da Coroa Flamejante</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
