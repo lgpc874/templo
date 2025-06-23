@@ -265,31 +265,48 @@ export class SupabaseDirect {
   }
 
   static async createCourse(courseData: Partial<Course>): Promise<Course | null> {
-    if (!supabase) return null;
-
-    // Limpar dados e converter 'none' para null
-    const cleanData = {
-      ...courseData,
-      reward_role_id: courseData.reward_role_id === 'none' ? null : courseData.reward_role_id,
-      image_url: courseData.image_url || null,
-      is_published: true // Garantir que curso seja publicado por padrão
-    };
-
-    console.log('Dados limpos para inserção:', cleanData);
-
-    const { data, error } = await supabase
-      .from('courses')
-      .insert(cleanData)
-      .select()
-      .single();
-    
-    if (error) {
-      console.error('Erro detalhado ao criar curso:', error);
+    if (!supabase) {
+      console.error('Supabase não está inicializado');
       return null;
     }
-    
-    console.log('Curso criado com sucesso:', data);
-    return data;
+
+    try {
+      // Limpar dados e converter 'none' para null
+      const cleanData = {
+        title: courseData.title,
+        slug: courseData.slug,
+        description: courseData.description,
+        required_role: courseData.required_role || 'buscador',
+        price: courseData.price || 0,
+        is_paid: courseData.is_paid || false,
+        is_published: true,
+        course_section_id: courseData.course_section_id || 1,
+        sequential_order: courseData.sequential_order || 1,
+        is_sequential: courseData.is_sequential || false,
+        sort_order: courseData.sort_order || courseData.sequential_order || 1,
+        reward_role_id: courseData.reward_role_id === 'none' ? null : courseData.reward_role_id,
+        image_url: courseData.image_url || null
+      };
+
+      console.log('Dados para inserção no Supabase:', cleanData);
+
+      const { data, error } = await supabase
+        .from('courses')
+        .insert(cleanData)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Erro detalhado do Supabase:', error);
+        return null;
+      }
+      
+      console.log('Curso criado com sucesso no Supabase:', data);
+      return data;
+    } catch (error) {
+      console.error('Erro durante criação do curso:', error);
+      return null;
+    }
   }
 
   static async updateCourse(id: number, updates: Partial<Course>): Promise<Course | null> {
