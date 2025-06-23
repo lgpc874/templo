@@ -183,6 +183,9 @@ export default function AdminCourses() {
 
   const handleCreateCourse = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('=== FRONTEND: Criando curso ===');
+    console.log('Form data:', courseForm);
+    
     if (!courseForm.title || !courseForm.description) {
       toast({ 
         title: "Campos obrigatórios", 
@@ -197,6 +200,9 @@ export default function AdminCourses() {
       .replace(/[^a-z0-9]/g, '-')
       .replace(/-+/g, '-')
       .replace(/^-|-$/g, '');
+    
+    console.log('Slug gerado:', slug);
+    console.log('Dados finais:', { ...courseForm, slug });
     
     createCourseMutation.mutate({ ...courseForm, slug });
   };
