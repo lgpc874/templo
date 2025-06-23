@@ -403,7 +403,7 @@ export default function Cursus() {
                           Concluído
                         </Button>
                       </Link>
-                    ) : (
+                    ) : courseState.action === 'continue' ? (
                       <Link href={`/cursus-leitor/${course.slug}`}>
                         <Button 
                           className="w-full text-white font-semibold"
@@ -412,7 +412,19 @@ export default function Cursus() {
                           }}
                         >
                           <courseState.icon className="w-4 h-4 mr-2" />
-                          {courseState.text}
+                          Continuar
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link href={`/curso-detalhe/${course.id}`}>
+                        <Button 
+                          className="w-full text-white font-semibold"
+                          style={{
+                            backgroundColor: course.course_sections?.color
+                          }}
+                        >
+                          <courseState.icon className="w-4 h-4 mr-2" />
+                          Ver Curso
                         </Button>
                       </Link>
                     )}
