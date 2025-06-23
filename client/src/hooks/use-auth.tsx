@@ -26,7 +26,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(() => 
-    localStorage.getItem("auth_token")
+    localStorage.getItem("token")
   );
   const [user, setUser] = useState<User | null>(null);
   const queryClient = useQueryClient();
@@ -34,7 +34,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const { data: userData, isLoading } = useQuery({
     queryKey: ["/api/auth/me"],
     queryFn: async () => {
-      const storedToken = localStorage.getItem("auth_token");
+      const storedToken = localStorage.getItem("token");
       if (!storedToken) {
         throw new Error("No token found");
       }
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return data.user;
     },
     retry: false,
-    enabled: !!localStorage.getItem("auth_token"),
+    enabled: !!localStorage.getItem("token"),
     staleTime: 0, // Sempre buscar dados frescos
     gcTime: 0, // Não manter em cache (TanStack Query v5)
   });
@@ -68,17 +68,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = (newToken: string, newUser: User) => {
     setToken(newToken);
     setUser(newUser);
-    localStorage.setItem("auth_token", newToken);
+    localStorage.setItem("token", newToken);
     queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem("auth_token");
+    localStorage.removeItem("token");
     localStorage.setItem("logout_state", "true");
-    queryClient.clear(); // Limpar todo o cache
-    // Redirecionar imediatamente
+    queryClient.clear();
     window.location.href = '/';
   };
 
@@ -102,7 +101,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.removeItem('logout_state');
         setToken(newToken);
         setUser(newUser);
-        localStorage.setItem("auth_token", newToken);
+        localStorage.setItem("token", newToken);
         queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
       },
       logout,

@@ -31,7 +31,9 @@ function authenticateToken(req: any, res: Response, next: NextFunction) {
 
   try {
     // Usar a chave JWT correta do ambiente
-    const jwtSecret = process.env.JWT_SECRET || process.env.SUPABASE_JWT_SECRET || 'fallback-key';
+    const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
+    console.log('Usando JWT secret:', jwtSecret ? 'Presente' : 'Ausente');
+    console.log('Token recebido:', token.substring(0, 20) + '...');
     const decoded = jwt.verify(token, jwtSecret) as any;
     console.log('Token decodificado:', decoded);
     req.user = decoded;
