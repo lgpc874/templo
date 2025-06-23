@@ -31,16 +31,46 @@ export default function CursusClean() {
   const [activeSection, setActiveSection] = useState<string>('buscador');
 
   // Buscar seções dos cursos
-  const { data: courseSections = [] } = useQuery<CourseSection[]>({
+  const { data: courseSections = [], isLoading: sectionsLoading } = useQuery<CourseSection[]>({
     queryKey: ['/api/course-sections'],
+    queryFn: async () => {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/course-sections', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!user,
   });
 
   // Buscar todos os cursos
   const { data: courses = [], isLoading: coursesLoading } = useQuery<Course[]>({
     queryKey: ['/api/courses'],
+    queryFn: async () => {
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch('/api/courses', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.status}`);
+      }
+      return response.json();
+    },
     enabled: !!user,
   });
+
+  // Debug logs
+  console.log('Course sections:', courseSections);
+  console.log('Courses:', courses);
+  console.log('Sections loading:', sectionsLoading);
+  console.log('Courses loading:', coursesLoading);
 
   // Buscar progresso do usuário
   const { data: userProgress = [] } = useQuery<UserCourseProgress[]>({
@@ -195,49 +225,59 @@ export default function CursusClean() {
             </div>
 
             {/* Course Sections Tabs */}
-            <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 bg-card-dark/50 mb-8">
+            {sectionsLoading ? (
+              <div className="text-center py-8">
+                <p className="text-ritualistic-beige/50">Carregando seções...</p>
+              </div>
+            ) : courseSections.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-ritualistic-beige/50">Nenhuma seção encontrada</p>
+              </div>
+            ) : (
+              <Tabs value={activeSection} onValueChange={setActiveSection} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7 bg-card-dark/50 mb-8">
+                  {courseSections.map((section) => (
+                    <TabsTrigger 
+                      key={section.id} 
+                      value={section.required_role}
+                      className="data-[state=active]:bg-golden-amber/20 data-[state=active]:text-golden-amber"
+                    >
+                      {section.name}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+
                 {courseSections.map((section) => (
-                  <TabsTrigger 
-                    key={section.id} 
-                    value={section.required_role}
-                    className="data-[state=active]:bg-golden-amber/20 data-[state=active]:text-golden-amber"
-                  >
-                    {section.name}
-                  </TabsTrigger>
+                  <TabsContent key={section.id} value={section.required_role}>
+                    <Card className="bg-card-dark/50 border-golden-amber/30 mb-8">
+                      <CardHeader>
+                        <CardTitle className="text-golden-amber text-2xl font-cinzel flex items-center gap-2">
+                          <span style={{ color: section.color }}>●</span>
+                          {section.name}
+                        </CardTitle>
+                        <CardDescription className="text-ritualistic-beige/70">
+                          {section.description}
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+
+                    <div className="grid gap-6">
+                      {coursesByRole[section.required_role]?.length ? (
+                        coursesByRole[section.required_role].map(course => renderCourseCard(course))
+                      ) : (
+                        <Card className="bg-card-dark border-golden-amber/30">
+                          <CardContent className="p-8 text-center">
+                            <p className="text-ritualistic-beige/50">
+                              {coursesLoading ? "Carregando cursos..." : "Nenhum curso disponível para este nível"}
+                            </p>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
+                  </TabsContent>
                 ))}
-              </TabsList>
-
-              {courseSections.map((section) => (
-                <TabsContent key={section.id} value={section.required_role}>
-                  <Card className="bg-card-dark/50 border-golden-amber/30 mb-8">
-                    <CardHeader>
-                      <CardTitle className="text-golden-amber text-2xl font-cinzel flex items-center gap-2">
-                        <span style={{ color: section.color }}>●</span>
-                        {section.name}
-                      </CardTitle>
-                      <CardDescription className="text-ritualistic-beige/70">
-                        {section.description}
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-
-                  <div className="grid gap-6">
-                    {coursesByRole[section.required_role]?.length ? (
-                      coursesByRole[section.required_role].map(course => renderCourseCard(course))
-                    ) : (
-                      <Card className="bg-card-dark border-golden-amber/30">
-                        <CardContent className="p-8 text-center">
-                          <p className="text-ritualistic-beige/50">
-                            {coursesLoading ? "Carregando cursos..." : "Nenhum curso disponível para este nível"}
-                          </p>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
+              </Tabs>
+            )}
 
             {/* Footer Quote */}
             <div className="text-center mt-16 border-t border-golden-amber/20 pt-8">
