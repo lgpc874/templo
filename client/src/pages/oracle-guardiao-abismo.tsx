@@ -32,6 +32,10 @@ export default function OracleGuardiaoAbismo() {
       if (response.ok) {
         const session = await response.json();
         window.location.href = `/oracle-chat?session=${session.session_token}`;
+      } else {
+        const errorData = await response.json();
+        console.error('Erro na resposta:', errorData);
+        alert('Erro ao iniciar consulta: ' + (errorData.error || 'Erro desconhecido'));
       }
     } catch (error) {
       console.error('Erro ao iniciar consulta:', error);
