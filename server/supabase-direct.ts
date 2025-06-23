@@ -62,6 +62,7 @@ export interface Course {
   sequential_order?: number;
   is_sequential?: boolean;
   reward_role_id?: string;
+  reward_badge_id?: string;
   created_at?: string;
   updated_at?: string;
 }

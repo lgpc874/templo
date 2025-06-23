@@ -638,7 +638,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         is_published: true,
         course_section_id: req.body.course_section_id || 1,
         sort_order: req.body.sort_order || 1,
-        image_url: req.body.image_url || null
+        image_url: req.body.image_url || null,
+        sequential_order: req.body.sequential_order || 1,
+        is_sequential: req.body.is_sequential || false,
+        reward_role_id: req.body.reward_role_id === 'none' ? null : req.body.reward_role_id
       };
 
       console.log('Dados para inserção:', courseData);
