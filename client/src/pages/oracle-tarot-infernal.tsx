@@ -122,42 +122,48 @@ export default function OracleTarotInfernal() {
           </div>
 
           {/* Conteúdo Principal */}
-          <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
-            <Card className="bg-transparent border-red-500/50 shadow-2xl shadow-red-900/30">
-              <CardHeader className="text-center pb-8">
-                <div className="w-24 h-24 bg-gradient-to-br from-red-600 to-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 relative">
-                  <Sparkles className="w-12 h-12 text-white" />
-                  <Flame className="w-6 h-6 text-red-300 absolute -top-2 -right-2 animate-pulse" />
+          <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+            <div className="border border-red-500/50 rounded-lg p-6 shadow-2xl shadow-red-900/30">
+              <div className="text-center pb-8">
+                <div className="w-20 h-20 bg-transparent rounded-full flex items-center justify-center mx-auto mb-6 relative border border-red-500/50 shadow-lg shadow-red-900/50">
+                  <Spade className="w-10 h-10 text-red-400" />
+                  <Sparkles className="w-5 h-5 text-red-300 absolute -top-2 -right-2 animate-pulse" />
                 </div>
                 
-                <CardTitle className="text-3xl text-white mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
-                  Consulta ao Tarot
-                </CardTitle>
-                <CardDescription className="text-gray-300 text-lg max-w-2xl mx-auto" style={{ fontFamily: 'EB Garamond' }}>
-                  Para que as cartas infernais possam revelar seu verdadeiro destino, 
-                  precisamos conectar sua essência às energias místicas dos arcanos.
-                </CardDescription>
-              </CardHeader>
+                <h2 className="text-2xl text-red-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  Iniciar Consulta
+                </h2>
+                <p className="text-ritualistic-beige text-sm max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
+                  Para consultar o Tarotum Infernalis, ofereça sua identidade verdadeira e o momento de sua manifestação neste plano.
+                </p>
+                
+                {/* Citação mística */}
+                <div className="mt-6 p-3 bg-transparent border-l-2 border-red-500/50 rounded-r">
+                  <p className="text-red-300 italic text-sm" style={{ fontFamily: 'EB Garamond' }}>
+                    "Fatum per ignem revelatur"
+                  </p>
+                </div>
+              </div>
               
-              <CardContent className="space-y-8">
-                <div className="grid gap-6 max-w-md mx-auto">
+              <div className="space-y-6">
+                <div className="grid gap-6 max-w-sm mx-auto">
                   <div className="space-y-2">
-                    <Label htmlFor="userName" className="text-red-300 font-medium" style={{ fontFamily: 'Cinzel' }}>
-                      Seu Nome Verdadeiro
+                    <Label htmlFor="userName" className="text-red-400 font-medium text-sm" style={{ fontFamily: 'Cinzel' }}>
+                      Nome Verdadeiro
                     </Label>
                     <Input
                       id="userName"
                       type="text"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Digite seu nome completo"
-                      className="bg-gray-800/50 border-red-500/30 text-white placeholder-gray-400 focus:border-red-400"
+                      placeholder="Revele sua identidade..."
+                      className="bg-transparent border-red-500/30 text-white placeholder-ritualistic-beige/60 focus:border-red-400 focus:ring-1 focus:ring-red-400/50 h-10 text-sm"
                       style={{ fontFamily: 'EB Garamond' }}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="birthDate" className="text-red-300 font-medium" style={{ fontFamily: 'Cinzel' }}>
+                    <Label htmlFor="birthDate" className="text-red-400 font-medium text-sm" style={{ fontFamily: 'Cinzel' }}>
                       Data de Nascimento
                     </Label>
                     <Input
@@ -165,7 +171,7 @@ export default function OracleTarotInfernal() {
                       type="date"
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
-                      className="bg-gray-800/50 border-red-500/30 text-white focus:border-red-400"
+                      className="bg-transparent border-red-500/30 text-white focus:border-red-400 focus:ring-1 focus:ring-red-400/50 h-10 text-sm"
                       style={{ fontFamily: 'EB Garamond' }}
                     />
                   </div>
@@ -175,29 +181,33 @@ export default function OracleTarotInfernal() {
                   <Button
                     onClick={handleStartConsultation}
                     disabled={!userName || !birthDate || isStarting}
-                    className="px-12 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-lg rounded-lg transition-all duration-300 disabled:opacity-50"
+                    className="px-8 py-3 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold text-sm transition-all duration-300 disabled:opacity-50 shadow-lg shadow-red-900/50"
                     style={{ fontFamily: 'Cinzel' }}
                   >
                     {isStarting ? (
                       <>
-                        <Flame className="w-5 h-5 mr-2 animate-pulse" />
-                        Embaralhando as Cartas...
+                        <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                        Invocando...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="w-5 h-5 mr-2" />
-                        Consultar o Tarot Infernal
+                        <Spade className="w-4 h-4 mr-2" />
+                        Consultar
                       </>
                     )}
                   </Button>
                 </div>
                 
-                <div className="text-center text-sm text-gray-400 pt-4" style={{ fontFamily: 'EB Garamond' }}>
-                  <p>As cartas infernais revelam verdades que podem mudar seu destino.</p>
-                  <p>Esteja preparado para receber a sabedoria dos arcanos sombrios.</p>
+                <div className="text-center pt-6 space-y-2">
+                  <div className="flex justify-center mb-3">
+                    <div className="h-px bg-gradient-to-r from-transparent via-red-400/50 to-transparent w-48"></div>
+                  </div>
+                  <p className="text-ritualistic-beige/70 text-xs" style={{ fontFamily: 'EB Garamond' }}>
+                    Mantenha sigilo absoluto sobre os mistérios revelados
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </ContentProtection>

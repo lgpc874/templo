@@ -106,9 +106,9 @@ export default function OracleChamasInfernais() {
             </div>
           </div>
 
-          <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
-            <Card className="bg-transparent border-orange-500/50 shadow-2xl shadow-orange-900/30">
-              <CardHeader className="text-center pb-8">
+          <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+            <div className="border border-orange-500/50 rounded-lg p-6 shadow-2xl shadow-orange-900/30">
+              <div className="text-center pb-6">
                 <div className="w-24 h-24 bg-gradient-to-br from-orange-600 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6 relative">
                   <Flame className="w-12 h-12 text-white" />
                   <Sparkles className="w-6 h-6 text-orange-300 absolute -top-2 -right-2 animate-pulse" />
@@ -121,9 +121,9 @@ export default function OracleChamasInfernais() {
                   Para que as chamas infernais possam revelar seus segredos mais ardentes, 
                   é necessário oferecer sua essência ao fogo sagrado.
                 </CardDescription>
-              </CardHeader>
+              </div>
               
-              <CardContent className="space-y-8">
+              <div className="space-y-6">
                 <div className="grid gap-6 max-w-md mx-auto">
                   <div className="space-y-2">
                     <Label htmlFor="userName" className="text-orange-300 font-medium" style={{ fontFamily: 'Cinzel' }}>
@@ -176,12 +176,16 @@ export default function OracleChamasInfernais() {
                   </Button>
                 </div>
                 
-                <div className="text-center text-sm text-gray-400 pt-4" style={{ fontFamily: 'EB Garamond' }}>
-                  <p>As chamas revelam paixões e desejos que ardem em sua alma.</p>
-                  <p>Prepare-se para enfrentar o fogo da verdade interior.</p>
+                <div className="text-center pt-6 space-y-2">
+                  <div className="flex justify-center mb-3">
+                    <div className="h-px bg-gradient-to-r from-transparent via-orange-400/50 to-transparent w-48"></div>
+                  </div>
+                  <p className="text-ritualistic-beige/70 text-xs" style={{ fontFamily: 'EB Garamond' }}>
+                    Mantenha sigilo absoluto sobre os mistérios revelados
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </ContentProtection>

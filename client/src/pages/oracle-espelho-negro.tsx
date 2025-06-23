@@ -123,8 +123,8 @@ export default function OracleEspelhoNegro() {
 
           {/* Conteúdo Principal */}
           <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
-            <Card className="bg-transparent border-purple-500/50 shadow-2xl shadow-purple-900/30">
-              <CardHeader className="text-center pb-6">
+            <div className="border border-purple-500/50 rounded-lg p-6 shadow-2xl shadow-purple-900/30">
+              <div className="text-center pb-6">
                 <div className="w-20 h-20 bg-transparent rounded-full flex items-center justify-center mx-auto mb-6 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
                   <Eye className="w-10 h-10 text-purple-400" />
                   <Sparkles className="w-5 h-5 text-purple-300 absolute -top-2 -right-2 animate-pulse" />
@@ -143,9 +143,9 @@ export default function OracleEspelhoNegro() {
                     "Veritas in tenebris revelatur"
                   </p>
                 </div>
-              </CardHeader>
+              </div>
               
-              <CardContent className="space-y-6">
+              <div className="space-y-6">
                 <div className="grid gap-6 max-w-sm mx-auto">
                   <div className="space-y-2">
                     <Label htmlFor="userName" className="text-purple-400 font-medium text-sm" style={{ fontFamily: 'Cinzel' }}>
@@ -207,8 +207,8 @@ export default function OracleEspelhoNegro() {
                     Mantenha sigilo absoluto sobre os mistérios revelados
                   </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </ContentProtection>

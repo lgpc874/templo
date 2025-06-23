@@ -106,9 +106,9 @@ export default function OracleAguasSombrias() {
             </div>
           </div>
 
-          <div className="relative z-10 max-w-4xl mx-auto px-4 py-12">
-            <Card className="bg-transparent border-blue-500/50 shadow-2xl shadow-blue-900/30">
-              <CardHeader className="text-center pb-8">
+          <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+            <div className="border border-blue-500/50 rounded-lg p-6 shadow-2xl shadow-blue-900/30">
+              <div className="text-center pb-6">
                 <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-6 relative">
                   <Droplets className="w-12 h-12 text-white" />
                   <Sparkles className="w-6 h-6 text-blue-300 absolute -top-2 -right-2 animate-pulse" />
@@ -121,9 +121,9 @@ export default function OracleAguasSombrias() {
                   Para que as águas sombrias possam revelar os segredos do inconsciente, 
                   é preciso deixar sua essência fluir nas correntes místicas.
                 </CardDescription>
-              </CardHeader>
+              </div>
               
-              <CardContent className="space-y-8">
+              <div className="space-y-6">
                 <div className="grid gap-6 max-w-md mx-auto">
                   <div className="space-y-2">
                     <Label htmlFor="userName" className="text-blue-300 font-medium" style={{ fontFamily: 'Cinzel' }}>
@@ -178,10 +178,12 @@ export default function OracleAguasSombrias() {
                 
                 <div className="text-center text-sm text-gray-400 pt-4" style={{ fontFamily: 'EB Garamond' }}>
                   <p>As águas sombrias revelam os mistérios que fluem no inconsciente.</p>
-                  <p>Deixe-se levar pelas correntes da sabedoria ancestral.</p>
+                  <p className="text-ritualistic-beige/70 text-xs" style={{ fontFamily: 'EB Garamond' }}>
+                    Mantenha sigilo absoluto sobre os mistérios revelados
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </ContentProtection>
