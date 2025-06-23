@@ -30,8 +30,8 @@ function authenticateToken(req: any, res: Response, next: NextFunction) {
   }
 
   try {
-    // Usar a chave JWT correta do ambiente
-    const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
+    // Usar a chave JWT do Supabase como padrão
+    const jwtSecret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || 'your-secret-key';
     console.log('Usando JWT secret:', jwtSecret ? 'Presente' : 'Ausente');
     console.log('Token recebido:', token.substring(0, 20) + '...');
     const decoded = jwt.verify(token, jwtSecret) as any;
@@ -84,9 +84,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(500).json({ error: "Erro ao criar usuário" });
       }
 
+      const jwtSecret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || 'your-secret-key';
       const token = jwt.sign(
         { id: newUser.id, email: newUser.email },
-        process.env.JWT_SECRET || 'your-secret-key',
+        jwtSecret,
         { expiresIn: '7d' }
       );
 
@@ -118,9 +119,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: "Credenciais inválidas" });
       }
 
+      const jwtSecret = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.JWT_SECRET || 'your-secret-key';
       const token = jwt.sign(
         { id: user.id, email: user.email },
-        process.env.JWT_SECRET || 'your-secret-key',
+        jwtSecret,
         { expiresIn: '7d' }
       );
 
