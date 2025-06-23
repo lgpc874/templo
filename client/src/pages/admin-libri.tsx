@@ -85,6 +85,7 @@ export default function AdminLibri() {
     title: '',
     description: '',
     content: '',
+    custom_css: '',
     cover_image_url: '',
     background_color: '#1F2937',
     is_paid: false,
@@ -152,6 +153,7 @@ export default function AdminLibri() {
       title: '',
       description: '',
       content: '<h2>Bem-vindo ao Grimório</h2><p>Escreva o conteúdo sagrado aqui...</p>',
+      custom_css: `.grimoire-content {\n  font-family: 'EB Garamond', serif;\n  line-height: 1.8;\n  color: #f3f4f6;\n}\n\n.grimoire-content h2 {\n  color: #fbbf24;\n  text-align: center;\n  font-family: 'Cinzel', serif;\n  margin-bottom: 2rem;\n}\n\n.grimoire-content p {\n  margin-bottom: 1.5rem;\n  text-indent: 2rem;\n}`,
       cover_image_url: '',
       background_color: '#1F2937',
       is_paid: false,
@@ -170,6 +172,7 @@ export default function AdminLibri() {
       title: grimoire.title,
       description: grimoire.description,
       content: grimoire.content,
+      custom_css: (grimoire as any).custom_css || `.grimoire-content {\n  font-family: 'EB Garamond', serif;\n  line-height: 1.8;\n  color: #f3f4f6;\n}`,
       cover_image_url: grimoire.cover_image_url || '',
       background_color: grimoire.background_color || '#1F2937',
       is_paid: grimoire.is_paid,
@@ -710,18 +713,79 @@ export default function AdminLibri() {
                     </div>
                   </div>
 
-                  {/* Editor de Conteúdo */}
+                  {/* Editor de Conteúdo HTML e CSS */}
                   <div className="mt-6">
                     <Label className="text-gray-300 text-lg mb-4 block">
                       <BookOpen className="w-5 h-5 inline mr-2" />
-                      Conteúdo do Grimório
+                      Conteúdo do Grimório (HTML + CSS)
                     </Label>
-                    <RichTextEditor
-                      value={grimoireForm.content}
-                      onChange={(value) => setGrimoireForm({...grimoireForm, content: value})}
-                      placeholder="Escreva o conteúdo sagrado do grimório..."
-                      height="400px"
-                    />
+                    
+                    <Tabs defaultValue="html" className="w-full">
+                      <TabsList className="grid w-full grid-cols-3 bg-gray-800 mb-4">
+                        <TabsTrigger value="html" className="text-white data-[state=active]:bg-blue-600">
+                          HTML
+                        </TabsTrigger>
+                        <TabsTrigger value="css" className="text-white data-[state=active]:bg-green-600">
+                          CSS
+                        </TabsTrigger>
+                        <TabsTrigger value="preview" className="text-white data-[state=active]:bg-purple-600">
+                          Preview
+                        </TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="html">
+                        <div>
+                          <Label className="text-gray-300 mb-2 block">Código HTML</Label>
+                          <Textarea
+                            value={grimoireForm.content}
+                            onChange={(e) => setGrimoireForm({...grimoireForm, content: e.target.value})}
+                            placeholder="<h2>Título do Grimório</h2>&#10;<p>Conteúdo sagrado aqui...</p>"
+                            className="bg-gray-800 border-gray-600 text-white font-mono text-sm"
+                            rows={15}
+                            style={{ fontFamily: 'Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}
+                          />
+                          <p className="text-xs text-gray-400 mt-2">
+                            Use HTML puro. Tags suportadas: h1-h6, p, div, span, strong, em, ul, ol, li, br, img, etc.
+                          </p>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="css">
+                        <div>
+                          <Label className="text-gray-300 mb-2 block">Código CSS Personalizado</Label>
+                          <Textarea
+                            value={grimoireForm.custom_css}
+                            onChange={(e) => setGrimoireForm({...grimoireForm, custom_css: e.target.value})}
+                            placeholder=".grimoire-content {&#10;  font-family: 'EB Garamond', serif;&#10;  color: #f3f4f6;&#10;}&#10;&#10;.grimoire-content h2 {&#10;  color: #fbbf24;&#10;  text-align: center;&#10;}"
+                            className="bg-gray-800 border-gray-600 text-white font-mono text-sm"
+                            rows={15}
+                            style={{ fontFamily: 'Monaco, Consolas, "Liberation Mono", "Courier New", monospace' }}
+                          />
+                          <p className="text-xs text-gray-400 mt-2">
+                            CSS será aplicado dentro do contexto .grimoire-content. Use classes e seletores relativos.
+                          </p>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="preview">
+                        <div>
+                          <Label className="text-gray-300 mb-2 block">Preview do Grimório</Label>
+                          <div 
+                            className="bg-gray-800 border border-gray-600 rounded-lg p-6 max-h-96 overflow-y-auto"
+                            style={{ backgroundColor: grimoireForm.background_color }}
+                          >
+                            <style>{grimoireForm.custom_css}</style>
+                            <div 
+                              className="grimoire-content"
+                              dangerouslySetInnerHTML={{ __html: grimoireForm.content }}
+                            />
+                          </div>
+                          <p className="text-xs text-gray-400 mt-2">
+                            Preview em tempo real do seu grimório com HTML e CSS aplicados.
+                          </p>
+                        </div>
+                      </TabsContent>
+                    </Tabs>
                   </div>
 
                   {/* Botões */}
