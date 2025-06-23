@@ -821,5 +821,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Finalizar módulo com requisitos de conclusão
+  app.post('/api/modules/complete', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { module_id, completed_requirements, requirement_data } = req.body;
+
+      // Registrar conclusão do módulo
+      const completion = await SupabaseDirect.completeModule({
+        user_id: userId,
+        module_id,
+        completed_requirements: JSON.stringify(completed_requirements),
+        requirement_data: JSON.stringify(requirement_data),
+        completed_at: new Date().toISOString()
+      });
+
+      if (!completion) {
+        throw new Error('Falha ao registrar conclusão do módulo');
+      }
+
+      res.json(completion);
+    } catch (error: any) {
+      console.error("Erro ao finalizar módulo:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   return httpServer;
 }

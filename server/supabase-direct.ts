@@ -90,6 +90,9 @@ export interface CourseModule {
   submission_text?: string;
   ritual_text?: string;
   custom_css?: string;
+  submission_position?: 'before' | 'after'; // Posição da submissão
+  completion_requirements?: string; // JSON com requisitos de conclusão
+  interactive_elements?: string; // JSON com elementos interativos
   created_at?: string;
   updated_at?: string;
 }
@@ -484,6 +487,34 @@ export class SupabaseDirect {
       .from('course_challenges')
       .insert(ritualData)
       .select()
+      .single();
+    
+    if (error || !data) return null;
+    return data;
+  }
+
+  // Conclusão de módulos
+  static async completeModule(completionData: any): Promise<any> {
+    if (!supabase) return null;
+
+    const { data, error } = await supabase
+      .from('module_completions')
+      .insert(completionData)
+      .select()
+      .single();
+    
+    if (error || !data) return null;
+    return data;
+  }
+
+  static async getModuleCompletion(userId: number, moduleId: number): Promise<any> {
+    if (!supabase) return null;
+
+    const { data, error } = await supabase
+      .from('module_completions')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('module_id', moduleId)
       .single();
     
     if (error || !data) return null;
