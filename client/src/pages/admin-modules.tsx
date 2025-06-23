@@ -228,8 +228,14 @@ export default function AdminModulesFinal() {
           title: "Módulo transmutado!", 
           description: "As alterações foram seladas nos registros arcanos"
         });
+        
+        // Recarregar a lista de módulos para garantir sincronização
+        if (selectedCourseId) {
+          loadModules(selectedCourseId);
+        }
       } else {
-        throw new Error('Erro ao atualizar módulo');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao atualizar módulo');
       }
     } catch (error: any) {
       toast({ 
@@ -256,8 +262,14 @@ export default function AdminModulesFinal() {
           title: "Módulo banido!", 
           description: "O conhecimento foi removido dos registros"
         });
+        
+        // Recarregar a lista de módulos para garantir sincronização
+        if (selectedCourseId) {
+          loadModules(selectedCourseId);
+        }
       } else {
-        throw new Error('Erro ao deletar módulo');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao deletar módulo');
       }
     } catch (error: any) {
       toast({ 

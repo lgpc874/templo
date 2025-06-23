@@ -707,15 +707,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
+      console.log('=== CRIANDO MÓDULO ===');
+      console.log('Dados recebidos:', req.body);
+
       const module = await SupabaseDirect.createModule(req.body);
 
       if (!module) {
         throw new Error('Falha ao criar módulo no Supabase');
       }
       
+      console.log('Módulo criado com sucesso:', module);
       res.json(module);
     } catch (error: any) {
       console.error("Error creating module:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Atualizar módulo
+  app.put("/api/admin/modules/:id", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const moduleId = parseInt(req.params.id);
+      console.log('=== ATUALIZANDO MÓDULO ===');
+      console.log('ID:', moduleId);
+      console.log('Dados para atualização:', req.body);
+
+      const updatedModule = await SupabaseDirect.updateModule(moduleId, req.body);
+
+      if (!updatedModule) {
+        console.error('Falha ao atualizar módulo no Supabase');
+        return res.status(404).json({ error: "Módulo não encontrado ou falha na atualização" });
+      }
+      
+      console.log('Módulo atualizado com sucesso:', updatedModule);
+      res.json(updatedModule);
+    } catch (error: any) {
+      console.error("Error updating module:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Deletar módulo
+  app.delete("/api/admin/modules/:id", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.email !== 'admin@templodoabismo.com.br') {
+        return res.status(403).json({ error: "Acesso negado" });
+      }
+
+      const moduleId = parseInt(req.params.id);
+      console.log('=== DELETANDO MÓDULO ===');
+      console.log('ID para deletar:', moduleId);
+
+      const success = await SupabaseDirect.deleteModule(moduleId);
+
+      if (!success) {
+        console.error('Falha ao deletar módulo no Supabase');
+        return res.status(404).json({ error: "Módulo não encontrado ou falha na exclusão" });
+      }
+      
+      console.log('Módulo deletado com sucesso');
+      res.json({ success: true, message: "Módulo deletado com sucesso" });
+    } catch (error: any) {
+      console.error("Error deleting module:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
     }
   });

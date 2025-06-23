@@ -411,6 +411,8 @@ export class SupabaseDirect {
   static async updateModule(id: number, updates: Partial<CourseModule>): Promise<CourseModule | null> {
     if (!supabase) return null;
 
+    console.log('Dados para inserção no Supabase:', updates);
+
     const { data, error } = await supabase
       .from('course_modules')
       .update(updates)
@@ -418,19 +420,37 @@ export class SupabaseDirect {
       .select()
       .single();
     
-    if (error || !data) return null;
+    if (error) {
+      console.error('Erro do Supabase na atualização:', error);
+      return null;
+    }
+    
+    if (!data) {
+      console.error('Nenhum dado retornado na atualização');
+      return null;
+    }
+
+    console.log('Módulo atualizado no Supabase:', data);
     return data;
   }
 
   static async deleteModule(id: number): Promise<boolean> {
     if (!supabase) return false;
 
+    console.log('Deletando módulo com ID:', id);
+
     const { error } = await supabase
       .from('course_modules')
       .delete()
       .eq('id', id);
     
-    return !error;
+    if (error) {
+      console.error('Erro do Supabase na exclusão:', error);
+      return false;
+    }
+
+    console.log('Módulo deletado do Supabase com sucesso');
+    return true;
   }
 
   // Submissões
