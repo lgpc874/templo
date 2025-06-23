@@ -130,8 +130,8 @@ export default function OracleTarotInfernal() {
                   <Sparkles className="w-5 h-5 text-red-300 absolute -top-2 -right-2 animate-pulse" />
                 </div>
                 
-                <h2 className="text-2xl text-red-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
-                  Iniciar Consulta
+                <h2 className="text-3xl text-red-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  Tarotum Infernalis
                 </h2>
                 <p className="text-ritualistic-beige text-sm max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
                   Para consultar o Tarotum Infernalis, ofereça sua identidade verdadeira e o momento de sua manifestação neste plano.

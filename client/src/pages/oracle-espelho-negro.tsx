@@ -89,35 +89,18 @@ export default function OracleEspelhoNegro() {
             <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-golden-amber/3 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '4s' }}></div>
           </div>
 
-          {/* Header */}
-          <div className="relative z-10 border-b border-purple-500/30 bg-transparent">
-            <div className="max-w-4xl mx-auto px-4 py-4">
-              <div className="flex items-center justify-between mb-4">
-                <Link href="/oraculum">
-                  <Button size="sm" className="bg-purple-500 hover:bg-purple-600 text-black font-medium">
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Voltar
-                  </Button>
-                </Link>
-              </div>
-              
-              <div className="text-center">
-                <div className="w-16 h-16 bg-transparent rounded-full flex items-center justify-center mx-auto mb-3 border border-purple-500/50">
-                  <Eye className="w-8 h-8 text-purple-400" />
-                </div>
-                
-                <h1 className="text-2xl font-bold text-purple-400 mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
-                  Speculum Nigrum
-                </h1>
-                <p className="text-ritualistic-beige text-xs max-w-md mx-auto" style={{ fontFamily: 'EB Garamond' }}>
-                  Revela as verdades ocultas através das sombras
-                </p>
-              </div>
-            </div>
+          {/* Botão Voltar */}
+          <div className="relative z-10 p-4">
+            <Link href="/oraculum">
+              <Button size="sm" className="bg-purple-500 hover:bg-purple-600 text-black font-medium">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar
+              </Button>
+            </Link>
           </div>
 
           {/* Conteúdo Principal */}
-          <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
+          <div className="relative z-10 max-w-2xl mx-auto px-4 py-8">
             <div className="border border-purple-500/50 rounded-lg p-6 shadow-2xl shadow-purple-900/30">
               <div className="text-center pb-6">
                 <div className="w-20 h-20 bg-transparent rounded-full flex items-center justify-center mx-auto mb-6 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
