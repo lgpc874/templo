@@ -31,10 +31,12 @@ interface Module {
   id: number;
   course_id: number;
   title: string;
-  content: string;
-  sort_order: number;
-  is_published: boolean;
-  unlock_after_module_id?: number;
+  html_content: string;
+  order_number: number;
+  requires_submission?: boolean;
+  ritual_mandatory?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface UserCourseProgress {
@@ -277,22 +279,22 @@ export default function CursoDetalhe() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
           {/* Conteúdo Principal */}
           <div className="lg:col-span-2">
             <Card className="bg-black/30 border-gray-700 backdrop-blur-sm">
-              <CardHeader>
-                <div className="flex items-start justify-between">
+              <CardHeader className="p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="flex-1">
                     <Badge 
                       variant="secondary" 
-                      className="mb-4"
+                      className="mb-3"
                       style={{ backgroundColor: sectionColor + '20', color: sectionColor }}
                     >
                       {course.course_sections.name}
                     </Badge>
-                    <CardTitle className="text-3xl text-amber-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+                    <CardTitle className="text-2xl md:text-3xl text-amber-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
                       {course.title}
                     </CardTitle>
                   </div>
@@ -336,34 +338,54 @@ export default function CursoDetalhe() {
                 <Separator className="my-8 border-amber-600/30" />
 
                 {/* Lista de Módulos */}
-                <div>
-                  <h3 className="text-xl font-bold text-amber-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
-                    Conteúdo do Curso
+                <div className="space-y-4">
+                  <h3 className="text-xl md:text-2xl font-semibold text-amber-400 mb-4" style={{ fontFamily: 'Cinzel' }}>
+                    Módulos do Curso ({modules.length})
                   </h3>
-                  <div className="space-y-3">
-                    {modules.map((module, index) => (
-                      <div 
-                        key={module.id}
-                        className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-lg border border-gray-700"
-                      >
-                        <div className="flex-shrink-0">
-                          {userProgress && index < userProgress.current_module - 1 ? (
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                          ) : (
+                  {modules.map((module, index) => (
+                    <Card key={module.id} className="bg-black/20 border-gray-600 hover:bg-black/30 transition-colors">
+                      <CardContent className="p-4 md:p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-start gap-3 flex-1">
+                            <div className="w-10 h-10 rounded-full bg-amber-400/20 flex items-center justify-center shrink-0">
+                              <Book className="w-5 h-5 text-amber-400" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-white mb-2" style={{ fontFamily: 'EB Garamond' }}>
+                                {module.title}
+                              </h4>
+                              <p className="text-sm text-gray-400 mb-2">
+                                Módulo {index + 1} de {modules.length}
+                              </p>
+                              {module.html_content && (
+                                <div 
+                                  className="text-sm text-gray-300 line-clamp-2 prose prose-invert prose-sm max-w-none mb-3"
+                                  dangerouslySetInnerHTML={{ 
+                                    __html: module.html_content.replace(/<[^>]*>/g, '').substring(0, 150) + '...' 
+                                  }}
+                                />
+                              )}
+                              <div className="flex gap-2">
+                                {module.requires_submission && (
+                                  <Badge variant="outline" className="text-xs text-blue-400 border-blue-400">
+                                    Requer Submissão
+                                  </Badge>
+                                )}
+                                {module.ritual_mandatory && (
+                                  <Badge variant="outline" className="text-xs text-purple-400 border-purple-400">
+                                    Ritual Obrigatório
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="ml-4 shrink-0">
                             <Lock className="w-5 h-5 text-gray-500" />
-                          )}
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <span 
-                            className="text-white font-medium"
-                            style={{ fontFamily: 'EB Garamond' }}
-                          >
-                            Módulo {index + 1}: {module.title}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>

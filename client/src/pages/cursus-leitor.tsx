@@ -33,10 +33,12 @@ interface Module {
   id: number;
   course_id: number;
   title: string;
-  content: string;
-  sort_order: number;
-  is_published: boolean;
-  unlock_after_module_id?: number;
+  html_content: string;
+  order_number: number;
+  requires_submission?: boolean;
+  ritual_mandatory?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface UserCourseProgress {
@@ -424,20 +426,20 @@ export default function CursusLeitor() {
       <div className="min-h-screen text-white" style={sectionStyles as any}>
         {/* Header */}
         <div className="border-b border-gray-800 bg-black/50 sticky top-0 z-10 backdrop-blur-sm">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+          <div className="container mx-auto px-4 py-3 md:py-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-2 md:gap-4">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setLocation('/cursus')}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white p-2"
                 >
-                  <ChevronLeft className="w-4 h-4 mr-2" />
-                  Voltar
+                  <ChevronLeft className="w-4 h-4 md:mr-2" />
+                  <span className="hidden sm:inline">Voltar</span>
                 </Button>
                 <div>
-                  <h1 className="text-xl font-bold text-amber-400" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  <h1 className="text-lg md:text-xl font-bold text-amber-400" style={{ fontFamily: 'Cinzel Decorative' }}>
                     {course.title}
                   </h1>
                   <Badge variant="secondary" style={{ backgroundColor: sectionColor + '20', color: sectionColor }}>
@@ -445,27 +447,56 @@ export default function CursusLeitor() {
                   </Badge>
                 </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 md:gap-4">
                 <div className="text-sm text-gray-400" style={{ fontFamily: 'EB Garamond' }}>
                   Módulo {currentModuleIndex + 1} de {modules.length}
                 </div>
-                <Progress value={calculateProgress()} className="w-32" />
+                <Progress value={calculateProgress()} className="w-24 md:w-32" />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Navegação de Módulos */}
-            <div className="lg:col-span-1">
+        <div className="container mx-auto px-4 py-4 md:py-8">
+          {/* Mobile Module Navigation */}
+          <div className="lg:hidden mb-4">
+            <Card className="bg-black/30 border-gray-700 backdrop-blur-sm">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-amber-400 font-semibold">Módulo {currentModuleIndex + 1}</span>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentModuleIndex(Math.max(0, currentModuleIndex - 1))}
+                      disabled={currentModuleIndex === 0}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCurrentModuleIndex(Math.min(modules.length - 1, currentModuleIndex + 1))}
+                      disabled={currentModuleIndex === modules.length - 1 || !isModuleUnlocked(currentModuleIndex + 1)}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-8">
+            {/* Desktop Navigation - Hidden on mobile */}
+            <div className="hidden lg:block lg:col-span-1">
               <Card className="bg-black/30 border-gray-700 sticky top-24 backdrop-blur-sm">
-                <CardHeader>
+                <CardHeader className="p-4">
                   <CardTitle className="text-amber-400" style={{ fontFamily: 'Cinzel Decorative' }}>
                     Módulos
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4">
                   <ScrollArea className="h-96">
                     <div className="space-y-2">
                       {modules.map((module, index) => {
@@ -533,7 +564,7 @@ export default function CursusLeitor() {
                       fontSize: '1.1rem',
                       lineHeight: '1.7'
                     }}
-                    dangerouslySetInnerHTML={{ __html: currentModule.content }}
+                    dangerouslySetInnerHTML={{ __html: currentModule.html_content }}
                   />
                   
                   <Separator className="my-8 border-amber-600/30" />
