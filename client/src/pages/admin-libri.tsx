@@ -883,6 +883,45 @@ export default function AdminLibri() {
                       </div>
                     </div>
 
+                  <div>
+                    <Label className="text-gray-300">Descrição</Label>
+                    <Textarea
+                      value={sectionForm.description}
+                      onChange={(e) => setSectionForm({...sectionForm, description: e.target.value})}
+                      placeholder="Descrição da seção"
+                      className="bg-gray-800 border-gray-600 text-white"
+                      rows={3}
+                    />
+                  </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-gray-300">
+                          <Palette className="w-4 h-4 inline mr-2" />
+                          Cor da Seção
+                        </Label>
+                        <Input
+                          type="color"
+                          value={sectionForm.color}
+                          onChange={(e) => setSectionForm({...sectionForm, color: e.target.value})}
+                          className="bg-gray-800 border-gray-600 h-10"
+                        />
+                      </div>
+
+                      <div>
+                        <Label className="text-gray-300">
+                          <Hash className="w-4 h-4 inline mr-2" />
+                          Ordem
+                        </Label>
+                        <Input
+                          type="number"
+                          value={sectionForm.sort_order}
+                          onChange={(e) => setSectionForm({...sectionForm, sort_order: parseInt(e.target.value) || 1})}
+                          className="bg-gray-800 border-gray-600 text-white"
+                        />
+                      </div>
+                    </div>
+
                     <div>
                       <Label className="text-gray-300">
                         <ImageIcon className="w-4 h-4 inline mr-2" />

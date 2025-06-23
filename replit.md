@@ -111,6 +111,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 20:42**: Editor HTML/CSS separado implementado na Forja Libri
 - **23/06/2025 20:42**: Sistema de abas com HTML, CSS e Preview em tempo real
 - **23/06/2025 20:42**: Suporte completo a CSS personalizado e HTML puro
+- **23/06/2025 20:46**: Corrigido editor de seções removendo campo icon_url inexistente
+- **23/06/2025 20:46**: Sistema de seções totalmente funcional implementado
 
 ## Próximos Passos
 1. Executar SQL para adicionar colunas sequenciais
