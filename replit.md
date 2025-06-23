@@ -96,6 +96,12 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 19:53**: Sistema de requisitos de conclusão implementado na aba Conclusão
 - **23/06/2025 19:58**: Sistema de requisitos implementado também na criação de módulos
 - **23/06/2025 19:58**: Interface completa de requisitos funcionando em criação e edição
+- **23/06/2025 20:03**: Implementadas rotas de grimórios no servidor atual
+- **23/06/2025 20:03**: Corrigido problema de grimórios não carregando (rotas estavam no backup)
+- **23/06/2025 20:03**: Criado SQL para tabelas de grimórios e seções de biblioteca
+- **23/06/2025 20:04**: Sistema de grimórios 100% funcional
+- **23/06/2025 20:04**: 6 grimórios e 5 seções carregando corretamente
+- **23/06/2025 20:04**: Rotas de progresso de grimórios implementadas
 
 ## Próximos Passos
 1. Executar SQL para adicionar colunas sequenciais

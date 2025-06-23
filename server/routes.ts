@@ -904,5 +904,201 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // =====================
+  // ROTAS DE GRIMÓRIOS
+  // =====================
+
+  // Rota para buscar grimórios do usuário (aba perfil)
+  app.get("/api/user/grimoires", authenticateToken, async (req: any, res) => {
+    try {
+      console.log('=== USER GRIMOIRES REQUEST ===');
+      console.log('User ID:', req.user.id);
+      
+      const { data: grimoires, error } = await supabase
+        .from('grimoires')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Erro ao buscar grimórios do usuário:', error);
+        console.error('Detalhes do erro:', error.message);
+        return res.status(500).json({ error: error.message });
+      }
+
+      console.log('Total de grimórios encontrados:', grimoires?.length || 0);
+      if (grimoires && grimoires.length > 0) {
+        console.log('Primeiro grimório:', grimoires[0].title);
+        console.log('Status publicado:', grimoires[0].is_published);
+      }
+      
+      res.json(grimoires || []);
+    } catch (error: any) {
+      console.error("Error fetching user grimoires:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rota para buscar todos os grimórios (página libri)
+  app.get("/api/grimoires", async (req, res) => {
+    try {
+      console.log('=== ALL GRIMOIRES REQUEST ===');
+      
+      // Primeiro tentar buscar com JOIN
+      let { data: grimoires, error } = await supabase
+        .from('grimoires')
+        .select(`
+          *,
+          library_sections!inner(name, color)
+        `)
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.log('Erro no JOIN, tentando busca simples:', error.message);
+        // Se falhar, buscar sem JOIN
+        const { data: simpleGrimoires, error: simpleError } = await supabase
+          .from('grimoires')
+          .select('*')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
+          
+        if (simpleError) {
+          console.error('Erro ao buscar grimórios:', simpleError);
+          return res.json([]);
+        }
+        grimoires = simpleGrimoires;
+      }
+
+      console.log('Grimórios públicos encontrados:', grimoires?.length || 0);
+      if (grimoires && grimoires.length > 0) {
+        console.log('Primeiro grimório:', grimoires[0].title);
+      }
+      res.json(grimoires || []);
+    } catch (error: any) {
+      console.error("Error fetching grimoires:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rota para buscar grimório específico por ID
+  app.get("/api/grimoires/:id", authenticateToken, async (req: any, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      console.log('=== GRIMOIRE BY ID REQUEST ===');
+      console.log('Grimoire ID:', id);
+
+      const { data: grimoire, error } = await supabase
+        .from('grimoires')
+        .select(`
+          *,
+          library_sections(name, color)
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error || !grimoire) {
+        console.error('Grimório não encontrado:', error);
+        return res.status(404).json({ error: "Grimório não encontrado" });
+      }
+
+      console.log('Grimório encontrado:', grimoire.title);
+      res.json(grimoire);
+    } catch (error: any) {
+      console.error("Error fetching grimoire:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rota para buscar seções da biblioteca
+  app.get("/api/library/sections", async (req, res) => {
+    try {
+      console.log('=== LIBRARY SECTIONS REQUEST ===');
+      
+      const { data: sections, error } = await supabase
+        .from('library_sections')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (error) {
+        console.error('Erro ao buscar seções:', error);
+        return res.json([]);
+      }
+
+      console.log('Seções encontradas:', sections?.length || 0);
+      res.json(sections || []);
+    } catch (error: any) {
+      console.error("Error fetching library sections:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Rota para buscar progresso do grimório do usuário
+  app.get('/api/user/grimoire-progress/:grimoireId', authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const grimoireId = parseInt(req.params.grimoireId);
+      
+      if (!userId) {
+        return res.status(401).json({ message: 'Usuário não autenticado' });
+      }
+
+      const { data: progress, error } = await supabase
+        .from('user_grimoire_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('grimoire_id', grimoireId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Erro ao buscar progresso:', error);
+        return res.status(500).json({ error: error.message });
+      }
+
+      res.json(progress || { current_page: 1, total_pages: 1, progress_percentage: 0 });
+    } catch (error) {
+      console.error('Erro ao buscar progresso do grimório:', error);
+      res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+  });
+
+  // Rota para salvar progresso do grimório do usuário
+  app.post('/api/user/grimoire-progress/:grimoireId', authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user?.id;
+      const grimoireId = parseInt(req.params.grimoireId);
+      const { current_page, total_pages, progress_percentage } = req.body;
+      
+      if (!userId) {
+        return res.status(401).json({ message: 'Usuário não autenticado' });
+      }
+
+      const { data: progress, error } = await supabase
+        .from('user_grimoire_progress')
+        .upsert({
+          user_id: userId,
+          grimoire_id: grimoireId,
+          current_page,
+          total_pages,
+          progress_percentage,
+          updated_at: new Date().toISOString()
+        }, { 
+          onConflict: 'user_id,grimoire_id' 
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Erro ao salvar progresso:', error);
+        return res.status(500).json({ error: error.message });
+      }
+      
+      res.json(progress);
+    } catch (error) {
+      console.error('Erro ao salvar progresso do grimório:', error);
+      res.status(500).json({ message: 'Erro interno do servidor' });
+    }
+  });
+
   return httpServer;
 }
