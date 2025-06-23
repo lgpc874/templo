@@ -82,7 +82,8 @@ export default function AdminModulesFinal() {
     submission_text: '',
     ritual_text: '',
     custom_css: '',
-    submission_position: 'before'
+    submission_position: 'before',
+    completion_requirements: '[]'
   });
 
   // Verificar se é admin
@@ -820,10 +821,112 @@ export default function AdminModulesFinal() {
                     </TabsContent>
 
                     <TabsContent value="completion" className="space-y-4">
-                      <div className="text-center py-8 text-gray-400">
-                        <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <p>Sistema de requisitos de conclusão</p>
-                        <p className="text-sm">Em desenvolvimento - será implementado na próxima versão</p>
+                      <div>
+                        <Label className="text-gray-300 mb-4 block text-lg">
+                          <Target className="w-5 h-5 inline mr-2" />
+                          Requisitos de Conclusão
+                        </Label>
+                        <p className="text-sm text-gray-400 mb-4">
+                          Configure os requisitos que o usuário deve cumprir para completar este módulo
+                        </p>
+
+                        <div className="space-y-4">
+                          {/* Botão Simples */}
+                          <div className="p-4 bg-gray-800 rounded-lg border border-gray-600">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <CheckCircle className="w-4 h-4 text-green-400" />
+                                <span className="text-white font-medium">Confirmação Simples</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                <Plus className="w-3 h-3" />
+                                Adicionar
+                              </Button>
+                            </div>
+                            <p className="text-xs text-gray-400">
+                              Usuário precisa clicar em "Completei" para finalizar o módulo
+                            </p>
+                          </div>
+
+                          {/* Quiz/Pergunta */}
+                          <div className="p-4 bg-gray-800 rounded-lg border border-gray-600">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <Zap className="w-4 h-4 text-yellow-400" />
+                                <span className="text-white font-medium">Quiz de Verificação</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                <Plus className="w-3 h-3" />
+                                Adicionar
+                              </Button>
+                            </div>
+                            <p className="text-xs text-gray-400">
+                              Pergunta com resposta obrigatória para verificar compreensão
+                            </p>
+                          </div>
+
+                          {/* Desafio Prático */}
+                          <div className="p-4 bg-gray-800 rounded-lg border border-gray-600">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <Target className="w-4 h-4 text-red-400" />
+                                <span className="text-white font-medium">Desafio Prático</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                <Plus className="w-3 h-3" />
+                                Adicionar
+                              </Button>
+                            </div>
+                            <p className="text-xs text-gray-400">
+                              Tarefa prática que deve ser realizada e reportada pelo usuário
+                            </p>
+                          </div>
+
+                          {/* Confirmação de Entendimento */}
+                          <div className="p-4 bg-gray-800 rounded-lg border border-gray-600">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <Eye className="w-4 h-4 text-blue-400" />
+                                <span className="text-white font-medium">Confirmação de Entendimento</span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                              >
+                                <Plus className="w-3 h-3" />
+                                Adicionar
+                              </Button>
+                            </div>
+                            <p className="text-xs text-gray-400">
+                              Usuário deve confirmar que compreendeu completamente o conteúdo
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="mt-6 p-4 bg-blue-950/20 border border-blue-600/30 rounded-lg">
+                          <p className="text-blue-200 text-sm mb-2">
+                            <strong>Sistema em Desenvolvimento:</strong>
+                          </p>
+                          <p className="text-blue-100 text-xs">
+                            • Interface para criar requisitos customizados<br/>
+                            • Validação automática de conclusão<br/>
+                            • Relatórios de progresso detalhados<br/>
+                            • Integração com sistema de recompensas
+                          </p>
+                        </div>
                       </div>
                     </TabsContent>
 
