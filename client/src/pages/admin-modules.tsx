@@ -70,7 +70,12 @@ export default function AdminModulesFinal() {
     html_content: '',
     order_number: 1,
     requires_submission: false,
-    ritual_mandatory: false
+    ritual_mandatory: false,
+    submission_text: '',
+    ritual_text: '',
+    custom_css: '',
+    submission_position: 'before',
+    completion_requirements: '[]'
   });
 
   // Verificar se é admin
@@ -408,30 +413,7 @@ export default function AdminModulesFinal() {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="requires_submission"
-                          checked={moduleForm.requires_submission || false}
-                          onChange={(e) => setModuleForm({...moduleForm, requires_submission: e.target.checked})}
-                        />
-                        <Label htmlFor="requires_submission" className="text-gray-300">
-                          Requer Submissão
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="ritual_mandatory"
-                          checked={moduleForm.ritual_mandatory || false}
-                          onChange={(e) => setModuleForm({...moduleForm, ritual_mandatory: e.target.checked})}
-                        />
-                        <Label htmlFor="ritual_mandatory" className="text-gray-300">
-                          Ritual Obrigatório
-                        </Label>
-                      </div>
-                    </div>
+
 
                     <Button 
                       type="submit" 
