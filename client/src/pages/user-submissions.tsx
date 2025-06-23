@@ -17,6 +17,9 @@ interface Module {
   html_content: string;
   requires_submission: boolean;
   ritual_mandatory: boolean;
+  submission_text?: string;
+  ritual_text?: string;
+  custom_css?: string;
 }
 
 interface Submission {
@@ -252,10 +255,15 @@ export default function UserSubmissions() {
             
             <CardContent className="space-y-6">
               {/* Conteúdo do módulo */}
-              <div 
-                className="prose prose-invert max-w-none text-red-100"
-                dangerouslySetInnerHTML={{ __html: module.html_content }}
-              />
+              <div className="module-content">
+                {module.custom_css && (
+                  <style dangerouslySetInnerHTML={{ __html: module.custom_css }} />
+                )}
+                <div 
+                  className="prose prose-invert max-w-none text-red-100"
+                  dangerouslySetInnerHTML={{ __html: module.html_content }}
+                />
+              </div>
 
               <Separator className="bg-red-800" />
 
@@ -263,9 +271,20 @@ export default function UserSubmissions() {
               {module.requires_submission && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-red-100">Submissão</h3>
+                    <h3 className="text-lg font-semibold text-red-100">Ritual de Submissão e Aceitação</h3>
                     {submission && getStatusBadge(submission.status)}
                   </div>
+                  
+                  {/* Texto da submissão criado pelo admin */}
+                  {module.submission_text && (
+                    <div className="bg-red-950/30 p-4 rounded-lg border border-red-800">
+                      <h4 className="text-red-200 font-medium mb-2">Declaração de Submissão:</h4>
+                      <div 
+                        className="prose prose-invert prose-sm text-red-100"
+                        dangerouslySetInnerHTML={{ __html: module.submission_text }}
+                      />
+                    </div>
+                  )}
                   
                   {submission ? (
                     <div className="bg-zinc-800 p-4 rounded-lg">
@@ -283,16 +302,19 @@ export default function UserSubmissions() {
                       <Textarea
                         value={submissionText[module.id] || ''}
                         onChange={(e) => setSubmissionText(prev => ({ ...prev, [module.id]: e.target.value }))}
-                        placeholder="Escreva sua submissão aqui..."
+                        placeholder="Declare sua aceitação e submissão ao caminho do templo..."
                         className="bg-zinc-800 border-red-700 text-red-100"
                         rows={6}
                       />
+                      <p className="text-sm text-red-400">
+                        Esta é sua declaração formal de aceitação e submissão aos ensinamentos do templo.
+                      </p>
                       <Button 
                         onClick={() => submitSubmission(module.id)}
                         disabled={!submissionText[module.id]?.trim()}
                         className="bg-red-700 hover:bg-red-600"
                       >
-                        Enviar Submissão
+                        Realizar Submissão ao Templo
                       </Button>
                     </div>
                   )}
@@ -306,6 +328,17 @@ export default function UserSubmissions() {
                     <h3 className="text-lg font-semibold text-red-100">Ritual Obrigatório</h3>
                     {ritual && getStatusBadge(ritual.status)}
                   </div>
+                  
+                  {/* Instruções do ritual criadas pelo admin */}
+                  {module.ritual_text && (
+                    <div className="bg-amber-950/30 p-4 rounded-lg border border-amber-800">
+                      <h4 className="text-amber-200 font-medium mb-2">Instruções do Ritual:</h4>
+                      <div 
+                        className="prose prose-invert prose-sm text-amber-100"
+                        dangerouslySetInnerHTML={{ __html: module.ritual_text }}
+                      />
+                    </div>
+                  )}
                   
                   {ritual ? (
                     <div className="bg-zinc-800 p-4 rounded-lg">

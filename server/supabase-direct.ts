@@ -87,6 +87,9 @@ export interface CourseModule {
   order_number: number;
   requires_submission?: boolean;
   ritual_mandatory?: boolean;
+  submission_text?: string;
+  ritual_text?: string;
+  custom_css?: string;
   created_at?: string;
   updated_at?: string;
 }
