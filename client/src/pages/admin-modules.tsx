@@ -533,10 +533,165 @@ export default function AdminModulesFinal() {
                       </TabsContent>
 
                       <TabsContent value="completion" className="space-y-4">
-                        <div className="text-center py-8 text-gray-400">
-                          <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <p>Sistema de requisitos de conclusão</p>
-                          <p className="text-sm">Em desenvolvimento - será implementado na próxima versão</p>
+                        <div>
+                          <Label className="text-gray-300 mb-4 block text-lg">
+                            <Target className="w-5 h-5 inline mr-2" />
+                            Requisitos de Conclusão
+                          </Label>
+                          <p className="text-sm text-gray-400 mb-4">
+                            Configure os requisitos que o usuário deve cumprir para completar este módulo
+                          </p>
+
+                          {/* Lista de Requisitos Adicionados */}
+                          {completionRequirements.length > 0 && (
+                            <div className="space-y-3 mb-6">
+                              <h4 className="text-white font-medium">Requisitos Configurados:</h4>
+                              {completionRequirements.map((req, index) => (
+                                <div key={index} className="p-3 bg-gray-800 rounded-lg border border-gray-600 flex items-center justify-between">
+                                  <div className="flex items-center space-x-3">
+                                    {req.type === 'simple' && <CheckCircle className="w-4 h-4 text-green-400" />}
+                                    {req.type === 'quiz' && <Zap className="w-4 h-4 text-yellow-400" />}
+                                    {req.type === 'challenge' && <Target className="w-4 h-4 text-red-400" />}
+                                    {req.type === 'confirmation' && <Eye className="w-4 h-4 text-blue-400" />}
+                                    <div>
+                                      <p className="text-white font-medium text-sm">{req.title}</p>
+                                      <p className="text-gray-400 text-xs">{req.description}</p>
+                                    </div>
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      const newReqs = completionRequirements.filter((_, i) => i !== index);
+                                      setCompletionRequirements(newReqs);
+                                    }}
+                                    className="text-red-400 border-red-400 hover:bg-red-400/10"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Tipos de Requisitos Disponíveis */}
+                          <div className="space-y-3">
+                            <div className="p-3 bg-gray-800 rounded-lg border border-gray-600">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <CheckCircle className="w-4 h-4 text-green-400" />
+                                  <span className="text-white font-medium text-sm">Confirmação Simples</span>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs"
+                                  onClick={() => {
+                                    setCurrentRequirement({
+                                      type: 'simple',
+                                      title: 'Confirmar Conclusão',
+                                      description: 'Clique para confirmar que completou o módulo',
+                                      config: { buttonText: 'Completei!' }
+                                    });
+                                    setShowRequirementForm(true);
+                                  }}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  Add
+                                </Button>
+                              </div>
+                              <p className="text-xs text-gray-400">
+                                Usuário precisa clicar em um botão para finalizar
+                              </p>
+                            </div>
+
+                            <div className="p-3 bg-gray-800 rounded-lg border border-gray-600">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <Zap className="w-4 h-4 text-yellow-400" />
+                                  <span className="text-white font-medium text-sm">Quiz de Verificação</span>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs"
+                                  onClick={() => {
+                                    setCurrentRequirement({
+                                      type: 'quiz',
+                                      title: 'Pergunta de Verificação',
+                                      description: 'Responda corretamente para prosseguir',
+                                      config: { question: '', answer: '', options: [] }
+                                    });
+                                    setShowRequirementForm(true);
+                                  }}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  Add
+                                </Button>
+                              </div>
+                              <p className="text-xs text-gray-400">
+                                Pergunta obrigatória para verificar compreensão
+                              </p>
+                            </div>
+
+                            <div className="p-3 bg-gray-800 rounded-lg border border-gray-600">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <Target className="w-4 h-4 text-red-400" />
+                                  <span className="text-white font-medium text-sm">Desafio Prático</span>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs"
+                                  onClick={() => {
+                                    setCurrentRequirement({
+                                      type: 'challenge',
+                                      title: 'Desafio Prático',
+                                      description: 'Complete uma tarefa prática',
+                                      config: { instructions: '', requiresProof: true }
+                                    });
+                                    setShowRequirementForm(true);
+                                  }}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  Add
+                                </Button>
+                              </div>
+                              <p className="text-xs text-gray-400">
+                                Tarefa prática a ser realizada e reportada
+                              </p>
+                            </div>
+
+                            <div className="p-3 bg-gray-800 rounded-lg border border-gray-600">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-2">
+                                  <Eye className="w-4 h-4 text-blue-400" />
+                                  <span className="text-white font-medium text-sm">Confirmação de Entendimento</span>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs"
+                                  onClick={() => {
+                                    setCurrentRequirement({
+                                      type: 'confirmation',
+                                      title: 'Confirmar Entendimento',
+                                      description: 'Declare que compreendeu o conteúdo',
+                                      config: { confirmationText: 'Eu entendi e aceito os ensinamentos deste módulo' }
+                                    });
+                                    setShowRequirementForm(true);
+                                  }}
+                                >
+                                  <Plus className="w-3 h-3" />
+                                  Add
+                                </Button>
+                              </div>
+                              <p className="text-xs text-gray-400">
+                                Confirmar compreensão completa do conteúdo
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </TabsContent>
 

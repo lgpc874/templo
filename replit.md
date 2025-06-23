@@ -94,6 +94,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 19:52**: Sistema completo de cursos implementado com campos sequenciais
 - **23/06/2025 19:52**: Adicionados: ordem sequencial, bloqueio, preços, recompensas de roles
 - **23/06/2025 19:53**: Sistema de requisitos de conclusão implementado na aba Conclusão
+- **23/06/2025 19:58**: Sistema de requisitos implementado também na criação de módulos
+- **23/06/2025 19:58**: Interface completa de requisitos funcionando em criação e edição
 
 ## Próximos Passos
 1. Executar SQL para adicionar colunas sequenciais
