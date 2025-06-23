@@ -89,11 +89,7 @@ export default function AdminCourses() {
   const { data: courses = [], isLoading: coursesLoading } = useQuery<Course[]>({
     queryKey: ['/api/admin/courses'],
     queryFn: async () => {
-      const token = localStorage.getItem('auth_token');
-      const response = await fetch('/api/admin/courses', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!response.ok) throw new Error('Erro ao buscar cursos');
+      const response = await apiRequest('/api/admin/courses');
       return response.json();
     }
   });
@@ -102,8 +98,7 @@ export default function AdminCourses() {
   const { data: courseSections = [] } = useQuery<CourseSection[]>({
     queryKey: ['/api/course-sections'],
     queryFn: async () => {
-      const response = await fetch('/api/course-sections');
-      if (!response.ok) throw new Error('Erro ao buscar seções');
+      const response = await apiRequest('/api/course-sections');
       return response.json();
     }
   });

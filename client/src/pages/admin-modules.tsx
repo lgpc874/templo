@@ -30,6 +30,12 @@ interface Course {
   title: string;
   slug: string;
   description: string;
+  required_role: string;
+  is_published: boolean;
+  price: number;
+  is_paid: boolean;
+  sort_order: number;
+  course_section_id: number;
   course_sections?: {
     name: string;
     color: string;
@@ -78,8 +84,8 @@ export default function AdminModules() {
     );
   }
 
-  // Buscar cursos
-  const { data: courses = [] } = useQuery<Course[]>({
+  // Buscar cursos  
+  const { data: courses = [] } = useQuery({
     queryKey: ['/api/admin/courses'],
     queryFn: async () => {
       const response = await apiRequest('/api/admin/courses');
