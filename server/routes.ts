@@ -1550,14 +1550,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/courses", authenticateToken, async (req, res) => {
+  app.get("/api/admin/courses", authenticateToken, async (req: any, res) => {
     try {
       console.log('=== ADMIN COURSES REQUEST ===');
-      console.log('User:', req.user.email);
+      console.log('User:', req.user?.email);
+      console.log('User ID:', req.user?.id);
       
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user?.email !== 'admin@templodoabismo.com.br') {
+        console.log('Access denied - not admin user');
         return res.status(403).json({ error: "Acesso negado" });
       }
+
+      console.log('Admin access confirmed, fetching courses...');
 
       const { data: courses, error } = await supabaseServiceNew.getClient()
         .from('courses')
@@ -1576,6 +1580,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       console.log('Admin courses found:', courses?.length || 0);
+      if (courses && courses.length > 0) {
+        console.log('First course:', courses[0].title);
+      }
+      
       res.json(courses || []);
     } catch (error: any) {
       console.error('Admin courses error:', error);
