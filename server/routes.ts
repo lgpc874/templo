@@ -1552,20 +1552,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/courses", authenticateToken, async (req, res) => {
     try {
+      console.log('=== ADMIN COURSES REQUEST ===');
+      console.log('User:', req.user.email);
+      
       if (req.user.email !== 'admin@templodoabismo.com.br') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
-      const { data: courses } = await supabaseServiceNew.getClient()
+      const { data: courses, error } = await supabaseServiceNew.getClient()
         .from('courses')
         .select(`
           *,
-          users(username)
+          course_sections(
+            name,
+            color
+          )
         `)
         .order('created_at', { ascending: false });
 
+      if (error) {
+        console.error('Error fetching admin courses:', error);
+        throw error;
+      }
+
+      console.log('Admin courses found:', courses?.length || 0);
       res.json(courses || []);
     } catch (error: any) {
+      console.error('Admin courses error:', error);
       res.status(500).json({ error: error.message });
     }
   });
