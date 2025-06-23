@@ -2863,21 +2863,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Admin endpoint para criar cursos
   app.post("/api/admin/courses", authenticateToken, async (req: any, res) => {
     try {
+      console.log('=== CRIANDO CURSO ===');
+      console.log('User:', req.user.email);
+      console.log('Request body:', req.body);
+      
       if (req.user.email !== 'admin@templodoabismo.com.br') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
+      console.log('Validação de admin passou, inserindo no Supabase...');
+      
       const { data: course, error } = await supabaseServiceNew.getClient()
         .from('courses')
         .insert(req.body)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Erro do Supabase ao criar curso:', error);
+        throw error;
+      }
+      
+      console.log('Curso criado com sucesso:', course);
       res.json(course);
     } catch (error: any) {
       console.error("Error creating course:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
+      res.status(500).json({ error: error.message || "Erro interno do servidor" });
     }
   });
 
