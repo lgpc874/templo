@@ -100,10 +100,10 @@ export default function Oraculum() {
               />
             </div>
             
-            <Card className="w-full max-w-md bg-black/80 border-ritualistic-gold/30 backdrop-blur-sm relative">
+            <Card className="w-full max-w-md bg-black/80 border-golden-amber/30 backdrop-blur-sm relative">
               <CardHeader className="text-center">
-                <Eye className="w-16 h-16 text-ritualistic-gold mx-auto mb-4 animate-pulse" />
-                <CardTitle className="text-2xl text-ritualistic-gold" style={{ fontFamily: 'Cinzel Decorative' }}>
+                <Eye className="w-16 h-16 text-golden-amber mx-auto mb-4 animate-pulse" />
+                <CardTitle className="text-2xl text-golden-amber" style={{ fontFamily: 'Cinzel Decorative' }}>
                   Acesso Restrito
                 </CardTitle>
                 <CardDescription className="text-ritualistic-beige" style={{ fontFamily: 'EB Garamond' }}>
@@ -113,7 +113,7 @@ export default function Oraculum() {
               <CardContent>
                 <Link href="/auth">
                   <Button 
-                    className="w-full bg-gradient-to-r from-ritualistic-gold/80 to-ritualistic-gold hover:from-ritualistic-gold hover:to-ritualistic-gold/80 text-black font-bold"
+                    className="w-full bg-gradient-to-r from-golden-amber/80 to-golden-amber hover:from-golden-amber hover:to-golden-amber/80 text-black font-bold"
                     style={{ fontFamily: 'Cinzel' }}
                   >
                     Fazer Login
@@ -143,9 +143,9 @@ export default function Oraculum() {
             </div>
             
             <div className="text-center relative">
-              <Eye className="w-16 h-16 text-ritualistic-gold mx-auto mb-4 animate-pulse" />
-              <div className="w-16 h-16 border-4 border-ritualistic-gold/30 border-t-ritualistic-gold rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-ritualistic-gold" style={{ fontFamily: 'EB Garamond' }}>
+              <Eye className="w-16 h-16 text-golden-amber mx-auto mb-4 animate-pulse" />
+              <div className="w-16 h-16 border-4 border-golden-amber/30 border-t-golden-amber rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-golden-amber" style={{ fontFamily: 'EB Garamond' }}>
                 Carregando os Mistérios Ancestrais...
               </p>
             </div>
@@ -176,12 +176,12 @@ export default function Oraculum() {
               <div className="text-center mb-16">
                 <div className="mb-8">
                   <div className="relative inline-block">
-                    <Eye className="w-20 h-20 mx-auto text-ritualistic-gold animate-pulse" />
-                    <div className="absolute inset-0 bg-ritualistic-gold/20 blur-xl rounded-full"></div>
+                    <Eye className="w-20 h-20 mx-auto text-golden-amber animate-pulse" />
+                    <div className="absolute inset-0 bg-golden-amber/20 blur-xl rounded-full"></div>
                   </div>
                 </div>
                 
-                <h1 className="text-5xl md:text-7xl font-bold text-ritualistic-gold mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
+                <h1 className="text-5xl md:text-7xl font-bold text-golden-amber mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
                   Oraculum Infernale
                 </h1>
                 
@@ -193,10 +193,10 @@ export default function Oraculum() {
                   </p>
                   
                   <div className="flex justify-center mb-8">
-                    <div className="h-px bg-gradient-to-r from-transparent via-ritualistic-gold to-transparent w-96"></div>
+                    <div className="h-px bg-gradient-to-r from-transparent via-golden-amber to-transparent w-96"></div>
                   </div>
                   
-                  <div className="flex items-center justify-center text-ritualistic-gold/80 space-x-8">
+                  <div className="flex items-center justify-center text-golden-amber/80 space-x-8">
                     <div className="flex items-center space-x-2">
                       <Eye className="w-5 h-5 animate-pulse" />
                       <span style={{ fontFamily: 'EB Garamond' }}>Visões Reveladoras</span>
@@ -225,16 +225,16 @@ export default function Oraculum() {
                 return (
                   <Card 
                     key={oracle.id} 
-                    className="group relative bg-black/60 border-ritualistic-gold/30 backdrop-blur-sm hover:bg-black/80 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-ritualistic-gold/20 hover:scale-105"
+                    className="group relative bg-black/60 border-golden-amber/30 backdrop-blur-sm hover:bg-black/80 transition-all duration-500 cursor-pointer hover:shadow-2xl hover:shadow-golden-amber/20 hover:scale-105"
                     style={{ fontFamily: 'EB Garamond' }}
                   >
                     {/* Efeito de brilho no hover */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-ritualistic-gold/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-golden-amber/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     
                     <CardHeader className="text-center pb-4">
                       <div className="flex justify-center mb-6">
                         <div 
-                          className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-ritualistic-gold/30"
+                          className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300 border border-golden-amber/30"
                           style={{
                             background: `radial-gradient(circle, ${oracle.theme_color}20, black)`,
                             boxShadow: `0 0 30px ${oracle.theme_color}40`
@@ -254,11 +254,11 @@ export default function Oraculum() {
                         </div>
                       </div>
                       
-                      <CardTitle className="text-2xl text-ritualistic-gold mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
+                      <CardTitle className="text-2xl text-golden-amber mb-2" style={{ fontFamily: 'Cinzel Decorative' }}>
                         {oracle.name}
                       </CardTitle>
                       
-                      <div className="text-sm text-ritualistic-gold/60 italic mb-4" style={{ fontFamily: 'EB Garamond' }}>
+                      <div className="text-sm text-golden-amber/60 italic mb-4" style={{ fontFamily: 'EB Garamond' }}>
                         {oracle.latin_name}
                       </div>
                       
@@ -278,7 +278,7 @@ export default function Oraculum() {
                                   Gratuito para seu role
                                 </Badge>
                               ) : (
-                                <Badge className="bg-ritualistic-gold/20 text-ritualistic-gold border-ritualistic-gold/30">
+                                <Badge className="bg-golden-amber/20 text-golden-amber border-golden-amber/30">
                                   R$ {userPrice.toFixed(2)}
                                 </Badge>
                               )}
@@ -299,14 +299,14 @@ export default function Oraculum() {
 
                         {/* Linha decorativa */}
                         <div className="flex justify-center">
-                          <div className="h-px bg-gradient-to-r from-transparent via-ritualistic-gold/50 to-transparent w-32"></div>
+                          <div className="h-px bg-gradient-to-r from-transparent via-golden-amber/50 to-transparent w-32"></div>
                         </div>
 
                         {/* Botão de acesso */}
                         {hasAccess ? (
                           <Link href={`/oraculum/${oracle.id}`}>
                             <Button 
-                              className="w-full bg-gradient-to-r from-ritualistic-gold/80 to-ritualistic-gold hover:from-ritualistic-gold hover:to-ritualistic-gold/80 text-black font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 border border-ritualistic-gold/30"
+                              className="w-full bg-gradient-to-r from-golden-amber/80 to-golden-amber hover:from-golden-amber hover:to-golden-amber/80 text-black font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 border border-golden-amber/30"
                               style={{ fontFamily: 'Cinzel' }}
                             >
                               <Eye className="w-4 h-4 mr-2" />
@@ -333,14 +333,14 @@ export default function Oraculum() {
             {/* Footer místico */}
             <div className="text-center mt-20">
               <div className="flex justify-center mb-6">
-                <div className="h-px bg-gradient-to-r from-transparent via-ritualistic-gold/50 to-transparent w-96"></div>
+                <div className="h-px bg-gradient-to-r from-transparent via-golden-amber/50 to-transparent w-96"></div>
               </div>
               
               <p className="text-ritualistic-beige/60 text-lg italic mb-4" style={{ fontFamily: 'EB Garamond' }}>
                 "Os mistérios se revelam àqueles que buscam com sinceridade e reverência aos antigos caminhos."
               </p>
               
-              <div className="flex items-center justify-center space-x-4 text-ritualistic-gold/60 text-sm">
+              <div className="flex items-center justify-center space-x-4 text-golden-amber/60 text-sm">
                 <span style={{ fontFamily: 'Cinzel' }}>TEMPLO DO ABISMO</span>
                 <span>•</span>
                 <span style={{ fontFamily: 'Cinzel' }}>ORÁCULOS INFERNAIS</span>
