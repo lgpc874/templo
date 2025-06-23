@@ -326,6 +326,279 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // =====================
+  // ROTAS DE PROGRESSO DO USUÁRIO
+  // =====================
+
+  // Buscar todos os progressos do usuário
+  app.get("/api/user/course-progress", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      console.log('=== FETCHING ALL USER PROGRESS ===');
+      console.log('User ID:', userId);
+      
+      const { data: progress, error } = await supabase
+        .from('user_course_progress')
+        .select('*')
+        .eq('user_id', userId);
+        
+      if (error) {
+        console.error('Error fetching user progress:', error);
+        return res.status(500).json({ error: "Erro ao buscar progresso" });
+      }
+      
+      res.json(progress || []);
+    } catch (error: any) {
+      console.error("Error fetching user progress:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Buscar progresso específico de um curso
+  app.get("/api/user/course-progress/:courseId", authenticateToken, async (req: any, res) => {
+    try {
+      const courseId = parseInt(req.params.courseId);
+      const userId = req.user.id;
+      console.log('=== FETCHING SPECIFIC COURSE PROGRESS ===');
+      console.log('User ID:', userId, 'Course ID:', courseId);
+      
+      const { data: progress, error } = await supabase
+        .from('user_course_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('course_id', courseId)
+        .single();
+        
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Error fetching specific progress:', error);
+        return res.status(500).json({ error: "Erro ao buscar progresso" });
+      }
+      
+      res.json(progress || null);
+    } catch (error: any) {
+      console.error("Error fetching specific course progress:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Criar/atualizar progresso do curso
+  app.post("/api/user/course-progress", authenticateToken, async (req: any, res) => {
+    try {
+      const { course_id, current_module = 1, is_completed = false } = req.body;
+      const userId = req.user.id;
+      
+      console.log('=== CREATING/UPDATING COURSE PROGRESS ===');
+      console.log('User ID:', userId, 'Course ID:', course_id, 'Module:', current_module);
+      
+      // Verificar se já existe progresso
+      const { data: existingProgress } = await supabase
+        .from('user_course_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('course_id', course_id)
+        .single();
+      
+      let result;
+      
+      if (existingProgress) {
+        // Atualizar progresso existente
+        const updates = {
+          current_module,
+          is_completed,
+          updated_at: new Date().toISOString()
+        };
+        
+        if (is_completed) {
+          updates.completed_at = new Date().toISOString();
+        }
+        
+        const { data, error } = await supabase
+          .from('user_course_progress')
+          .update(updates)
+          .eq('user_id', userId)
+          .eq('course_id', course_id)
+          .select()
+          .single();
+          
+        if (error) {
+          console.error('Error updating progress:', error);
+          return res.status(500).json({ error: "Erro ao atualizar progresso" });
+        }
+        
+        result = data;
+      } else {
+        // Criar novo progresso
+        const progressData = {
+          user_id: userId,
+          course_id,
+          current_module,
+          is_completed,
+          started_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        if (is_completed) {
+          progressData.completed_at = new Date().toISOString();
+        }
+        
+        const { data, error } = await supabase
+          .from('user_course_progress')
+          .insert(progressData)
+          .select()
+          .single();
+          
+        if (error) {
+          console.error('Error creating progress:', error);
+          return res.status(500).json({ error: "Erro ao criar progresso" });
+        }
+        
+        result = data;
+      }
+      
+      console.log('Progress saved successfully:', result);
+      res.json(result);
+    } catch (error: any) {
+      console.error("Error saving course progress:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Buscar cursos do usuário (com progresso)
+  app.get("/api/user/courses", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      console.log('=== FETCHING USER COURSES ===');
+      console.log('User ID:', userId);
+      
+      const { data: coursesWithProgress, error } = await supabase
+        .from('user_course_progress')
+        .select(`
+          *,
+          courses!course_id (
+            id,
+            title,
+            slug,
+            description,
+            image_url,
+            required_role,
+            is_paid,
+            price,
+            course_section_id,
+            course_sections!course_section_id (
+              name,
+              color
+            )
+          )
+        `)
+        .eq('user_id', userId)
+        .order('started_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching user courses:', error);
+        return res.status(500).json({ error: "Erro ao buscar cursos do usuário" });
+      }
+      
+      console.log('User courses found:', coursesWithProgress?.length || 0);
+      res.json(coursesWithProgress || []);
+    } catch (error: any) {
+      console.error("Error fetching user courses:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Completar módulo
+  app.get("/api/modules/:moduleId/complete", authenticateToken, async (req: any, res) => {
+    try {
+      const moduleId = parseInt(req.params.moduleId);
+      const userId = req.user.id;
+      
+      console.log('=== COMPLETING MODULE ===');
+      console.log('User ID:', userId, 'Module ID:', moduleId);
+      
+      // Buscar informações do módulo diretamente do banco
+      const { data: module, error: moduleError } = await supabase
+        .from('course_modules')
+        .select('*')
+        .eq('id', moduleId)
+        .single();
+      
+      if (moduleError || !module) {
+        console.error('Module not found:', moduleError);
+        return res.status(404).json({ error: "Módulo não encontrado" });
+      }
+      
+      // Buscar todos os módulos do curso para determinar se é o último
+      const { data: allModules, error: modulesError } = await supabase
+        .from('course_modules')
+        .select('*')
+        .eq('course_id', module.course_id)
+        .order('order_number');
+      
+      if (modulesError || !allModules) {
+        console.error('Error fetching course modules:', modulesError);
+        return res.status(500).json({ error: "Erro ao buscar módulos do curso" });
+      }
+      
+      const totalModules = allModules.length;
+      const isLastModule = module.order_number === totalModules;
+      
+      // Buscar progresso atual
+      const { data: currentProgress } = await supabase
+        .from('user_course_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('course_id', module.course_id)
+        .single();
+      
+      if (!currentProgress) {
+        return res.status(404).json({ error: "Progresso não encontrado" });
+      }
+      
+      // Atualizar progresso
+      const nextModule = isLastModule ? totalModules : currentProgress.current_module + 1;
+      const updates = {
+        current_module: nextModule,
+        is_completed: isLastModule,
+        updated_at: new Date().toISOString()
+      };
+      
+      if (isLastModule) {
+        updates.completed_at = new Date().toISOString();
+      }
+      
+      const { data: updatedProgress, error } = await supabase
+        .from('user_course_progress')
+        .update(updates)
+        .eq('user_id', userId)
+        .eq('course_id', module.course_id)
+        .select()
+        .single();
+        
+      if (error) {
+        console.error('Error updating progress after module completion:', error);
+        return res.status(500).json({ error: "Erro ao completar módulo" });
+      }
+      
+      console.log('Module completed successfully. Is last module:', isLastModule);
+      res.json({ success: true, isLastModule, updatedProgress });
+    } catch (error: any) {
+      console.error("Error completing module:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Buscar desafios de um módulo
+  app.get("/api/modules/:moduleId/challenges", authenticateToken, async (req: any, res) => {
+    try {
+      // Por enquanto retorna array vazio, implementar quando necessário
+      res.json([]);
+    } catch (error: any) {
+      console.error("Error fetching module challenges:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // =====================
   // ROTAS ADMIN
   // =====================
 

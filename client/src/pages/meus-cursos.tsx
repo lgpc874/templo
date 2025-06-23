@@ -118,9 +118,9 @@ export default function MeusCursos() {
   };
 
   const calculateProgress = (course: UserCourse) => {
-    // Implementar cálculo real baseado no número de módulos
-    // Por agora, estimativa baseada no module atual
-    const estimatedTotalModules = 10; // Buscar do banco real
+    // Usar estimativa com base no módulo atual
+    // TODO: Buscar número real de módulos do curso quando necessário
+    const estimatedTotalModules = 5;
     return Math.min((course.current_module / estimatedTotalModules) * 100, 100);
   };
 

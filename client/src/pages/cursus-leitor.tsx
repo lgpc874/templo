@@ -208,18 +208,26 @@ export default function CursusLeitor() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user/course-progress'] });
-      toast({ title: 'Progresso salvo com sucesso!' });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/courses'] });
     },
   });
 
   const completeModuleMutation = useMutation({
     mutationFn: async (moduleId: number) => {
-      return apiRequest(`/api/modules/${moduleId}/complete`, {
-        method: 'POST',
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`/api/modules/${moduleId}/complete`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
+      if (!response.ok) {
+        throw new Error(`Failed to complete module: ${response.status}`);
+      }
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/user/course-progress'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/courses'] });
     },
   });
 
@@ -270,32 +278,49 @@ export default function CursusLeitor() {
   const handleCompleteModule = async () => {
     if (!course || !modules[currentModuleIndex]) return;
     
-    // Verificar se há desafios obrigatórios
-    const requiredChallenges = challenges.filter(c => c.is_required);
-    if (requiredChallenges.length > 0) {
-      setShowChallenge(true);
-      return;
-    }
-    
-    // Marcar módulo como concluído
-    await completeModuleMutation.mutateAsync(modules[currentModuleIndex].id);
-    
-    // Atualizar progresso
-    const nextModule = currentModuleIndex + 1;
-    if (nextModule < modules.length) {
-      await updateProgressMutation.mutateAsync({
-        course_id: course.id,
-        current_module: nextModule + 1,
+    try {
+      // Verificar se há desafios obrigatórios
+      const requiredChallenges = challenges.filter(c => c.is_required);
+      if (requiredChallenges.length > 0) {
+        setShowChallenge(true);
+        return;
+      }
+      
+      const currentModule = modules[currentModuleIndex];
+      console.log('Completing module:', currentModule.id, 'Order:', currentModule.order_number);
+      
+      // Marcar módulo como concluído
+      const result = await completeModuleMutation.mutateAsync(currentModule.id);
+      
+      if (result.isLastModule) {
+        // Curso completo
+        toast({ 
+          title: 'Parabéns! Curso concluído!', 
+          description: 'Você completou todos os módulos do curso.' 
+        });
+        
+        // Redirecionar para a página de cursos após um delay
+        setTimeout(() => {
+          setLocation('/cursus');
+        }, 3000);
+      } else {
+        // Avançar para próximo módulo
+        const nextModuleIndex = currentModuleIndex + 1;
+        if (nextModuleIndex < modules.length) {
+          setCurrentModuleIndex(nextModuleIndex);
+          toast({ 
+            title: 'Módulo concluído!', 
+            description: `Avançando para o módulo ${nextModuleIndex + 1}.` 
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error completing module:', error);
+      toast({ 
+        title: 'Erro ao completar módulo', 
+        description: 'Tente novamente em alguns momentos.',
+        variant: 'destructive'
       });
-      setCurrentModuleIndex(nextModule);
-    } else {
-      // Curso completo
-      await updateProgressMutation.mutateAsync({
-        course_id: course.id,
-        current_module: modules.length,
-        is_completed: true,
-      });
-      toast({ title: 'Parabéns! Curso concluído!', description: 'Você completou todos os módulos.' });
     }
   };
 
