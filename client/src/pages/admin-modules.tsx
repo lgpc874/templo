@@ -403,16 +403,160 @@ export default function AdminModulesFinal() {
                       />
                     </div>
 
-                    <div>
-                      <Label className="text-gray-300">Conteúdo do Módulo</Label>
-                      <RichTextEditor
-                        value={moduleForm.html_content}
-                        onChange={(value) => setModuleForm({...moduleForm, html_content: value})}
-                        placeholder="Escreva o conteúdo do módulo..."
-                        className="bg-black/30 border-green-500/50"
-                        height="200px"
-                      />
-                    </div>
+                    <Tabs defaultValue="content" className="space-y-4">
+                      <TabsList className="grid w-full grid-cols-4 bg-gray-800">
+                        <TabsTrigger value="content">Conteúdo</TabsTrigger>
+                        <TabsTrigger value="submission">Submissão</TabsTrigger>
+                        <TabsTrigger value="completion">Conclusão</TabsTrigger>
+                        <TabsTrigger value="preview">Preview</TabsTrigger>
+                      </TabsList>
+
+                      <TabsContent value="content" className="space-y-4">
+                        <div>
+                          <Label className="text-gray-300 mb-2 block">Conteúdo HTML do Módulo</Label>
+                          <RichTextEditor
+                            value={moduleForm.html_content}
+                            onChange={(value) => setModuleForm({...moduleForm, html_content: value})}
+                            placeholder="Insira o conteúdo HTML do módulo..."
+                            height="300px"
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label className="text-gray-300 mb-2 block">CSS Customizado (Opcional)</Label>
+                          <Textarea
+                            value={moduleForm.custom_css || ''}
+                            onChange={(e) => setModuleForm({...moduleForm, custom_css: e.target.value})}
+                            placeholder="CSS personalizado para este módulo..."
+                            className="bg-gray-800 border-gray-600 text-white min-h-[100px] font-mono text-sm"
+                          />
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="submission" className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="requires_submission_new"
+                            checked={moduleForm.requires_submission}
+                            onCheckedChange={(checked) => 
+                              setModuleForm({...moduleForm, requires_submission: checked as boolean})
+                            }
+                          />
+                          <Label htmlFor="requires_submission_new" className="text-gray-300">
+                            Este módulo requer submissão/aceitação
+                          </Label>
+                        </div>
+
+                        {moduleForm.requires_submission && (
+                          <div className="space-y-4">
+                            <div>
+                              <Label className="text-gray-300 mb-2 block">Posição da Submissão</Label>
+                              <Select 
+                                value={moduleForm.submission_position || 'before'}
+                                onValueChange={(value) => setModuleForm({...moduleForm, submission_position: value})}
+                              >
+                                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="before">Antes do conteúdo (bloqueia acesso)</SelectItem>
+                                  <SelectItem value="after">Após o conteúdo</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <p className="text-sm text-gray-400 mt-1">
+                                {moduleForm.submission_position === 'before' 
+                                  ? 'O usuário deve aceitar antes de ver o conteúdo'
+                                  : 'A submissão aparece no final do módulo'
+                                }
+                              </p>
+                            </div>
+
+                            <div>
+                              <Label className="text-gray-300 mb-2 block">Texto da Submissão</Label>
+                              <RichTextEditor
+                                value={moduleForm.submission_text || ''}
+                                onChange={(value) => setModuleForm({...moduleForm, submission_text: value})}
+                                placeholder="Texto do ritual de submissão e aceitação..."
+                                height="200px"
+                              />
+                              <p className="text-sm text-gray-400 mt-2">
+                                Este é o ritual onde a pessoa declara e aceita o caminho do templo
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex items-center space-x-2 mt-4">
+                          <Checkbox 
+                            id="ritual_mandatory_new"
+                            checked={moduleForm.ritual_mandatory}
+                            onCheckedChange={(checked) => 
+                              setModuleForm({...moduleForm, ritual_mandatory: checked as boolean})
+                            }
+                          />
+                          <Label htmlFor="ritual_mandatory_new" className="text-gray-300">
+                            Ritual Obrigatório
+                          </Label>
+                        </div>
+
+                        {moduleForm.ritual_mandatory && (
+                          <div>
+                            <Label className="text-gray-300 mb-2 block">Instruções do Ritual</Label>
+                            <RichTextEditor
+                              value={moduleForm.ritual_text || ''}
+                              onChange={(value) => setModuleForm({...moduleForm, ritual_text: value})}
+                              placeholder="Instruções detalhadas do ritual obrigatório..."
+                              height="200px"
+                            />
+                            <p className="text-sm text-gray-400 mt-2">
+                              Instruções específicas que o estudante deve seguir
+                            </p>
+                          </div>
+                        )}
+                      </TabsContent>
+
+                      <TabsContent value="completion" className="space-y-4">
+                        <div className="text-center py-8 text-gray-400">
+                          <Target className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                          <p>Sistema de requisitos de conclusão</p>
+                          <p className="text-sm">Em desenvolvimento - será implementado na próxima versão</p>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="preview" className="space-y-4">
+                        <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                          <h3 className="text-lg font-semibold text-white mb-4">Preview do Módulo</h3>
+                          
+                          {moduleForm.requires_submission && moduleForm.submission_position === 'before' && (
+                            <div className="mb-6 p-4 bg-red-950/30 border border-red-800 rounded-lg">
+                              <h4 className="text-red-200 font-medium mb-2">Submissão Inicial (Bloqueia Acesso)</h4>
+                              <div 
+                                className="prose prose-invert prose-sm"
+                                dangerouslySetInnerHTML={{ __html: moduleForm.submission_text || 'Texto da submissão...' }}
+                              />
+                            </div>
+                          )}
+
+                          <div className="mb-6">
+                            <h4 className="text-white font-medium mb-2">Conteúdo Principal</h4>
+                            <div 
+                              className="prose prose-invert"
+                              dangerouslySetInnerHTML={{ __html: moduleForm.html_content || 'Conteúdo do módulo...' }}
+                            />
+                          </div>
+
+                          {moduleForm.ritual_mandatory && (
+                            <div className="border-t border-gray-700 pt-4">
+                              <h4 className="text-amber-200 font-medium mb-2">Ritual Obrigatório</h4>
+                              <div 
+                                className="prose prose-invert prose-sm text-amber-100"
+                                dangerouslySetInnerHTML={{ __html: moduleForm.ritual_text || 'Instruções do ritual...' }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </TabsContent>
+                    </Tabs>
 
                     <div>
                       <Label className="text-gray-300">Ordem do Módulo</Label>
