@@ -90,6 +90,7 @@ function App() {
                 <Route path="/admin" component={Admin} />
                 <Route path="/admin-courses" component={AdminCourses} />
                 <Route path="/admin-modules" component={AdminModules} />
+                <Route path="/admin/libri" component={AdminLibri} />
                 <Route path="/oraculum" component={Oraculum} />
                 <Route path="/vox-pluma" component={VoxPluma} />
                 <Route path="/de-templo" component={DeTemplo} />
