@@ -229,11 +229,11 @@ export default function Cursus() {
         <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-cinzel text-golden-amber mb-4">
-              Cursus - Caminhos do Conhecimento
+            <h1 className="text-4xl font-bold text-amber-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+              Cursus Initiatici
             </h1>
-            <p className="text-ritualistic-beige/70 text-lg max-w-2xl mx-auto">
-              Jornadas estruturadas de aprendizado que te guiarão através dos mistérios ancestrais do Templo do Abismo
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto" style={{ fontFamily: 'EB Garamond' }}>
+              Descubra os mistérios sagrados através dos caminhos iniciáticos do conhecimento
             </p>
           </div>
 
@@ -290,72 +290,56 @@ export default function Cursus() {
           {/* Grid de Cursos */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeSectionCourses.map((course) => {
-              const courseState = getCourseState(course);
-              const IconComponent = courseState.icon;
               
               return (
                 <Card 
                   key={course.id} 
-                  className="bg-card-dark border-ritualistic-beige/20 hover:border-golden-amber/50 transition-all duration-300 group"
+                  className="bg-black/30 border-gray-700 backdrop-blur-sm hover:border-amber-600/50 transition-all duration-200"
                 >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <CardTitle className="text-golden-amber font-cinzel mb-2 group-hover:text-golden-amber/90 transition-colors">
+                        <CardTitle className="text-amber-400 mb-2 hover:text-amber-300 transition-colors" style={{ fontFamily: 'Cinzel Decorative' }}>
                           {course.title}
                         </CardTitle>
                         <div className="flex items-center space-x-2 mb-2">
                           <Badge 
-                            variant="outline"
+                            variant="secondary"
                             style={{
-                              borderColor: `${course.course_sections?.color}50`,
-                              backgroundColor: `${course.course_sections?.color}10`,
+                              backgroundColor: `${course.course_sections?.color}20`,
                               color: course.course_sections?.color
                             }}
                           >
                             {course.course_sections?.name}
                           </Badge>
-                          {course.is_paid && (
-                            <Badge className="bg-golden-amber/20 text-golden-amber border-golden-amber/30">
+                          {!course.is_paid ? (
+                            <Badge variant="outline" className="text-green-400 border-green-400">
+                              Gratuito
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="text-yellow-400 border-yellow-400">
                               R$ {course.price}
                             </Badge>
                           )}
                         </div>
                       </div>
-                      <IconComponent 
-                        className={`w-6 h-6 ${courseState.isLocked ? 'text-gray-500' : 'text-golden-amber'}`}
-                      />
                     </div>
                   </CardHeader>
                   
                   <CardContent>
-                    <p className="text-ritualistic-beige/70 text-sm mb-4 line-clamp-3">
+                    <p className="text-gray-300 text-sm mb-4 line-clamp-3" style={{ fontFamily: 'EB Garamond' }}>
                       {course.description}
                     </p>
-                    
-                    {courseState.progress > 0 && (
-                      <div className="mb-4">
-                        <div className="flex justify-between text-xs text-ritualistic-beige/60 mb-1">
-                          <span>Progresso</span>
-                          <span>{Math.round(courseState.progress)}%</span>
-                        </div>
-                        <Progress value={courseState.progress} className="h-2" />
-                      </div>
-                    )}
+
                     
                     <Link href={`/curso-detalhe/${course.id}`}>
                       <Button 
-                        className={`w-full ${
-                          courseState.isLocked 
-                            ? 'bg-gray-600 text-gray-300 cursor-not-allowed'
-                            : courseState.action === 'continue'
-                            ? 'bg-blue-600 hover:bg-blue-600/90 text-white'
-                            : 'bg-golden-amber hover:bg-golden-amber/90 text-black'
-                        }`}
-                        disabled={courseState.isLocked}
+                        className="w-full text-white font-semibold"
+                        style={{
+                          backgroundColor: course.course_sections?.color
+                        }}
                       >
-                        <IconComponent className="w-4 h-4 mr-2" />
-                        {courseState.text}
+                        Ver Curso
                       </Button>
                     </Link>
                   </CardContent>
