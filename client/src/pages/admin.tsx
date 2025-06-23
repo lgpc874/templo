@@ -107,7 +107,7 @@ export default function Admin() {
       color: 'from-indigo-600 to-purple-600',
       borderColor: 'border-indigo-500/30',
       shadowColor: 'shadow-indigo-900/30',
-      route: '/admin-oracles'
+      route: '/admin/oraculum'
     },
     {
       id: 'system',
