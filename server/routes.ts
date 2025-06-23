@@ -739,5 +739,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return userLevel >= requiredLevel;
   }
 
+  // =====================
+  // ROTAS DE SUBMISSÕES E RITUAIS
+  // =====================
+
+  // Buscar submissões do usuário para um curso
+  app.get('/api/user/submissions/:courseId', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const { courseId } = req.params;
+      const userId = req.user.id;
+
+      const submissions = await SupabaseDirect.getUserSubmissions(userId, parseInt(courseId));
+      res.json(submissions);
+    } catch (error: any) {
+      console.error("Erro ao buscar submissões:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Buscar rituais do usuário para um curso
+  app.get('/api/user/rituals/:courseId', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const { courseId } = req.params;
+      const userId = req.user.id;
+
+      const rituals = await SupabaseDirect.getUserRituals(userId, parseInt(courseId));
+      res.json(rituals);
+    } catch (error: any) {
+      console.error("Erro ao buscar rituais:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Criar submissão
+  app.post('/api/user/submit', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { module_id, submission_text } = req.body;
+
+      const submission = await SupabaseDirect.createSubmission({
+        user_id: userId,
+        module_id,
+        submission_text
+      });
+
+      if (!submission) {
+        throw new Error('Falha ao criar submissão');
+      }
+
+      res.json(submission);
+    } catch (error: any) {
+      console.error("Erro ao criar submissão:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Registrar ritual/desafio
+  app.post('/api/user/ritual', authenticateToken, async (req: any, res: Response) => {
+    try {
+      const userId = req.user.id;
+      const { module_id, ritual_description, ritual_date, ritual_notes } = req.body;
+
+      const ritual = await SupabaseDirect.createRitual({
+        user_id: userId,
+        module_id,
+        challenge_description: ritual_description,
+        challenge_date: ritual_date,
+        challenge_notes: ritual_notes,
+        status: 'completed',
+        completed_at: new Date().toISOString()
+      });
+
+      if (!ritual) {
+        throw new Error('Falha ao registrar ritual');
+      }
+
+      res.json(ritual);
+    } catch (error: any) {
+      console.error("Erro ao registrar ritual:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   return httpServer;
 }

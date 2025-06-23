@@ -91,6 +91,36 @@ export interface CourseModule {
   updated_at?: string;
 }
 
+export interface CourseSubmission {
+  id: number;
+  user_id: number;
+  module_id: number;
+  submission_text: string;
+  status: 'pending' | 'approved' | 'rejected' | 'needs_revision';
+  submitted_at: string;
+  reviewed_at?: string;
+  reviewer_id?: number;
+  reviewer_notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CourseChallenge {
+  id: number;
+  user_id: number;
+  module_id: number;
+  challenge_description: string;
+  challenge_date: string;
+  challenge_notes?: string;
+  status: 'completed' | 'verified' | 'rejected';
+  completed_at: string;
+  verified_at?: string;
+  verifier_id?: number;
+  verifier_notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 // Funções diretas do Supabase
 export class SupabaseDirect {
   
@@ -395,5 +425,65 @@ export class SupabaseDirect {
       .eq('id', id);
     
     return !error;
+  }
+
+  // Submissões
+  static async getUserSubmissions(userId: number, courseId: number): Promise<CourseSubmission[]> {
+    if (!supabase) return [];
+
+    const { data, error } = await supabase
+      .from('course_submission')
+      .select(`
+        *,
+        course_modules!inner(course_id)
+      `)
+      .eq('user_id', userId)
+      .eq('course_modules.course_id', courseId);
+    
+    if (error || !data) return [];
+    return data;
+  }
+
+  static async createSubmission(submissionData: Partial<CourseSubmission>): Promise<CourseSubmission | null> {
+    if (!supabase) return null;
+
+    const { data, error } = await supabase
+      .from('course_submission')
+      .insert(submissionData)
+      .select()
+      .single();
+    
+    if (error || !data) return null;
+    return data;
+  }
+
+  // Desafios/Rituais
+  static async getUserRituals(userId: number, courseId: number): Promise<CourseChallenge[]> {
+    if (!supabase) return [];
+
+    const { data, error } = await supabase
+      .from('course_challenges')
+      .select(`
+        *,
+        course_modules!inner(course_id)
+      `)
+      .eq('user_id', userId)
+      .eq('course_modules.course_id', courseId);
+    
+    if (error || !data) return [];
+    return data;
+  }
+
+  static async createRitual(ritualData: Partial<CourseChallenge>): Promise<CourseChallenge | null> {
+    if (!supabase) return null;
+
+    const { data, error } = await supabase
+      .from('course_challenges')
+      .insert(ritualData)
+      .select()
+      .single();
+    
+    if (error || !data) return null;
+    return data;
   }
 }
