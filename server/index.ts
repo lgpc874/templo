@@ -1,7 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { supabaseServiceNew } from "./supabase-service-new";
+import { SupabaseDirect } from "./supabase-direct";
 
 const app = express();
 
@@ -62,7 +62,7 @@ app.use((req, res, next) => {
   // Initialize database after server setup
   setTimeout(async () => {
     try {
-      await supabaseServiceNew.testConnection();
+      await SupabaseDirect.testConnection();
       log("Database connection established successfully");
     } catch (error) {
       log(`Database initialization error: ${error}`);

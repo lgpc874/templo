@@ -22,8 +22,7 @@ import {
 } from "@shared/schema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { supabaseService } from "./supabase-service";
-import { supabaseServiceNew } from "./supabase-service-new";
+import { SupabaseDirect } from "./supabase-direct";
 import PDFGenerator from "./pdf-generator";
 import { AdvancedPDFGenerator } from "./advanced-pdf-generator";
 import { ReliablePDFGenerator } from "./reliable-pdf-generator";
@@ -79,14 +78,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const data: RegisterData = registerSchema.parse(req.body);
       
-      const existingUser = await supabaseServiceNew.getUserByEmail(data.email);
+      const existingUser = await SupabaseDirect.getUserByEmail(data.email);
       if (existingUser) {
         return res.status(400).json({ error: "Email já está em uso" });
       }
 
       const hashedPassword = await bcrypt.hash(data.password, 10);
 
-      const newUser = await supabaseServiceNew.createUser({
+      const newUser = await SupabaseDirect.createUser({
         username: data.username,
         email: data.email,
         password: hashedPassword,
@@ -121,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const data: LoginData = loginSchema.parse(req.body);
       
-      const user = await supabaseServiceNew.getUserByEmail(data.email);
+      const user = await SupabaseDirect.getUserByEmail(data.email);
       if (!user) {
         return res.status(401).json({ error: "Credenciais inválidas" });
       }
@@ -1563,28 +1562,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Admin access confirmed, fetching courses...');
 
-      const { data: courses, error } = await supabaseServiceNew.getClient()
-        .from('courses')
-        .select(`
-          *,
-          course_sections(
-            name,
-            color
-          )
-        `)
-        .order('created_at', { ascending: false });
+      const courses = await SupabaseDirect.getAdminCourses();
 
-      if (error) {
-        console.error('Error fetching admin courses:', error);
-        throw error;
-      }
-
-      console.log('Admin courses found:', courses?.length || 0);
-      if (courses && courses.length > 0) {
+      console.log('Admin courses found:', courses.length);
+      if (courses.length > 0) {
         console.log('First course:', courses[0].title);
       }
       
-      res.json(courses || []);
+      res.json(courses);
     } catch (error: any) {
       console.error('Admin courses error:', error);
       res.status(500).json({ error: error.message });
@@ -2269,8 +2254,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return roleLevels[role] || 0;
   }
 
-  // Inicializar seções padrão e atualizar schema
-  await supabaseServiceNew.initializeDefaultSections();
+  // Sistema usando Supabase direto - seções já configuradas
 
   // ======================
   // ROTAS DO SISTEMA DE CURSOS
@@ -2279,19 +2263,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Buscar seções dos cursos
   app.get("/api/course-sections", async (req, res) => {
     try {
-      const { data, error } = await supabaseServiceNew.getSupabase()
-        .from('course_sections')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
+      const data = await SupabaseDirect.getCourseSections();
       
-      if (error) {
-        console.error('Erro ao buscar seções:', error);
-        return res.status(500).json({ error: "Erro ao buscar seções" });
-      }
-      
-      console.log(`Retornando ${data?.length || 0} seções dos cursos`);
-      res.json(data || []);
+      console.log(`Retornando ${data.length} seções dos cursos`);
+      res.json(data);
     } catch (error: any) {
       console.error("Error fetching course sections:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
@@ -2305,7 +2280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('User from token:', req.user.id);
       
       // Buscar dados atualizados do usuário
-      const user = await supabaseServiceNew.getUserById(req.user.id);
+      const user = await SupabaseDirect.getUserById(req.user.id);
       if (!user) {
         return res.status(404).json({ error: "Usuário não encontrado" });
       }
@@ -2313,18 +2288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Role atual do usuário:', user.role);
       
       // Buscar todos os cursos com informações da seção
-      const { data: courses, error } = await supabaseServiceNew.getClient()
-        .from('courses')
-        .select(`
-          *,
-          course_sections!course_section_id (
-            name,
-            color,
-            required_role
-          )
-        `)
-        .eq('is_published', true)
-        .order('sort_order');
+      const courses = await SupabaseDirect.getAllCourses();
       
       if (error) {
         console.error('Erro ao buscar cursos:', error);
@@ -2734,19 +2698,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('=== BUSCANDO MÓDULOS DO CURSO ===');
       console.log('Course ID:', courseId);
       
-      const { data: modules, error } = await supabaseServiceNew.getClient()
-        .from('course_modules')
-        .select('*')
-        .eq('course_id', courseId)
-        .order('order_number');
+      const modules = await SupabaseDirect.getCourseModules(courseId);
       
-      if (error) {
-        console.error('Erro ao buscar módulos:', error);
-        throw error;
-      }
-      
-      console.log('Módulos encontrados:', modules?.length || 0);
-      res.json(modules || []);
+      console.log('Módulos encontrados:', modules.length);
+      res.json(modules);
     } catch (error: any) {
       console.error("Error fetching course modules:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
@@ -2894,15 +2849,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Validação de admin passou, inserindo no Supabase...');
       
-      const { data: course, error } = await supabaseServiceNew.getClient()
-        .from('courses')
-        .insert(req.body)
-        .select()
-        .single();
+      const course = await SupabaseDirect.createCourse(req.body);
 
-      if (error) {
-        console.error('Erro do Supabase ao criar curso:', error);
-        throw error;
+      if (!course) {
+        throw new Error('Falha ao criar curso no Supabase');
       }
       
       console.log('Curso criado com sucesso:', course);
@@ -2920,13 +2870,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
-      const { data: module, error } = await supabaseServiceNew.getClient()
-        .from('modules')
-        .insert(req.body)
-        .select()
-        .single();
+      const module = await SupabaseDirect.createModule(req.body);
 
-      if (error) throw error;
+      if (!module) {
+        throw new Error('Falha ao criar módulo no Supabase');
+      }
+      
       res.json(module);
     } catch (error: any) {
       console.error("Error creating module:", error);
