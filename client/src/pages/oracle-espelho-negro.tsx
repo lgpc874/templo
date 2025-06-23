@@ -126,50 +126,48 @@ export default function OracleEspelhoNegro() {
           </div>
 
           {/* Conteúdo Principal */}
-          <div className="relative z-10 max-w-4xl mx-auto px-4 py-16">
+          <div className="relative z-10 max-w-2xl mx-auto px-4 py-12">
             <Card className="bg-black/90 border-purple-500/50 backdrop-blur-sm shadow-2xl shadow-purple-900/30">
-              <CardHeader className="text-center pb-8">
-                <div className="w-32 h-32 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-8 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
-                  <Eye className="w-16 h-16 text-purple-400" />
-                  <Sparkles className="w-8 h-8 text-purple-300 absolute -top-3 -right-3 animate-pulse" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-purple-400/10 to-transparent rounded-full"></div>
+              <CardHeader className="text-center pb-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-full flex items-center justify-center mx-auto mb-6 relative border border-purple-500/50 shadow-lg shadow-purple-900/50">
+                  <Eye className="w-10 h-10 text-purple-400" />
+                  <Sparkles className="w-5 h-5 text-purple-300 absolute -top-2 -right-2 animate-pulse" />
                 </div>
                 
-                <CardTitle className="text-4xl text-purple-400 mb-6" style={{ fontFamily: 'Cinzel Decorative' }}>
-                  Iniciar Consulta Sombria
+                <CardTitle className="text-2xl text-purple-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  Iniciar Consulta
                 </CardTitle>
-                <CardDescription className="text-ritualistic-beige text-xl max-w-3xl mx-auto leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
-                  Para que o Espelho Negro possa refletir sua verdadeira essência nas águas sombrias do conhecimento, 
-                  é necessário oferecer sua identidade verdadeira e o momento sagrado de sua manifestação neste plano terreno.
+                <CardDescription className="text-ritualistic-beige text-sm max-w-lg mx-auto leading-relaxed" style={{ fontFamily: 'EB Garamond' }}>
+                  Para consultar o Speculum Nigrum, ofereça sua identidade verdadeira e o momento de sua manifestação neste plano.
                 </CardDescription>
                 
                 {/* Citação mística */}
-                <div className="mt-8 p-4 bg-purple-400/5 border-l-4 border-purple-500/50 rounded-r-lg">
-                  <p className="text-purple-300 italic text-lg" style={{ fontFamily: 'EB Garamond' }}>
-                    "Quem olha no espelho das trevas, vê não apenas seu reflexo, mas a alma nua em sua verdade absoluta."
+                <div className="mt-6 p-3 bg-purple-400/5 border-l-2 border-purple-500/50 rounded-r">
+                  <p className="text-purple-300 italic text-sm" style={{ fontFamily: 'EB Garamond' }}>
+                    "Veritas in tenebris revelatur"
                   </p>
                 </div>
               </CardHeader>
               
-              <CardContent className="space-y-10">
-                <div className="grid gap-8 max-w-lg mx-auto">
-                  <div className="space-y-3">
-                    <Label htmlFor="userName" className="text-purple-400 font-semibold text-lg" style={{ fontFamily: 'Cinzel' }}>
-                      Seu Nome Verdadeiro
+              <CardContent className="space-y-6">
+                <div className="grid gap-6 max-w-sm mx-auto">
+                  <div className="space-y-2">
+                    <Label htmlFor="userName" className="text-purple-400 font-medium text-sm" style={{ fontFamily: 'Cinzel' }}>
+                      Nome Verdadeiro
                     </Label>
                     <Input
                       id="userName"
                       type="text"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder="Revele sua identidade aos mistérios..."
-                      className="bg-black/90 border-purple-500/30 text-white placeholder-ritualistic-beige/60 focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 h-12 text-lg"
+                      placeholder="Revele sua identidade..."
+                      className="bg-black/90 border-purple-500/30 text-white placeholder-ritualistic-beige/60 focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 h-10 text-sm"
                       style={{ fontFamily: 'EB Garamond' }}
                     />
                   </div>
                   
-                  <div className="space-y-3">
-                    <Label htmlFor="birthDate" className="text-purple-400 font-semibold text-lg" style={{ fontFamily: 'Cinzel' }}>
+                  <div className="space-y-2">
+                    <Label htmlFor="birthDate" className="text-purple-400 font-medium text-sm" style={{ fontFamily: 'Cinzel' }}>
                       Data de Nascimento
                     </Label>
                     <Input
@@ -177,43 +175,40 @@ export default function OracleEspelhoNegro() {
                       type="date"
                       value={birthDate}
                       onChange={(e) => setBirthDate(e.target.value)}
-                      className="bg-black/90 border-purple-500/30 text-white focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 h-12 text-lg"
+                      className="bg-black/90 border-purple-500/30 text-white focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 h-10 text-sm"
                       style={{ fontFamily: 'EB Garamond' }}
                     />
                   </div>
                 </div>
                 
-                <div className="text-center pt-8">
+                <div className="text-center pt-6">
                   <Button
                     onClick={handleStartConsultation}
                     disabled={!userName || !birthDate || isStarting}
-                    className="px-16 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xl transition-all duration-300 disabled:opacity-50 shadow-lg shadow-purple-900/50 hover:shadow-xl hover:shadow-purple-900/70"
+                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-sm transition-all duration-300 disabled:opacity-50 shadow-lg shadow-purple-900/50"
                     style={{ fontFamily: 'Cinzel' }}
                   >
                     {isStarting ? (
                       <>
-                        <Sparkles className="w-6 h-6 mr-3 animate-spin" />
-                        Invocando as Sombras...
+                        <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                        Invocando...
                       </>
                     ) : (
                       <>
-                        <Eye className="w-6 h-6 mr-3" />
-                        Consultar Speculum Nigrum
+                        <Eye className="w-4 h-4 mr-2" />
+                        Consultar
                       </>
                     )}
                   </Button>
                 </div>
                 
                 {/* Aviso místico */}
-                <div className="text-center pt-8 space-y-2">
-                  <div className="flex justify-center mb-4">
-                    <div className="h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent w-64"></div>
+                <div className="text-center pt-6 space-y-2">
+                  <div className="flex justify-center mb-3">
+                    <div className="h-px bg-gradient-to-r from-transparent via-purple-400/50 to-transparent w-48"></div>
                   </div>
-                  <p className="text-purple-300 text-lg italic" style={{ fontFamily: 'EB Garamond' }}>
-                    "Veritas in tenebris revelatur"
-                  </p>
-                  <p className="text-ritualistic-beige/70 text-sm" style={{ fontFamily: 'EB Garamond' }}>
-                    As verdades se revelam nas trevas - Mantenha sigilo absoluto sobre os mistérios desvelados
+                  <p className="text-ritualistic-beige/70 text-xs" style={{ fontFamily: 'EB Garamond' }}>
+                    Mantenha sigilo absoluto sobre os mistérios revelados
                   </p>
                 </div>
               </CardContent>
