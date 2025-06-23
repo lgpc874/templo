@@ -311,6 +311,8 @@ export default function CursusLeitor() {
         const nextModuleIndex = currentModuleIndex + 1;
         if (nextModuleIndex < modules.length) {
           setCurrentModuleIndex(nextModuleIndex);
+          // Scroll para o topo ao avançar módulo
+          window.scrollTo({ top: 0, behavior: 'smooth' });
           toast({ 
             title: 'Módulo concluído!', 
             description: `Avançando para o módulo ${nextModuleIndex + 1}.` 
@@ -330,6 +332,8 @@ export default function CursusLeitor() {
   const handleNavigateToModule = (moduleIndex: number) => {
     if (isModuleUnlocked(moduleIndex)) {
       setCurrentModuleIndex(moduleIndex);
+      // Scroll suave para o topo da página
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
