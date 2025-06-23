@@ -61,6 +61,7 @@ export interface Course {
   course_section_id: number;
   sequential_order?: number;
   is_sequential?: boolean;
+  reward_role_id?: string;
   created_at?: string;
   updated_at?: string;
 }

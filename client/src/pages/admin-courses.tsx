@@ -36,6 +36,7 @@ interface Course {
   course_section_id: number;
   sequential_order?: number;
   is_sequential?: boolean;
+  reward_role_id?: string;
   course_sections?: {
     name: string;
     color: string;
@@ -72,7 +73,8 @@ export default function AdminCoursesFinal() {
     is_paid: false,
     course_section_id: 1,
     sequential_order: 1,
-    is_sequential: false
+    is_sequential: false,
+    reward_role_id: ''
   });
 
   // Verificar se é admin
@@ -172,7 +174,8 @@ export default function AdminCoursesFinal() {
           is_paid: false,
           course_section_id: 1,
           sequential_order: 1,
-          is_sequential: false
+          is_sequential: false,
+          reward_role_id: ''
         });
         toast({ title: "Curso criado com sucesso!" });
       } else {
@@ -328,21 +331,65 @@ export default function AdminCoursesFinal() {
                     />
                   </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="course_section_id">Seção do Curso</Label>
+                      <Select 
+                        value={courseForm.course_section_id.toString()} 
+                        onValueChange={(value) => setCourseForm({...courseForm, course_section_id: parseInt(value)})}
+                      >
+                        <SelectTrigger className="bg-black/30 border-gray-600">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {courseSections.map((section) => (
+                            <SelectItem key={section.id} value={section.id.toString()}>
+                              {section.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="required_role">Role Necessário</Label>
+                      <Select 
+                        value={courseForm.required_role} 
+                        onValueChange={(value) => setCourseForm({...courseForm, required_role: value})}
+                      >
+                        <SelectTrigger className="bg-black/30 border-gray-600">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="buscador">Buscador</SelectItem>
+                          <SelectItem value="iniciado">Iniciado</SelectItem>
+                          <SelectItem value="portador_veu">Portador do Véu</SelectItem>
+                          <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
+                          <SelectItem value="guardiao_nome">Guardião do Nome</SelectItem>
+                          <SelectItem value="arauto_queda">Arauto da Queda</SelectItem>
+                          <SelectItem value="portador_coroa">Portador da Coroa</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
                   <div>
-                    <Label htmlFor="course_section_id">Seção do Curso</Label>
+                    <Label htmlFor="reward_role_id">Role Recompensa (após conclusão)</Label>
                     <Select 
-                      value={courseForm.course_section_id.toString()} 
-                      onValueChange={(value) => setCourseForm({...courseForm, course_section_id: parseInt(value)})}
+                      value={courseForm.reward_role_id} 
+                      onValueChange={(value) => setCourseForm({...courseForm, reward_role_id: value})}
                     >
                       <SelectTrigger className="bg-black/30 border-gray-600">
-                        <SelectValue />
+                        <SelectValue placeholder="Selecione um role de recompensa (opcional)" />
                       </SelectTrigger>
                       <SelectContent>
-                        {courseSections.map((section) => (
-                          <SelectItem key={section.id} value={section.id.toString()}>
-                            {section.name}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="">Nenhum</SelectItem>
+                        <SelectItem value="iniciado">Iniciado</SelectItem>
+                        <SelectItem value="portador_veu">Portador do Véu</SelectItem>
+                        <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
+                        <SelectItem value="guardiao_nome">Guardião do Nome</SelectItem>
+                        <SelectItem value="arauto_queda">Arauto da Queda</SelectItem>
+                        <SelectItem value="portador_coroa">Portador da Coroa</SelectItem>
+                        <SelectItem value="magus_supremo">Magus Supremo</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -539,25 +586,48 @@ export default function AdminCoursesFinal() {
                     </Select>
                   </div>
 
-                  <div>
-                    <Label>Role Necessário</Label>
-                    <Select 
-                      value={editingCourse.required_role} 
-                      onValueChange={(value) => setEditingCourse({...editingCourse, required_role: value})}
-                    >
-                      <SelectTrigger className="bg-black/30 border-gray-600">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="buscador">Buscador</SelectItem>
-                        <SelectItem value="iniciado">Iniciado</SelectItem>
-                        <SelectItem value="portador_veu">Portador do Véu</SelectItem>
-                        <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
-                        <SelectItem value="guardiao_nome">Guardião do Nome</SelectItem>
-                        <SelectItem value="arauto_queda">Arauto da Queda</SelectItem>
-                        <SelectItem value="portador_coroa">Portador da Coroa</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label>Role Necessário</Label>
+                      <Select 
+                        value={editingCourse.required_role} 
+                        onValueChange={(value) => setEditingCourse({...editingCourse, required_role: value})}
+                      >
+                        <SelectTrigger className="bg-black/30 border-gray-600">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="buscador">Buscador</SelectItem>
+                          <SelectItem value="iniciado">Iniciado</SelectItem>
+                          <SelectItem value="portador_veu">Portador do Véu</SelectItem>
+                          <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
+                          <SelectItem value="guardiao_nome">Guardião do Nome</SelectItem>
+                          <SelectItem value="arauto_queda">Arauto da Queda</SelectItem>
+                          <SelectItem value="portador_coroa">Portador da Coroa</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Role Recompensa</Label>
+                      <Select 
+                        value={editingCourse.reward_role_id || ''} 
+                        onValueChange={(value) => setEditingCourse({...editingCourse, reward_role_id: value || undefined})}
+                      >
+                        <SelectTrigger className="bg-black/30 border-gray-600">
+                          <SelectValue placeholder="Nenhum" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Nenhum</SelectItem>
+                          <SelectItem value="iniciado">Iniciado</SelectItem>
+                          <SelectItem value="portador_veu">Portador do Véu</SelectItem>
+                          <SelectItem value="discipulo_chamas">Discípulo das Chamas</SelectItem>
+                          <SelectItem value="guardiao_nome">Guardião do Nome</SelectItem>
+                          <SelectItem value="arauto_queda">Arauto da Queda</SelectItem>
+                          <SelectItem value="portador_coroa">Portador da Coroa</SelectItem>
+                          <SelectItem value="magus_supremo">Magus Supremo</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
