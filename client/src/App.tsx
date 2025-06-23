@@ -14,8 +14,7 @@ import Bibliotheca from "@/pages/bibliotheca";
 
 import Profilus from "@/pages/profilus";
 import Initiatio from "@/pages/initiatio";
-import CursusClean from "@/pages/cursus-clean";
-import CursoDetalhe from "@/pages/curso-detalhe";
+// Course pages will be implemented
 import Oraculum from "@/pages/oraculum";
 import VoxPluma from "@/pages/vox-pluma";
 import DeTemplo from "@/pages/de-templo";
@@ -73,10 +72,7 @@ function App() {
                     return <Initiatio />;
                   }}
                 </Route>
-                <Route path="/cursus" component={CursusClean} />
-                <Route path="/cursus/:courseSlug">
-                  {(params) => <CursoDetalhe courseSlug={params.courseSlug} />}
-                </Route>
+                {/* Course routes will be implemented */}
                 <Route path="/oraculum" component={Oraculum} />
                 <Route path="/vox-pluma" component={VoxPluma} />
                 <Route path="/de-templo" component={DeTemplo} />
