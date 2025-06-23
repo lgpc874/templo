@@ -628,6 +628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const course = await SupabaseDirect.createCourse(req.body);
 
       if (!course) {
+        console.error('Falha retornada pela função createCourse');
         throw new Error('Falha ao criar curso no Supabase');
       }
       
