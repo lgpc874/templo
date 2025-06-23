@@ -3,6 +3,15 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
+    
+    // Se for erro 401 (token expirado), limpar dados de auth
+    if (res.status === 401) {
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_data');
+      window.location.href = '/auth';
+      return;
+    }
+    
     throw new Error(`${res.status}: ${text}`);
   }
 }

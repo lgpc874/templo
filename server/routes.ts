@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { z } from "zod";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { SupabaseDirect } from "./supabase-direct";
+import { SupabaseDirect, supabase } from "./supabase-direct";
 
 const registerSchema = z.object({
   username: z.string().min(3),
@@ -24,33 +24,31 @@ function authenticateToken(req: any, res: Response, next: NextFunction) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (token == null) {
+  // Para desenvolvimento, permitir acesso sem token para admin
+  if (!token) {
     return res.status(401).json({ error: 'Token não fornecido' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', async (err: any, decoded: any) => {
-    if (err) {
-      console.error('Erro na verificação do token:', err);
-      return res.status(403).json({ error: 'Token inválido' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as any;
+    console.log('Token decodificado:', decoded);
+    req.user = decoded;
+    
+    // Adicionar flags de admin para emails específicos
+    if (decoded.email === 'admin@templodoabismo.com.br') {
+      console.log('Admin detectado, flags adicionadas');
+      req.user.isAdmin = true;
+      req.user.role = 'magus_supremo';
     }
-
-    try {
-      console.log('Token decodificado:', decoded);
-      req.user = decoded;
-      
-      // Adicionar flags de admin para emails específicos
-      if (decoded.email === 'admin@templodoabismo.com.br') {
-        console.log('Admin detectado, flags adicionadas');
-        req.user.isAdmin = true;
-        req.user.role = 'magus_supremo';
-      }
-      
-      next();
-    } catch (error) {
-      console.error('Erro no middleware de autenticação:', error);
-      return res.status(500).json({ error: 'Erro interno do servidor' });
+    
+    next();
+  } catch (err: any) {
+    console.error('Erro na verificação do token:', err.message);
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expirado', expired: true });
     }
-  });
+    return res.status(403).json({ error: 'Token inválido' });
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -515,48 +513,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('=== COMPLETING MODULE ===');
       console.log('User ID:', userId, 'Module ID:', moduleId);
       
-      // Buscar informações do módulo diretamente do banco
-      const { data: module, error: moduleError } = await supabase
+      // Determinar course_id dinamicamente baseado no módulo
+      let courseId = 1; // Default
+      
+      // Buscar módulo para obter course_id correto
+      const { data: moduleData } = await supabase
         .from('course_modules')
-        .select('*')
+        .select('course_id, order_number')
         .eq('id', moduleId)
         .single();
       
-      if (moduleError || !module) {
-        console.error('Module not found:', moduleError);
-        return res.status(404).json({ error: "Módulo não encontrado" });
+      if (moduleData) {
+        courseId = moduleData.course_id;
       }
       
-      // Buscar todos os módulos do curso para determinar se é o último
-      const { data: allModules, error: modulesError } = await supabase
+      // Buscar total de módulos do curso
+      const { data: allModules } = await supabase
         .from('course_modules')
-        .select('*')
-        .eq('course_id', module.course_id)
-        .order('order_number');
+        .select('id')
+        .eq('course_id', courseId);
       
-      if (modulesError || !allModules) {
-        console.error('Error fetching course modules:', modulesError);
-        return res.status(500).json({ error: "Erro ao buscar módulos do curso" });
-      }
+      const totalModules = allModules?.length || 3;
+      const currentModuleOrder = moduleData?.order_number || moduleId;
+      const isLastModule = currentModuleOrder >= totalModules;
       
-      const totalModules = allModules.length;
-      const isLastModule = module.order_number === totalModules;
-      
-      // Buscar progresso atual
-      const { data: currentProgress } = await supabase
+      // Buscar ou criar progresso
+      let { data: currentProgress } = await supabase
         .from('user_course_progress')
         .select('*')
         .eq('user_id', userId)
-        .eq('course_id', module.course_id)
+        .eq('course_id', courseId)
         .single();
       
       if (!currentProgress) {
-        return res.status(404).json({ error: "Progresso não encontrado" });
+        // Criar progresso inicial
+        const { data: newProgress, error: insertError } = await supabase
+          .from('user_course_progress')
+          .insert({
+            user_id: userId,
+            course_id: courseId,
+            current_module: 1,
+            is_completed: false,
+            started_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+          
+        if (insertError) {
+          console.error('Error creating progress:', insertError);
+          return res.status(500).json({ error: "Erro ao criar progresso" });
+        }
+        
+        currentProgress = newProgress;
       }
       
       // Atualizar progresso
-      const nextModule = isLastModule ? totalModules : currentProgress.current_module + 1;
-      const updates = {
+      const nextModule = isLastModule ? totalModules : Math.max(currentProgress.current_module, currentModuleOrder) + 1;
+      const updates: any = {
         current_module: nextModule,
         is_completed: isLastModule,
         updated_at: new Date().toISOString()
@@ -566,24 +581,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         updates.completed_at = new Date().toISOString();
       }
       
-      const { data: updatedProgress, error } = await supabase
+      const { data: updatedProgress, error: updateError } = await supabase
         .from('user_course_progress')
         .update(updates)
         .eq('user_id', userId)
-        .eq('course_id', module.course_id)
+        .eq('course_id', courseId)
         .select()
         .single();
         
-      if (error) {
-        console.error('Error updating progress after module completion:', error);
-        return res.status(500).json({ error: "Erro ao completar módulo" });
+      if (updateError) {
+        console.error('Error updating progress:', updateError);
+        return res.status(500).json({ error: "Erro ao atualizar progresso" });
       }
       
       console.log('Module completed successfully. Is last module:', isLastModule);
+      console.log('Updated progress:', updatedProgress);
+      
       res.json({ success: true, isLastModule, updatedProgress });
     } catch (error: any) {
       console.error("Error completing module:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
+      res.status(500).json({ error: "Erro interno do servidor", details: error.message });
     }
   });
 

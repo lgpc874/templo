@@ -15,6 +15,10 @@ export const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, s
   }
 }) : null;
 
+if (!supabase) {
+  throw new Error('Supabase client não pôde ser inicializado. Verifique as variáveis de ambiente.');
+}
+
 if (supabase) {
   console.log('✅ Supabase conectado com credenciais válidas');
   
