@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { PageTransition } from '@/components/page-transition';
@@ -7,15 +7,28 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Crown, Plus, Edit, Trash2, Save, X, Settings, Eye, Flame, 
-  Droplets, Shield, Sparkles, DollarSign, Users, Palette,
-  Key, Brain, MessageSquare, ArrowUp, ArrowDown
+  Eye, 
+  Sparkles, 
+  Flame, 
+  Droplets, 
+  Shield, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Settings, 
+  Save,
+  Key,
+  Brain,
+  Palette,
+  DollarSign
 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import ContentProtection from '@/components/content-protection';
 
 interface Oracle {
@@ -44,12 +57,8 @@ interface OracleConfig {
   default_model: string;
   max_tokens: number;
   temperature: number;
+  updated_at: string;
 }
-
-const roles = [
-  'buscador', 'iniciado', 'portador_veu', 'discipulo_chamas',
-  'guardiao_nome', 'arauto_queda', 'portador_coroa', 'magus_supremo'
-];
 
 const getOracleIcon = (oracleName: string) => {
   switch (oracleName.toLowerCase()) {
@@ -64,90 +73,61 @@ const getOracleIcon = (oracleName: string) => {
     case 'guardião do abismo':
       return <Shield className="w-5 h-5" />;
     default:
-      return <Crown className="w-5 h-5" />;
+      return <Brain className="w-5 h-5" />;
   }
 };
 
-export default function AdminOraculum() {
-  const { user, isAuthenticated } = useAuth();
-  const queryClient = useQueryClient();
+const rolesList = [
+  'buscador', 'iniciado', 'portador_veu', 'discipulo_chamas', 
+  'guardiao_nome', 'arauto_queda', 'portador_coroa', 'magus_supremo'
+];
 
-  const [editingOracle, setEditingOracle] = useState<Oracle | null>(null);
-  const [showOracleForm, setShowOracleForm] = useState(false);
+export default function AdminOraculum() {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const [selectedOracle, setSelectedOracle] = useState<Oracle | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [activeTab, setActiveTab] = useState('oracles');
 
-  // Estados para formulários
-  const [oracleForm, setOracleForm] = useState({
-    name: '',
-    latin_name: '',
-    description: '',
-    icon_url: '',
-    theme_color: '#8B5CF6',
-    is_active: true,
-    is_paid: true,
-    price: 0,
-    free_roles: [] as string[],
-    restricted_roles: [] as string[],
-    role_discounts: {} as any,
-    sort_order: 1,
-    ai_personality: '',
-    ai_instructions: '',
-    auto_presentation: true,
-    custom_presentation: ''
-  });
-
-  const [configForm, setConfigForm] = useState({
-    openai_api_key: '',
-    default_model: 'gpt-4',
-    max_tokens: 500,
-    temperature: 0.8
-  });
-
-  // Queries
-  const { data: oracles = [], refetch: refetchOracles } = useQuery({
+  // Buscar oráculos
+  const { data: oracles = [], isLoading: oraclesLoading } = useQuery<Oracle[]>({
     queryKey: ['/api/admin/oracles'],
-    enabled: isAuthenticated && user?.role === 'magus_supremo'
+    enabled: user?.role === 'magus_supremo'
   });
 
-  const { data: config } = useQuery({
+  // Buscar configuração
+  const { data: config } = useQuery<OracleConfig>({
     queryKey: ['/api/admin/oracles/config'],
-    enabled: isAuthenticated && user?.role === 'magus_supremo'
+    enabled: user?.role === 'magus_supremo'
   });
 
-  // Update config form when data changes
-  useEffect(() => {
-    if (config) {
-      setConfigForm({
-        openai_api_key: config.openai_api_key || '',
-        default_model: config.default_model,
-        max_tokens: config.max_tokens,
-        temperature: config.temperature
-      });
-    }
-  }, [config]);
-
-  // Mutations
+  // Criar oráculo
   const createOracleMutation = useMutation({
-    mutationFn: async (data: typeof oracleForm) => {
+    mutationFn: async (oracleData: Partial<Oracle>) => {
       const response = await fetch('/api/admin/oracles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(oracleData)
       });
       if (!response.ok) throw new Error('Erro ao criar oráculo');
       return response.json();
     },
     onSuccess: () => {
-      refetchOracles();
-      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/oracles'] });
+      setShowCreateForm(false);
+      toast({ title: 'Oráculo criado com sucesso!' });
     }
   });
 
+  // Atualizar oráculo
   const updateOracleMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number, data: typeof oracleForm }) => {
+    mutationFn: async ({ id, data }: { id: number; data: Partial<Oracle> }) => {
       const response = await fetch(`/api/admin/oracles/${id}`, {
         method: 'PUT',
         headers: {
@@ -160,11 +140,14 @@ export default function AdminOraculum() {
       return response.json();
     },
     onSuccess: () => {
-      refetchOracles();
-      resetForm();
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/oracles'] });
+      setIsEditing(false);
+      setSelectedOracle(null);
+      toast({ title: 'Oráculo atualizado com sucesso!' });
     }
   });
 
+  // Deletar oráculo
   const deleteOracleMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/admin/oracles/${id}`, {
@@ -177,124 +160,44 @@ export default function AdminOraculum() {
       return response.json();
     },
     onSuccess: () => {
-      refetchOracles();
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/oracles'] });
+      setSelectedOracle(null);
+      toast({ title: 'Oráculo deletado com sucesso!' });
     }
   });
 
+  // Atualizar configuração
   const updateConfigMutation = useMutation({
-    mutationFn: async (data: typeof configForm) => {
+    mutationFn: async (configData: Partial<OracleConfig>) => {
       const response = await fetch('/api/admin/oracles/config', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(configData)
       });
       if (!response.ok) throw new Error('Erro ao atualizar configuração');
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/oracles/config'] });
+      toast({ title: 'Configuração atualizada com sucesso!' });
     }
   });
 
-  // Funções auxiliares
-  const resetForm = () => {
-    setOracleForm({
-      name: '',
-      latin_name: '',
-      description: '',
-      icon_url: '',
-      theme_color: '#8B5CF6',
-      is_active: true,
-      is_paid: true,
-      price: 0,
-      free_roles: [],
-      restricted_roles: [],
-      role_discounts: {},
-      sort_order: oracles.length + 1,
-      ai_personality: '',
-      ai_instructions: '',
-      auto_presentation: true,
-      custom_presentation: ''
-    });
-    setEditingOracle(null);
-    setShowOracleForm(false);
-  };
-
-  const handleCreateOracle = () => {
-    setEditingOracle(null);
-    resetForm();
-    setShowOracleForm(true);
-  };
-
-  const handleEditOracle = (oracle: Oracle) => {
-    setEditingOracle(oracle);
-    setOracleForm({
-      name: oracle.name,
-      latin_name: oracle.latin_name,
-      description: oracle.description || '',
-      icon_url: oracle.icon_url || '',
-      theme_color: oracle.theme_color,
-      is_active: oracle.is_active,
-      is_paid: oracle.is_paid,
-      price: oracle.price,
-      free_roles: oracle.free_roles || [],
-      restricted_roles: oracle.restricted_roles || [],
-      role_discounts: oracle.role_discounts || {},
-      sort_order: oracle.sort_order,
-      ai_personality: oracle.ai_personality || '',
-      ai_instructions: oracle.ai_instructions || '',
-      auto_presentation: oracle.auto_presentation,
-      custom_presentation: oracle.custom_presentation || ''
-    });
-    setShowOracleForm(true);
-  };
-
-  const handleSaveOracle = () => {
-    if (editingOracle) {
-      updateOracleMutation.mutate({ id: editingOracle.id, data: oracleForm });
-    } else {
-      createOracleMutation.mutate(oracleForm);
-    }
-  };
-
-  const handleDeleteOracle = (id: number) => {
-    if (confirm('Tem certeza que deseja deletar este oráculo?')) {
-      deleteOracleMutation.mutate(id);
-    }
-  };
-
-  const toggleRoleInArray = (role: string, array: string[], setter: (roles: string[]) => void) => {
-    if (array.includes(role)) {
-      setter(array.filter(r => r !== role));
-    } else {
-      setter([...array, role]);
-    }
-  };
-
-  const updateRoleDiscount = (role: string, discount: number) => {
-    setOracleForm({
-      ...oracleForm,
-      role_discounts: {
-        ...oracleForm.role_discounts,
-        [role]: discount
-      }
-    });
-  };
-
-  if (!isAuthenticated || user?.role !== 'magus_supremo') {
+  if (user?.role !== 'magus_supremo') {
     return (
       <PageTransition>
-        <div className="min-h-screen bg-gradient-to-b from-black via-purple-950 to-black flex items-center justify-center p-4">
-          <Card className="w-full max-w-md bg-gray-900/80 border-purple-500/30">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl text-purple-300">Acesso Restrito</CardTitle>
-              <CardDescription className="text-gray-400">
-                Apenas o Magus Supremo pode acessar esta área
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <Card className="w-full max-w-md bg-black/90 border-red-500/40">
+            <CardContent className="p-8 text-center">
+              <Shield className="w-16 h-16 mx-auto text-red-500 mb-4" />
+              <CardTitle className="text-xl text-red-400 mb-4">Acesso Negado</CardTitle>
+              <CardDescription className="text-ritualistic-beige">
+                Apenas o Magus Supremo pode acessar a administração dos oráculos.
               </CardDescription>
-            </CardHeader>
+            </CardContent>
           </Card>
         </div>
       </PageTransition>
@@ -304,461 +207,658 @@ export default function AdminOraculum() {
   return (
     <PageTransition>
       <ContentProtection>
-        <div className="min-h-screen bg-gradient-to-b from-black via-purple-950 to-black">
-          {/* Header */}
-          <div className="border-b border-purple-500/30 bg-gradient-to-r from-purple-900/50 to-black/80">
-            <div className="max-w-7xl mx-auto px-4 py-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <Crown className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-white">Admin Oraculum</h1>
-                  <p className="text-gray-400">Administração dos Oráculos Infernais</p>
-                </div>
+        <div className="min-h-screen bg-black">
+          <div className="container mx-auto px-4 py-8">
+            {/* Header */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-3 mb-4">
+                <Brain className="w-8 h-8 text-golden-amber" />
+                <h1 className="text-3xl font-bold text-golden-amber" style={{ fontFamily: 'Cinzel' }}>
+                  ADMINISTRAÇÃO ORACULUM
+                </h1>
               </div>
+              <p className="text-ritualistic-beige/70">
+                Gerencie os oráculos infernais e suas configurações de IA
+              </p>
             </div>
-          </div>
 
-          <div className="max-w-7xl mx-auto p-4">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2 bg-gray-900/60">
-                <TabsTrigger value="oracles" className="data-[state=active]:bg-purple-600">
-                  <Sparkles className="w-4 h-4 mr-2" />
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-gray-900/50 border border-golden-amber/20">
+                <TabsTrigger 
+                  value="oracles" 
+                  className="data-[state=active]:bg-golden-amber/20 data-[state=active]:text-golden-amber"
+                >
+                  <Brain className="w-4 h-4 mr-2" />
                   Oráculos
                 </TabsTrigger>
-                <TabsTrigger value="config" className="data-[state=active]:bg-purple-600">
+                <TabsTrigger 
+                  value="config" 
+                  className="data-[state=active]:bg-golden-amber/20 data-[state=active]:text-golden-amber"
+                >
                   <Settings className="w-4 h-4 mr-2" />
-                  Configurações
+                  Configuração IA
                 </TabsTrigger>
               </TabsList>
 
+              {/* Aba Oráculos */}
               <TabsContent value="oracles" className="space-y-6">
-                {!showOracleForm ? (
-                  <>
-                    {/* Botão Criar */}
-                    <Card className="bg-gray-900/60 border-purple-500/30">
-                      <CardContent className="p-4">
-                        <Button onClick={handleCreateOracle} className="bg-purple-600 hover:bg-purple-700">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Criar Novo Oráculo
-                        </Button>
-                      </CardContent>
-                    </Card>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold text-golden-amber">Oráculos Cadastrados</h2>
+                  <Button 
+                    onClick={() => setShowCreateForm(true)}
+                    className="bg-golden-amber hover:bg-golden-amber/80 text-black"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Novo Oráculo
+                  </Button>
+                </div>
 
-                    {/* Lista de Oráculos */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {oracles.map((oracle: Oracle) => (
-                        <Card 
-                          key={oracle.id} 
-                          className="bg-gray-900/60 border-purple-500/30 hover:border-purple-400/50 transition-colors"
-                        >
-                          <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center space-x-3">
-                                <div 
-                                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                                  style={{ 
-                                    background: `linear-gradient(135deg, ${oracle.theme_color}40, ${oracle.theme_color}60)`
-                                  }}
-                                >
-                                  {oracle.icon_url ? (
-                                    <img src={oracle.icon_url} alt={oracle.name} className="w-5 h-5" />
-                                  ) : (
-                                    <div style={{ color: oracle.theme_color }}>
-                                      {getOracleIcon(oracle.name)}
-                                    </div>
-                                  )}
-                                </div>
-                                <div>
-                                  <CardTitle className="text-lg text-white">{oracle.name}</CardTitle>
-                                  <p className="text-sm text-gray-400 italic">{oracle.latin_name}</p>
-                                </div>
-                              </div>
-                              
-                              <div className="flex items-center space-x-2">
-                                {oracle.is_active ? (
-                                  <Badge variant="secondary" className="bg-green-600/20 text-green-400">
-                                    Ativo
-                                  </Badge>
-                                ) : (
-                                  <Badge variant="destructive" className="bg-red-600/20 text-red-400">
-                                    Inativo
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                          </CardHeader>
-
-                          <CardContent className="space-y-4">
-                            <p className="text-gray-300 text-sm">{oracle.description}</p>
-                            
-                            <div className="flex items-center justify-between text-sm">
-                              <div className="flex items-center space-x-4">
-                                <div className="flex items-center space-x-1">
-                                  <DollarSign className="w-4 h-4 text-green-400" />
-                                  <span className="text-gray-300">
-                                    {oracle.is_paid ? `R$ ${oracle.price.toFixed(2)}` : 'Gratuito'}
-                                  </span>
-                                </div>
-                                <div className="flex items-center space-x-1">
-                                  <ArrowUp className="w-4 h-4 text-purple-400" />
-                                  <span className="text-gray-300">Ordem: {oracle.sort_order}</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="flex space-x-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleEditOracle(oracle)}
-                                className="flex-1"
-                              >
-                                <Edit className="w-4 h-4 mr-2" />
-                                Editar
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => handleDeleteOracle(oracle.id)}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
-                    </div>
-                  </>
+                {oraclesLoading ? (
+                  <div className="text-center py-8">
+                    <div className="w-8 h-8 border-2 border-golden-amber border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-ritualistic-beige">Carregando oráculos...</p>
+                  </div>
                 ) : (
-                  /* Formulário de Edição/Criação */
-                  <Card className="bg-gray-900/60 border-purple-500/30">
-                    <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-xl text-white">
-                          {editingOracle ? 'Editar Oráculo' : 'Criar Novo Oráculo'}
-                        </CardTitle>
-                        <Button variant="ghost" size="sm" onClick={resetForm}>
-                          <X className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent className="space-y-6">
-                      <Tabs defaultValue="basic" className="space-y-4">
-                        <TabsList className="grid grid-cols-4 bg-gray-800">
-                          <TabsTrigger value="basic">Básico</TabsTrigger>
-                          <TabsTrigger value="pricing">Preços</TabsTrigger>
-                          <TabsTrigger value="ai">IA</TabsTrigger>
-                          <TabsTrigger value="advanced">Avançado</TabsTrigger>
-                        </TabsList>
-
-                        <TabsContent value="basic" className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label className="text-gray-300">Nome do Oráculo</Label>
-                              <Input
-                                value={oracleForm.name}
-                                onChange={(e) => setOracleForm({...oracleForm, name: e.target.value})}
-                                className="bg-gray-800 border-gray-600 text-white"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-gray-300">Nome em Latim</Label>
-                              <Input
-                                value={oracleForm.latin_name}
-                                onChange={(e) => setOracleForm({...oracleForm, latin_name: e.target.value})}
-                                className="bg-gray-800 border-gray-600 text-white"
-                              />
-                            </div>
-                          </div>
-
-                          <div>
-                            <Label className="text-gray-300">Descrição</Label>
-                            <Textarea
-                              value={oracleForm.description}
-                              onChange={(e) => setOracleForm({...oracleForm, description: e.target.value})}
-                              className="bg-gray-800 border-gray-600 text-white"
-                              rows={3}
-                            />
-                          </div>
-
-                          <div className="grid grid-cols-3 gap-4">
-                            <div>
-                              <Label className="text-gray-300">URL do Ícone</Label>
-                              <Input
-                                value={oracleForm.icon_url}
-                                onChange={(e) => setOracleForm({...oracleForm, icon_url: e.target.value})}
-                                className="bg-gray-800 border-gray-600 text-white"
-                                placeholder="https://..."
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-gray-300">Cor do Tema</Label>
-                              <Input
-                                type="color"
-                                value={oracleForm.theme_color}
-                                onChange={(e) => setOracleForm({...oracleForm, theme_color: e.target.value})}
-                                className="bg-gray-800 border-gray-600 h-10"
-                              />
-                            </div>
-                            <div>
-                              <Label className="text-gray-300">Ordem</Label>
-                              <Input
-                                type="number"
-                                value={oracleForm.sort_order}
-                                onChange={(e) => setOracleForm({...oracleForm, sort_order: parseInt(e.target.value) || 1})}
-                                className="bg-gray-800 border-gray-600 text-white"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex items-center space-x-4">
-                            <div className="flex items-center space-x-2">
-                              <Switch
-                                checked={oracleForm.is_active}
-                                onCheckedChange={(checked) => setOracleForm({...oracleForm, is_active: checked})}
-                              />
-                              <Label className="text-gray-300">Ativo</Label>
-                            </div>
-                          </div>
-                        </TabsContent>
-
-                        <TabsContent value="pricing" className="space-y-4">
-                          <div className="flex items-center space-x-2 mb-4">
-                            <Switch
-                              checked={oracleForm.is_paid}
-                              onCheckedChange={(checked) => setOracleForm({...oracleForm, is_paid: checked})}
-                            />
-                            <Label className="text-gray-300">Consulta Paga</Label>
-                          </div>
-
-                          {oracleForm.is_paid && (
-                            <>
-                              <div>
-                                <Label className="text-gray-300">Preço por Consulta (R$)</Label>
-                                <Input
-                                  type="number"
-                                  step="0.01"
-                                  value={oracleForm.price}
-                                  onChange={(e) => setOracleForm({...oracleForm, price: parseFloat(e.target.value) || 0})}
-                                  className="bg-gray-800 border-gray-600 text-white"
-                                />
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {oracles.map((oracle) => (
+                      <Card 
+                        key={oracle.id} 
+                        className="bg-black/60 border-gray-700 hover:border-golden-amber/50 transition-colors cursor-pointer"
+                        onClick={() => setSelectedOracle(oracle)}
+                      >
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                              <div 
+                                className="w-10 h-10 rounded-full flex items-center justify-center"
+                                style={{ backgroundColor: oracle.theme_color + '20', color: oracle.theme_color }}
+                              >
+                                {getOracleIcon(oracle.name)}
                               </div>
-
                               <div>
-                                <Label className="text-gray-300 mb-3 block">Roles com Acesso Gratuito</Label>
-                                <div className="grid grid-cols-4 gap-2">
-                                  {roles.map(role => (
-                                    <div key={role} className="flex items-center space-x-2">
-                                      <input
-                                        type="checkbox"
-                                        checked={oracleForm.free_roles.includes(role)}
-                                        onChange={() => toggleRoleInArray(role, oracleForm.free_roles, (roles) => 
-                                          setOracleForm({...oracleForm, free_roles: roles})
-                                        )}
-                                        className="rounded"
-                                      />
-                                      <Label className="text-xs text-gray-400">{role}</Label>
-                                    </div>
-                                  ))}
-                                </div>
+                                <CardTitle className="text-golden-amber text-sm">{oracle.name}</CardTitle>
+                                <p className="text-xs text-gray-400 italic">{oracle.latin_name}</p>
                               </div>
-
-                              <div>
-                                <Label className="text-gray-300 mb-3 block">Descontos por Role (%)</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {roles.map(role => (
-                                    <div key={role} className="flex items-center space-x-2">
-                                      <Label className="text-xs text-gray-400 w-20">{role}:</Label>
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={oracleForm.role_discounts[role] || 0}
-                                        onChange={(e) => updateRoleDiscount(role, parseInt(e.target.value) || 0)}
-                                        className="bg-gray-800 border-gray-600 text-white text-xs h-8"
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            </>
-                          )}
-
-                          <div>
-                            <Label className="text-gray-300 mb-3 block">Roles Restritos (deixe vazio para permitir todos)</Label>
-                            <div className="grid grid-cols-4 gap-2">
-                              {roles.map(role => (
-                                <div key={role} className="flex items-center space-x-2">
-                                  <input
-                                    type="checkbox"
-                                    checked={oracleForm.restricted_roles.includes(role)}
-                                    onChange={() => toggleRoleInArray(role, oracleForm.restricted_roles, (roles) => 
-                                      setOracleForm({...oracleForm, restricted_roles: roles})
-                                    )}
-                                    className="rounded"
-                                  />
-                                  <Label className="text-xs text-gray-400">{role}</Label>
-                                </div>
-                              ))}
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              {oracle.is_active ? (
+                                <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Ativo</Badge>
+                              ) : (
+                                <Badge className="bg-red-500/20 text-red-400 border-red-500/50">Inativo</Badge>
+                              )}
                             </div>
                           </div>
-                        </TabsContent>
-
-                        <TabsContent value="ai" className="space-y-4">
-                          <div>
-                            <Label className="text-gray-300">Personalidade da IA</Label>
-                            <Input
-                              value={oracleForm.ai_personality}
-                              onChange={(e) => setOracleForm({...oracleForm, ai_personality: e.target.value})}
-                              className="bg-gray-800 border-gray-600 text-white"
-                              placeholder="Ex: Bruxa mestre na magia da divinação"
-                            />
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <p className="text-xs text-ritualistic-beige/70 mb-3 line-clamp-2">
+                            {oracle.description}
+                          </p>
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-gray-400">
+                              {oracle.is_paid ? `R$ ${oracle.price}` : 'Gratuito'}
+                            </span>
+                            <span className="text-gray-400">Ordem: {oracle.sort_order}</span>
                           </div>
-
-                          <div>
-                            <Label className="text-gray-300">Instruções para IA</Label>
-                            <Textarea
-                              value={oracleForm.ai_instructions}
-                              onChange={(e) => setOracleForm({...oracleForm, ai_instructions: e.target.value})}
-                              className="bg-gray-800 border-gray-600 text-white"
-                              rows={6}
-                              placeholder="Instruções detalhadas sobre como a IA deve se comportar..."
-                            />
-                          </div>
-
-                          <Separator className="bg-gray-700" />
-
-                          <div className="flex items-center space-x-2">
-                            <Switch
-                              checked={oracleForm.auto_presentation}
-                              onCheckedChange={(checked) => setOracleForm({...oracleForm, auto_presentation: checked})}
-                            />
-                            <Label className="text-gray-300">Apresentação Automática</Label>
-                          </div>
-
-                          {!oracleForm.auto_presentation && (
-                            <div>
-                              <Label className="text-gray-300">Mensagem de Apresentação Personalizada</Label>
-                              <Textarea
-                                value={oracleForm.custom_presentation}
-                                onChange={(e) => setOracleForm({...oracleForm, custom_presentation: e.target.value})}
-                                className="bg-gray-800 border-gray-600 text-white"
-                                rows={4}
-                                placeholder="Mensagem fixa de apresentação..."
-                              />
-                            </div>
-                          )}
-                        </TabsContent>
-
-                        <TabsContent value="advanced" className="space-y-4">
-                          <div className="text-center py-8">
-                            <Settings className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-                            <p className="text-gray-400">Configurações avançadas serão implementadas em versões futuras</p>
-                          </div>
-                        </TabsContent>
-                      </Tabs>
-
-                      <div className="flex space-x-2 pt-4">
-                        <Button
-                          onClick={handleSaveOracle}
-                          disabled={createOracleMutation.isPending || updateOracleMutation.isPending}
-                          className="bg-purple-600 hover:bg-purple-700"
-                        >
-                          {(createOracleMutation.isPending || updateOracleMutation.isPending) ? (
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                          ) : (
-                            <Save className="w-4 h-4 mr-2" />
-                          )}
-                          {editingOracle ? 'Salvar Alterações' : 'Criar Oráculo'}
-                        </Button>
-                        <Button variant="outline" onClick={resetForm}>
-                          <X className="w-4 h-4 mr-2" />
-                          Cancelar
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
                 )}
               </TabsContent>
 
+              {/* Aba Configuração */}
               <TabsContent value="config" className="space-y-6">
-                <Card className="bg-gray-900/60 border-purple-500/30">
+                <Card className="bg-black/60 border-gray-700">
                   <CardHeader>
-                    <CardTitle className="text-xl text-white flex items-center space-x-2">
-                      <Key className="w-5 h-5" />
-                      <span>Configurações da IA</span>
+                    <CardTitle className="text-golden-amber flex items-center">
+                      <Key className="w-5 h-5 mr-2" />
+                      Configuração OpenAI
                     </CardTitle>
-                    <CardDescription className="text-gray-400">
-                      Configure as credenciais e parâmetros da inteligência artificial
+                    <CardDescription>
+                      Configure as credenciais e parâmetros da IA para os oráculos
                     </CardDescription>
                   </CardHeader>
-
                   <CardContent className="space-y-4">
-                    <div>
-                      <Label className="text-gray-300">Chave API OpenAI</Label>
-                      <Input
-                        type="password"
-                        value={configForm.openai_api_key}
-                        onChange={(e) => setConfigForm({...configForm, openai_api_key: e.target.value})}
-                        className="bg-gray-800 border-gray-600 text-white"
-                        placeholder="sk-..."
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label className="text-gray-300">Modelo da IA</Label>
+                        <Label htmlFor="openai_key" className="text-ritualistic-beige">Chave OpenAI</Label>
                         <Input
-                          value={configForm.default_model}
-                          onChange={(e) => setConfigForm({...configForm, default_model: e.target.value})}
-                          className="bg-gray-800 border-gray-600 text-white"
+                          id="openai_key"
+                          type="password"
+                          placeholder="sk-..."
+                          defaultValue={config?.openai_api_key || ''}
+                          className="bg-gray-900/50 border-gray-600 text-white"
+                          onBlur={(e) => {
+                            if (e.target.value !== config?.openai_api_key) {
+                              updateConfigMutation.mutate({ openai_api_key: e.target.value });
+                            }
+                          }}
                         />
                       </div>
                       <div>
-                        <Label className="text-gray-300">Max Tokens</Label>
+                        <Label htmlFor="model" className="text-ritualistic-beige">Modelo</Label>
+                        <Select 
+                          defaultValue={config?.default_model || 'gpt-4'}
+                          onValueChange={(value) => updateConfigMutation.mutate({ default_model: value })}
+                        >
+                          <SelectTrigger className="bg-gray-900/50 border-gray-600 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="gpt-4">GPT-4</SelectItem>
+                            <SelectItem value="gpt-4-turbo">GPT-4 Turbo</SelectItem>
+                            <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="max_tokens" className="text-ritualistic-beige">Max Tokens</Label>
                         <Input
+                          id="max_tokens"
                           type="number"
-                          value={configForm.max_tokens}
-                          onChange={(e) => setConfigForm({...configForm, max_tokens: parseInt(e.target.value) || 500})}
-                          className="bg-gray-800 border-gray-600 text-white"
+                          defaultValue={config?.max_tokens || 1000}
+                          className="bg-gray-900/50 border-gray-600 text-white"
+                          onBlur={(e) => {
+                            const value = parseInt(e.target.value);
+                            if (value !== config?.max_tokens) {
+                              updateConfigMutation.mutate({ max_tokens: value });
+                            }
+                          }}
                         />
                       </div>
                       <div>
-                        <Label className="text-gray-300">Temperature</Label>
+                        <Label htmlFor="temperature" className="text-ritualistic-beige">Temperature</Label>
                         <Input
+                          id="temperature"
                           type="number"
                           step="0.1"
                           min="0"
                           max="2"
-                          value={configForm.temperature}
-                          onChange={(e) => setConfigForm({...configForm, temperature: parseFloat(e.target.value) || 0.8})}
-                          className="bg-gray-800 border-gray-600 text-white"
+                          defaultValue={config?.temperature || 0.8}
+                          className="bg-gray-900/50 border-gray-600 text-white"
+                          onBlur={(e) => {
+                            const value = parseFloat(e.target.value);
+                            if (value !== config?.temperature) {
+                              updateConfigMutation.mutate({ temperature: value });
+                            }
+                          }}
                         />
                       </div>
                     </div>
-
-                    <Button
-                      onClick={() => updateConfigMutation.mutate(configForm)}
-                      disabled={updateConfigMutation.isPending}
-                      className="bg-purple-600 hover:bg-purple-700"
-                    >
-                      {updateConfigMutation.isPending ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      ) : (
-                        <Save className="w-4 h-4 mr-2" />
-                      )}
-                      Salvar Configurações
-                    </Button>
                   </CardContent>
                 </Card>
               </TabsContent>
             </Tabs>
+
+            {/* Modal de Detalhes do Oráculo */}
+            {selectedOracle && (
+              <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+                <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black border-golden-amber/30">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div 
+                          className="w-10 h-10 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: selectedOracle.theme_color + '20', color: selectedOracle.theme_color }}
+                        >
+                          {getOracleIcon(selectedOracle.name)}
+                        </div>
+                        <div>
+                          <CardTitle className="text-golden-amber">{selectedOracle.name}</CardTitle>
+                          <p className="text-sm text-gray-400 italic">{selectedOracle.latin_name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setIsEditing(!isEditing)}
+                          className="border-golden-amber/50 text-golden-amber hover:bg-golden-amber/10"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            if (confirm('Tem certeza que deseja deletar este oráculo?')) {
+                              deleteOracleMutation.mutate(selectedOracle.id);
+                            }
+                          }}
+                          className="border-red-500/50 text-red-400 hover:bg-red-500/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setSelectedOracle(null)}
+                          className="text-gray-400"
+                        >
+                          ✕
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {isEditing ? (
+                      <OracleEditForm 
+                        oracle={selectedOracle} 
+                        onSave={(data) => updateOracleMutation.mutate({ id: selectedOracle.id, data })}
+                        onCancel={() => setIsEditing(false)}
+                      />
+                    ) : (
+                      <OracleDetails oracle={selectedOracle} />
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Modal de Criação */}
+            {showCreateForm && (
+              <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+                <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-black border-golden-amber/30">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-golden-amber">Criar Novo Oráculo</CardTitle>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setShowCreateForm(false)}
+                        className="text-gray-400"
+                      >
+                        ✕
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <OracleCreateForm 
+                      onSave={(data) => createOracleMutation.mutate(data)}
+                      onCancel={() => setShowCreateForm(false)}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
       </ContentProtection>
     </PageTransition>
+  );
+}
+
+// Componente de detalhes do oráculo
+function OracleDetails({ oracle }: { oracle: Oracle }) {
+  return (
+    <div className="space-y-4 text-sm">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label className="text-ritualistic-beige">Status</Label>
+          <div className="mt-1">
+            {oracle.is_active ? (
+              <Badge className="bg-green-500/20 text-green-400 border-green-500/50">Ativo</Badge>
+            ) : (
+              <Badge className="bg-red-500/20 text-red-400 border-red-500/50">Inativo</Badge>
+            )}
+          </div>
+        </div>
+        <div>
+          <Label className="text-ritualistic-beige">Preço</Label>
+          <p className="text-white mt-1">
+            {oracle.is_paid ? `R$ ${oracle.price.toFixed(2)}` : 'Gratuito'}
+          </p>
+        </div>
+      </div>
+      
+      <div>
+        <Label className="text-ritualistic-beige">Descrição</Label>
+        <p className="text-white mt-1">{oracle.description}</p>
+      </div>
+      
+      <div>
+        <Label className="text-ritualistic-beige">Personalidade IA</Label>
+        <p className="text-white mt-1">{oracle.ai_personality}</p>
+      </div>
+      
+      <div>
+        <Label className="text-ritualistic-beige">Instruções IA</Label>
+        <p className="text-white mt-1 whitespace-pre-wrap">{oracle.ai_instructions}</p>
+      </div>
+
+      <div>
+        <Label className="text-ritualistic-beige">Apresentação Personalizada</Label>
+        <p className="text-white mt-1">{oracle.custom_presentation}</p>
+      </div>
+      
+      <div>
+        <Label className="text-ritualistic-beige">Roles Gratuitos</Label>
+        <div className="flex flex-wrap gap-1 mt-1">
+          {oracle.free_roles.map(role => (
+            <Badge key={role} variant="secondary" className="text-xs">
+              {role}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Componente de edição do oráculo
+function OracleEditForm({ oracle, onSave, onCancel }: { 
+  oracle: Oracle; 
+  onSave: (data: Partial<Oracle>) => void; 
+  onCancel: () => void;
+}) {
+  const [formData, setFormData] = useState(oracle);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="name" className="text-ritualistic-beige">Nome</Label>
+          <Input
+            id="name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="bg-gray-900/50 border-gray-600 text-white"
+          />
+        </div>
+        <div>
+          <Label htmlFor="latin_name" className="text-ritualistic-beige">Nome Latino</Label>
+          <Input
+            id="latin_name"
+            value={formData.latin_name}
+            onChange={(e) => setFormData({ ...formData, latin_name: e.target.value })}
+            className="bg-gray-900/50 border-gray-600 text-white"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="description" className="text-ritualistic-beige">Descrição</Label>
+        <Textarea
+          id="description"
+          value={formData.description || ''}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          className="bg-gray-900/50 border-gray-600 text-white"
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="theme_color" className="text-ritualistic-beige">Cor do Tema</Label>
+          <Input
+            id="theme_color"
+            type="color"
+            value={formData.theme_color}
+            onChange={(e) => setFormData({ ...formData, theme_color: e.target.value })}
+            className="bg-gray-900/50 border-gray-600 h-10"
+          />
+        </div>
+        <div>
+          <Label htmlFor="price" className="text-ritualistic-beige">Preço</Label>
+          <Input
+            id="price"
+            type="number"
+            step="0.01"
+            value={formData.price}
+            onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+            className="bg-gray-900/50 border-gray-600 text-white"
+          />
+        </div>
+        <div>
+          <Label htmlFor="sort_order" className="text-ritualistic-beige">Ordem</Label>
+          <Input
+            id="sort_order"
+            type="number"
+            value={formData.sort_order}
+            onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })}
+            className="bg-gray-900/50 border-gray-600 text-white"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="is_active"
+            checked={formData.is_active}
+            onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+          />
+          <Label htmlFor="is_active" className="text-ritualistic-beige">Ativo</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="is_paid"
+            checked={formData.is_paid}
+            onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
+          />
+          <Label htmlFor="is_paid" className="text-ritualistic-beige">Pago</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="auto_presentation"
+            checked={formData.auto_presentation}
+            onCheckedChange={(checked) => setFormData({ ...formData, auto_presentation: checked })}
+          />
+          <Label htmlFor="auto_presentation" className="text-ritualistic-beige">Auto Apresentação</Label>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="ai_personality" className="text-ritualistic-beige">Personalidade IA</Label>
+        <Input
+          id="ai_personality"
+          value={formData.ai_personality || ''}
+          onChange={(e) => setFormData({ ...formData, ai_personality: e.target.value })}
+          className="bg-gray-900/50 border-gray-600 text-white"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="ai_instructions" className="text-ritualistic-beige">Instruções IA</Label>
+        <Textarea
+          id="ai_instructions"
+          value={formData.ai_instructions || ''}
+          onChange={(e) => setFormData({ ...formData, ai_instructions: e.target.value })}
+          className="bg-gray-900/50 border-gray-600 text-white"
+          rows={4}
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="custom_presentation" className="text-ritualistic-beige">Apresentação Personalizada</Label>
+        <Textarea
+          id="custom_presentation"
+          value={formData.custom_presentation || ''}
+          onChange={(e) => setFormData({ ...formData, custom_presentation: e.target.value })}
+          className="bg-gray-900/50 border-gray-600 text-white"
+          rows={3}
+        />
+      </div>
+
+      <div className="flex justify-end space-x-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button type="submit" className="bg-golden-amber hover:bg-golden-amber/80 text-black">
+          <Save className="w-4 h-4 mr-2" />
+          Salvar
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+// Componente de criação do oráculo
+function OracleCreateForm({ onSave, onCancel }: { 
+  onSave: (data: Partial<Oracle>) => void; 
+  onCancel: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    name: '',
+    latin_name: '',
+    description: '',
+    theme_color: '#8b5cf6',
+    is_active: true,
+    is_paid: false,
+    price: 0,
+    free_roles: rolesList,
+    restricted_roles: [],
+    role_discounts: {},
+    sort_order: 1,
+    ai_personality: '',
+    ai_instructions: '',
+    auto_presentation: true,
+    custom_presentation: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="name" className="text-ritualistic-beige">Nome *</Label>
+          <Input
+            id="name"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="bg-gray-900/50 border-gray-600 text-white"
+          />
+        </div>
+        <div>
+          <Label htmlFor="latin_name" className="text-ritualistic-beige">Nome Latino *</Label>
+          <Input
+            id="latin_name"
+            required
+            value={formData.latin_name}
+            onChange={(e) => setFormData({ ...formData, latin_name: e.target.value })}
+            className="bg-gray-900/50 border-gray-600 text-white"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="description" className="text-ritualistic-beige">Descrição</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          className="bg-gray-900/50 border-gray-600 text-white"
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <Label htmlFor="theme_color" className="text-ritualistic-beige">Cor do Tema</Label>
+          <Input
+            id="theme_color"
+            type="color"
+            value={formData.theme_color}
+            onChange={(e) => setFormData({ ...formData, theme_color: e.target.value })}
+            className="bg-gray-900/50 border-gray-600 h-10"
+          />
+        </div>
+        <div>
+          <Label htmlFor="price" className="text-ritualistic-beige">Preço</Label>
+          <Input
+            id="price"
+            type="number"
+            step="0.01"
+            value={formData.price}
+            onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+            className="bg-gray-900/50 border-gray-600 text-white"
+          />
+        </div>
+        <div>
+          <Label htmlFor="sort_order" className="text-ritualistic-beige">Ordem</Label>
+          <Input
+            id="sort_order"
+            type="number"
+            value={formData.sort_order}
+            onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) })}
+            className="bg-gray-900/50 border-gray-600 text-white"
+          />
+        </div>
+      </div>
+
+      <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="is_active"
+            checked={formData.is_active}
+            onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
+          />
+          <Label htmlFor="is_active" className="text-ritualistic-beige">Ativo</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="is_paid"
+            checked={formData.is_paid}
+            onCheckedChange={(checked) => setFormData({ ...formData, is_paid: checked })}
+          />
+          <Label htmlFor="is_paid" className="text-ritualistic-beige">Pago</Label>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="ai_personality" className="text-ritualistic-beige">Personalidade IA</Label>
+        <Input
+          id="ai_personality"
+          value={formData.ai_personality}
+          onChange={(e) => setFormData({ ...formData, ai_personality: e.target.value })}
+          className="bg-gray-900/50 border-gray-600 text-white"
+          placeholder="Ex: Mestre místico do tarot infernal"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="ai_instructions" className="text-ritualistic-beige">Instruções IA</Label>
+        <Textarea
+          id="ai_instructions"
+          value={formData.ai_instructions}
+          onChange={(e) => setFormData({ ...formData, ai_instructions: e.target.value })}
+          className="bg-gray-900/50 border-gray-600 text-white"
+          rows={4}
+          placeholder="Instruções detalhadas para a personalidade da IA..."
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="custom_presentation" className="text-ritualistic-beige">Apresentação Personalizada</Label>
+        <Textarea
+          id="custom_presentation"
+          value={formData.custom_presentation}
+          onChange={(e) => setFormData({ ...formData, custom_presentation: e.target.value })}
+          className="bg-gray-900/50 border-gray-600 text-white"
+          rows={3}
+          placeholder="Mensagem de apresentação que o oráculo mostrará..."
+        />
+      </div>
+
+      <div className="flex justify-end space-x-2">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button type="submit" className="bg-golden-amber hover:bg-golden-amber/80 text-black">
+          <Plus className="w-4 h-4 mr-2" />
+          Criar Oráculo
+        </Button>
+      </div>
+    </form>
   );
 }

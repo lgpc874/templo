@@ -212,24 +212,60 @@ export default function OracleChat() {
   if (!isAuthenticated) {
     return (
       <PageTransition>
-        <div className="min-h-screen bg-gradient-to-b from-black via-purple-950 to-black flex items-center justify-center p-4">
-          <Card className="w-full max-w-md bg-gray-900/80 border-purple-500/30">
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl text-purple-300">Acesso Restrito</CardTitle>
-            </CardHeader>
+        <div className="min-h-screen bg-black flex items-center justify-center p-4">
+          <Card className="w-full max-w-md bg-black/90 border-golden-amber/40">
+            <CardContent className="p-8 text-center">
+              <Eye className="w-16 h-16 mx-auto text-golden-amber mb-4" />
+              <CardTitle className="text-xl text-golden-amber mb-4">Acesso Restrito</CardTitle>
+              <CardDescription className="text-ritualistic-beige">
+                Faça login para acessar os oráculos
+              </CardDescription>
+            </CardContent>
           </Card>
         </div>
       </PageTransition>
     );
   }
 
-  if (oracleLoading || !oracle) {
+  if (sessionLoading) {
     return (
       <PageTransition>
-        <div className="min-h-screen bg-gradient-to-b from-black via-purple-950 to-black flex items-center justify-center">
+        <div className="min-h-screen bg-black flex items-center justify-center">
           <div className="text-center">
-            <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-purple-300">Carregando Oráculo...</p>
+            <div className="w-16 h-16 border-4 border-golden-amber border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-golden-amber">Carregando sessão do oráculo...</p>
+          </div>
+        </div>
+      </PageTransition>
+    );
+  }
+
+  if (!session) {
+    return (
+      <PageTransition>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <Card className="w-full max-w-md bg-black/90 border-red-500/40">
+            <CardContent className="p-8 text-center">
+              <Shield className="w-16 h-16 mx-auto text-red-500 mb-4" />
+              <CardTitle className="text-xl text-red-400 mb-4">Sessão Inválida</CardTitle>
+              <CardDescription className="text-ritualistic-beige">
+                Sessão do oráculo não encontrada ou expirada
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </div>
+      </PageTransition>
+    );
+  }
+
+  const oracle = session.oracle;
+  if (!oracle) {
+    return (
+      <PageTransition>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-golden-amber border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-golden-amber">Carregando dados do oráculo...</p>
           </div>
         </div>
       </PageTransition>
