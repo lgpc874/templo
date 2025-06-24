@@ -139,6 +139,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **24/06/2025 00:49**: Sistema preparado para novo sistema de roles personalizado
 - **24/06/2025 00:51**: Adicionada proteção de role magus_supremo apenas para páginas admin
 - **24/06/2025 00:51**: Outras páginas permanecem abertas sem proteção de autenticação
+- **24/06/2025 00:54**: Rotas admin alteradas para "sanctum-magistri" por segurança
+- **24/06/2025 00:54**: Todas referências internas atualizadas para nova rota discreta
 
 ## Sistema Oraculum Implementado ✅
 - **5 Oráculos Criados**: Espelho Negro, Tarot Infernal, Chamas Infernais, Águas Sombrias, Guardião do Abismo

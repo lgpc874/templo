@@ -94,11 +94,11 @@ function App() {
 
                 <Route path="/cursus-leitor/:slug" component={CursusLeitor} />
                 <Route path="/meus-cursos" component={MeusCursos} />
-                <Route path="/admin" component={Admin} />
-                <Route path="/admin-courses" component={AdminCourses} />
-                <Route path="/admin-modules" component={AdminModules} />
-                <Route path="/admin/libri" component={AdminLibri} />
-                <Route path="/admin/oraculum" component={AdminOraculum} />
+                <Route path="/sanctum-magistri" component={Admin} />
+                <Route path="/sanctum-magistri/cursus" component={AdminCourses} />
+                <Route path="/sanctum-magistri/modulus" component={AdminModules} />
+                <Route path="/sanctum-magistri/libri" component={AdminLibri} />
+                <Route path="/sanctum-magistri/oraculum" component={AdminOraculum} />
                 <Route path="/oraculum" component={Oraculum} />
                 <Route path="/speculum-nigrum" component={OracleEspelhoNegro} />
                 <Route path="/tarotum-infernalis" component={OracleTarotInfernal} />

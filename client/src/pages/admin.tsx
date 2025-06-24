@@ -80,7 +80,7 @@ export default function Admin() {
       color: 'from-amber-600 to-orange-600',
       borderColor: 'border-amber-500/30',
       shadowColor: 'shadow-amber-900/30',
-      route: '/admin-courses',
+      route: '/sanctum-magistri/cursus',
       isPrimary: true
     },
     {
@@ -92,7 +92,7 @@ export default function Admin() {
       color: 'from-blue-600 to-purple-600',
       borderColor: 'border-blue-500/30',
       shadowColor: 'shadow-blue-900/30',
-      route: '/admin-modules',
+      route: '/sanctum-magistri/modulus',
       isPrimary: true
     },
     {
@@ -104,7 +104,7 @@ export default function Admin() {
       color: 'from-purple-600 to-indigo-600',
       borderColor: 'border-purple-500/30',
       shadowColor: 'shadow-purple-900/30',
-      route: '/admin/libri'
+      route: '/sanctum-magistri/libri'
     },
     {
       id: 'initiates',
@@ -115,7 +115,7 @@ export default function Admin() {
       color: 'from-green-600 to-teal-600',
       borderColor: 'border-green-500/30',
       shadowColor: 'shadow-green-900/30',
-      route: '/admin-users'
+      route: '/sanctum-magistri/usuarios'
     },
     {
       id: 'oracles',
@@ -126,7 +126,7 @@ export default function Admin() {
       color: 'from-indigo-600 to-purple-600',
       borderColor: 'border-indigo-500/30',
       shadowColor: 'shadow-indigo-900/30',
-      route: '/admin/oraculum'
+      route: '/sanctum-magistri/oraculum'
     },
     {
       id: 'system',
