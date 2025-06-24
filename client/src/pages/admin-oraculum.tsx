@@ -702,14 +702,18 @@ function OracleEditForm({ oracle, onSave, onCancel }: {
       </div>
 
       <div>
-        <Label htmlFor="ai_instructions" className="text-ritualistic-beige">Instruções IA</Label>
+        <Label htmlFor="ai_instructions" className="text-ritualistic-beige">Prompt/Instruções para IA</Label>
         <Textarea
           id="ai_instructions"
           value={formData.ai_instructions || ''}
           onChange={(e) => setFormData({ ...formData, ai_instructions: e.target.value })}
-          className="bg-gray-900/50 border-gray-600 text-white"
-          rows={4}
+          placeholder="Digite aqui o prompt/personalidade que será enviado para a IA. A IA receberá automaticamente o nome, data de nascimento e pergunta da pessoa."
+          className="bg-gray-900/50 border-gray-600 text-white min-h-[150px]"
+          rows={6}
         />
+        <p className="text-xs text-gray-400 mt-1">
+          A IA recebe automaticamente: nome da pessoa, data de nascimento e pergunta/situação
+        </p>
       </div>
 
       <div>
