@@ -77,6 +77,7 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - Quer sistema 100% conectado ao Supabase, sem mocks
 - **CRÍTICO**: Backend é Supabase, NUNCA usar banco local ou psql
 - **CRÍTICO**: Sempre usar APIs do servidor para verificar dados no Supabase
+- **NOVO**: Sistema Oraculum deve usar APENAS IA real (OpenAI), sem fallbacks simulados
 
 ## Mudanças Recentes
 - **23/06/2025 19:04**: Corrigida autenticação JWT e conexão Supabase
@@ -125,6 +126,9 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **23/06/2025 21:22**: APIs completas para sessões, mensagens e configurações
 - **23/06/2025 22:10**: Páginas individuais dos oráculos com nomes latinos implementadas
 - **23/06/2025 22:10**: 5 botões funcionais na página Oraculum direcionando para consultas específicas
+- **24/06/2025 00:42**: Sistema de apresentação automática do oráculo implementado
+- **24/06/2025 00:42**: Removido sistema de IA simulada - apenas OpenAI real permitido
+- **24/06/2025 00:42**: Oráculo se apresenta automaticamente ao entrar no chat
 
 ## Sistema Oraculum Implementado ✅
 - **5 Oráculos Criados**: Espelho Negro, Tarot Infernal, Chamas Infernais, Águas Sombrias, Guardião do Abismo

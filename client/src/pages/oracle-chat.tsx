@@ -120,22 +120,20 @@ export default function OracleChat() {
     enabled: !!session?.id && isAuthenticated
   });
 
-  // Criar mensagem de apresentação se não houver mensagens
+  // Apresentação automática do oráculo
   useEffect(() => {
-    if (session?.oracle && messages.length === 0 && !sessionLoading) {
-      const welcomeMessage: OracleMessage = {
-        id: 0,
-        session_id: session.id,
-        is_user: false,
-        message: `Eu sou ${session.oracle.name}. ${session.oracle.custom_presentation || 'Bem-vindo à consulta. Como posso ajudá-lo hoje?'}`,
-        tokens_used: 0,
-        cost: 0,
-        created_at: new Date().toISOString()
-      };
-      // Temporariamente adicionar mensagem de boas-vindas
-      setTimeout(() => refetchMessages(), 100);
+    if (session && session.oracle && messages.length === 0 && !sessionLoading) {
+      // Se não há mensagens e o oráculo tem apresentação automática, enviar apresentação
+      if (session.oracle.auto_presentation) {
+        const presentationMessage = "APRESENTACAO_AUTOMATICA";
+        
+        chatMutation.mutate({
+          message: presentationMessage,
+          sessionToken: session.session_token
+        });
+      }
     }
-  }, [session, messages.length, sessionLoading, refetchMessages]);
+  }, [session, messages, sessionLoading]);
 
   // Criar nova sessão
   const createSessionMutation = useMutation({

@@ -1409,21 +1409,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(402).json({ error: 'Pagamento necessário', price: oracle.price });
       }
 
-      // Salvar mensagem do usuário
-      await SupabaseDirect.addOracleMessage({
-        session_id: session.id,
-        is_user: true,
-        message: message,
-        tokens_used: 0,
-        cost: 0
-      });
+      // Salvar mensagem do usuário (apenas se não for apresentação automática)
+      if (!isAutoPresentation) {
+        await SupabaseDirect.addOracleMessage({
+          session_id: session.id,
+          is_user: true,
+          message: message,
+          tokens_used: 0,
+          cost: 0
+        });
+      }
 
+      // Verificar se é apresentação automática
+      const isAutoPresentation = message === "APRESENTACAO_AUTOMATICA";
+      
       // Configurar prompt para IA
-      const aiPrompt = `${oracle.ai_instructions}
+      const aiPrompt = isAutoPresentation ? 
+        `${oracle.ai_instructions}
 
-Informações da consulta:
-- Nome: ${session.user_name}
-- Data de nascimento: ${session.birth_date}
+Nome da pessoa: ${session.user_name}
+Data de nascimento: ${session.birth_date}
+
+Você deve se apresentar como o oráculo ${oracle.name} (${oracle.latin_name}). Faça uma apresentação mística e envolvente, mencionando o nome da pessoa e sua data de nascimento. Termine perguntando qual seria a pergunta que deseja fazer ao oráculo. Seja acolhedor mas mantenha o tom místico.` :
+        `${oracle.ai_instructions}
+
+Nome da pessoa: ${session.user_name}
+Data de nascimento: ${session.birth_date}
 - Pergunta: ${message}
 
 Responda de forma mística, profunda e ritualística, sempre contextualizando com o nome e data de nascimento da pessoa.`;
@@ -1471,36 +1482,11 @@ Responda de forma mística, profunda e ritualística, sempre contextualizando co
           throw new Error('Chave OpenAI não configurada');
         }
       } catch (error) {
-        console.log('Usando resposta simulada:', error);
-        
-        if (isAutoPresentation) {
-          aiResponse = `Salve, ${session.user_name}, nascido(a) sob as influências cósmicas de ${session.birth_date}...
-
-Eu sou o ${oracle.name}, conhecido nos círculos místicos como ${oracle.latin_name}. Através dos reflexos sombrios do espelho negro, posso vislumbrar os segredos que o destino reserva para sua jornada.
-
-Sinto a energia de sua alma pulsando através do véu dimensional... Há perguntas que ecoam em seu ser, verdades que anseiam por revelação.
-
-Qual questão traz à minha presença, criança das estrelas? Que mistério deseja desvendar através da antiga sabedoria do espelho negro?
-
-*Configure a chave OpenAI no painel admin para ativar respostas completas da IA.*`;
-        } else {
-          aiResponse = `Salve, ${session.user_name}, nascido(a) sob as influências de ${session.birth_date}...
-
-As energias que emanam de sua essência revelam através do ${oracle.name} que sua pergunta ecoa pelos corredores do tempo...
-
-${message.toLowerCase().includes('amor') || message.toLowerCase().includes('relacionamento') ? 
-  'Os ventos do coração sussurram que transformações profundas se aproximam em sua jornada afetiva.' :
-  message.toLowerCase().includes('trabalho') || message.toLowerCase().includes('carreira') ?
-  'As chamas do progresso indicam que novos caminhos profissionais se manifestarão em breve.' :
-  message.toLowerCase().includes('saúde') ?
-  'As águas da cura fluem em sua direção, trazendo renovação e vitalidade para seu ser.' :
-  'Os mistérios se revelam gradualmente àqueles que buscam com sinceridade.'
-}
-
-Configure a chave OpenAI no painel admin para ativar respostas completas da IA.
-
-Que os mistérios se revelem em sua jornada espiritual.`;
-        }
+        console.error('Erro na integração com OpenAI:', error);
+        return res.status(500).json({ 
+          error: 'Erro na integração com IA', 
+          details: 'Configure a chave OpenAI válida no painel administrativo' 
+        });
       }
 
       // Salvar resposta da IA
