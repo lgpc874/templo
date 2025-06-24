@@ -93,15 +93,17 @@ export default function AdminOraculum() {
   const [activeTab, setActiveTab] = useState('oracles');
 
   // Buscar oráculos
-  const { data: oracles = [], isLoading: oraclesLoading } = useQuery<Oracle[]>({
+  const { data: oracles = [], isLoading: oraclesLoading, error: oraclesError } = useQuery<Oracle[]>({
     queryKey: ['/api/admin/oracles'],
-    enabled: user?.role === 'magus_supremo'
+    enabled: user?.role === 'magus_supremo',
+    retry: 1
   });
 
   // Buscar configuração
-  const { data: config } = useQuery<OracleConfig>({
+  const { data: config, error: configError } = useQuery<OracleConfig>({
     queryKey: ['/api/admin/oracles/config'],
-    enabled: user?.role === 'magus_supremo'
+    enabled: user?.role === 'magus_supremo',
+    retry: 1
   });
 
   // Criar oráculo
@@ -257,6 +259,24 @@ export default function AdminOraculum() {
                   <div className="text-center py-8">
                     <div className="w-8 h-8 border-2 border-golden-amber border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                     <p className="text-ritualistic-beige">Carregando oráculos...</p>
+                  </div>
+                ) : oraclesError ? (
+                  <div className="text-center py-8">
+                    <Shield className="w-16 h-16 mx-auto text-red-500 mb-4" />
+                    <p className="text-red-400 mb-2">Erro ao carregar oráculos</p>
+                    <p className="text-gray-400 text-sm">{oraclesError.message}</p>
+                    <Button 
+                      onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/oracles'] })}
+                      className="mt-4 bg-golden-amber hover:bg-golden-amber/80 text-black"
+                    >
+                      Tentar Novamente
+                    </Button>
+                  </div>
+                ) : oracles.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Brain className="w-16 h-16 mx-auto text-gray-500 mb-4" />
+                    <p className="text-gray-400">Nenhum oráculo encontrado</p>
+                    <p className="text-gray-500 text-sm">Clique em "Novo Oráculo" para criar o primeiro</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

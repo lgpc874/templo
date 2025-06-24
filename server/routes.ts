@@ -1489,7 +1489,12 @@ Que os mistérios se revelem em sua jornada espiritual.`;
       console.log(`Total de oráculos encontrados: ${oracles.length}`);
       
       if (oracles.length > 0) {
-        console.log('Primeiro oráculo:', oracles[0]);
+        console.log('Primeiro oráculo:', JSON.stringify(oracles[0], null, 2));
+        oracles.forEach((oracle, index) => {
+          console.log(`Oráculo ${index + 1}: ID=${oracle.id}, Nome=${oracle.name}, Ativo=${oracle.is_active}`);
+        });
+      } else {
+        console.log('Nenhum oráculo encontrado no banco de dados');
       }
       
       res.json(oracles);
