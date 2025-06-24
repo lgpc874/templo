@@ -1423,21 +1423,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verificar se é apresentação automática
       const isAutoPresentation = message === "APRESENTACAO_AUTOMATICA";
       
-      // Configurar prompt para IA substituindo variáveis
+      // Configurar prompt para IA
       let aiPrompt = oracle.ai_instructions || '';
       
-      // Substituir variáveis no prompt
-      aiPrompt = aiPrompt
-        .replace(/\{nome\}/g, session.user_name)
-        .replace(/\{nascimento\}/g, session.birth_date)
-        .replace(/\{oracle_name\}/g, oracle.name)
-        .replace(/\{oracle_latin\}/g, oracle.latin_name);
+      // Adicionar informações da sessão ao prompt
+      const contextInfo = `
+Nome da pessoa: ${session.user_name}
+Data de nascimento: ${session.birth_date}
+${isAutoPresentation ? 'Situação: Apresentação inicial do oráculo' : `Pergunta: ${message}`}
+`;
 
-      if (isAutoPresentation) {
-        aiPrompt = aiPrompt.replace(/\{pergunta\}/g, 'APRESENTAÇÃO INICIAL');
-      } else {
-        aiPrompt = aiPrompt.replace(/\{pergunta\}/g, message);
-      }
+      aiPrompt = aiPrompt + '\n\n' + contextInfo;
 
       // Integração com OpenAI
       let aiResponse = '';

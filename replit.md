@@ -132,6 +132,8 @@ Sistema web completo para "Templo do Abismo" com foco em cursos hierárquicos ba
 - **24/06/2025 00:42**: Oráculo se apresenta automaticamente ao entrar no chat
 - **24/06/2025 00:44**: IA configurada para não mencionar data de nascimento diretamente
 - **24/06/2025 00:44**: Sistema permite referências sutis a ciclos cósmicos baseados no nascimento
+- **24/06/2025 00:47**: Simplificado sistema de prompt - IA recebe contexto automaticamente
+- **24/06/2025 00:47**: Removidas variáveis obrigatórias - prompt pode ser escrito naturalmente
 
 ## Sistema Oraculum Implementado ✅
 - **5 Oráculos Criados**: Espelho Negro, Tarot Infernal, Chamas Infernais, Águas Sombrias, Guardião do Abismo
