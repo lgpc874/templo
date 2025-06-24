@@ -95,6 +95,15 @@ export default function AdminOraculum() {
   // Buscar oráculos
   const { data: oracles = [], isLoading: oraclesLoading, error: oraclesError } = useQuery<Oracle[]>({
     queryKey: ['/api/admin/oracles'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/oracles', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error('Erro ao carregar oráculos');
+      return response.json();
+    },
     enabled: user?.role === 'magus_supremo',
     retry: 1
   });
@@ -102,6 +111,15 @@ export default function AdminOraculum() {
   // Buscar configuração
   const { data: config, error: configError } = useQuery<OracleConfig>({
     queryKey: ['/api/admin/oracles/config'],
+    queryFn: async () => {
+      const response = await fetch('/api/admin/oracles/config', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error('Erro ao carregar configuração');
+      return response.json();
+    },
     enabled: user?.role === 'magus_supremo',
     retry: 1
   });

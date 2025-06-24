@@ -3,7 +3,7 @@ import { useRoute } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/use-auth';
 import { PageTransition } from '@/components/page-transition';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -93,12 +93,30 @@ export default function OracleChat() {
   // Buscar sessão atual e dados do oráculo
   const { data: session, isLoading: sessionLoading } = useQuery<OracleSession & { oracle: Oracle }>({
     queryKey: [`/api/oracles/session/${sessionToken}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/oracles/session/${sessionToken}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error('Sessão não encontrada');
+      return response.json();
+    },
     enabled: !!sessionToken && isAuthenticated
   });
 
   // Buscar mensagens da sessão
   const { data: messages = [], refetch: refetchMessages } = useQuery<OracleMessage[]>({
     queryKey: [`/api/oracles/messages/${session?.id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/oracles/messages/${session?.id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) return [];
+      return response.json();
+    },
     enabled: !!session?.id && isAuthenticated
   });
 
