@@ -739,14 +739,16 @@ export class SupabaseDirect {
 
   static async createOracleSession(sessionData: Partial<OracleSession>): Promise<OracleSession | null> {
     try {
+      if (!supabase) {
+        console.error('Supabase não inicializado');
+        return null;
+      }
+
+      console.log('Dados sendo enviados para Supabase:', sessionData);
+
       const { data, error } = await supabase
         .from('oracle_sessions')
-        .insert([{
-          ...sessionData,
-          session_token: Math.random().toString(36).substring(7) + Date.now().toString(),
-          started_at: new Date().toISOString(),
-          last_activity: new Date().toISOString()
-        }])
+        .insert([sessionData])
         .select()
         .single();
 
@@ -755,18 +757,29 @@ export class SupabaseDirect {
         return null;
       }
 
+      console.log('Dados retornados do Supabase:', data);
       return data;
     } catch (error) {
-      console.error('Erro ao criar sessão do oráculo:', error);
+      console.error('Erro na criação da sessão:', error);
       return null;
     }
   }
 
-  static async getOracleSession(sessionToken: string): Promise<OracleSession | null> {
+  static async getOracleSession(sessionToken: string): Promise<(OracleSession & { oracle: Oracle }) | null> {
     try {
+      if (!supabase) {
+        console.error('Supabase não inicializado');
+        return null;
+      }
+
+      console.log('Buscando sessão com token:', sessionToken);
+
       const { data, error } = await supabase
         .from('oracle_sessions')
-        .select('*')
+        .select(`
+          *,
+          oracles (*)
+        `)
         .eq('session_token', sessionToken)
         .eq('is_active', true)
         .single();
@@ -776,9 +789,19 @@ export class SupabaseDirect {
         return null;
       }
 
+      console.log('Sessão encontrada no banco:', data);
+      
+      // Reestruturar resposta para incluir oracle como propriedade direta
+      if (data && data.oracles) {
+        return {
+          ...data,
+          oracle: data.oracles
+        };
+      }
+
       return data;
     } catch (error) {
-      console.error('Erro ao buscar sessão do oráculo:', error);
+      console.error('Erro na busca da sessão:', error);
       return null;
     }
   }
