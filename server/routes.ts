@@ -1423,21 +1423,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Verificar se é apresentação automática
       const isAutoPresentation = message === "APRESENTACAO_AUTOMATICA";
       
-      // Configurar prompt para IA
-      const aiPrompt = isAutoPresentation ? 
-        `${oracle.ai_instructions}
+      // Configurar prompt para IA substituindo variáveis
+      let aiPrompt = oracle.ai_instructions || '';
+      
+      // Substituir variáveis no prompt
+      aiPrompt = aiPrompt
+        .replace(/\{nome\}/g, session.user_name)
+        .replace(/\{nascimento\}/g, session.birth_date)
+        .replace(/\{oracle_name\}/g, oracle.name)
+        .replace(/\{oracle_latin\}/g, oracle.latin_name);
 
-Nome da pessoa: ${session.user_name}
-Data de nascimento: ${session.birth_date}
-
-Você deve se apresentar como o oráculo ${oracle.name} (${oracle.latin_name}). Faça uma apresentação mística e envolvente, mencionando o nome da pessoa e sua data de nascimento. Termine perguntando qual seria a pergunta que deseja fazer ao oráculo. Seja acolhedor mas mantenha o tom místico.` :
-        `${oracle.ai_instructions}
-
-Nome da pessoa: ${session.user_name}
-Data de nascimento: ${session.birth_date}
-- Pergunta: ${message}
-
-Responda de forma mística, profunda e ritualística, sempre contextualizando com o nome e data de nascimento da pessoa.`;
+      if (isAutoPresentation) {
+        aiPrompt = aiPrompt.replace(/\{pergunta\}/g, 'APRESENTAÇÃO INICIAL');
+      } else {
+        aiPrompt = aiPrompt.replace(/\{pergunta\}/g, message);
+      }
 
       // Integração com OpenAI
       let aiResponse = '';
