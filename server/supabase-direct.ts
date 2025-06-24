@@ -890,22 +890,63 @@ export class SupabaseDirect {
 
   static async updateOracleConfig(updates: Partial<OracleConfig>): Promise<OracleConfig | null> {
     try {
-      const { data, error } = await supabase
-        .from('oracle_config')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', 1)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Erro ao atualizar configuração dos oráculos:', error);
+      if (!supabase) {
+        console.error('Supabase não inicializado');
         return null;
       }
 
-      return data;
+      console.log('Atualizando configuração no Supabase com:', updates);
+
+      // Primeiro tentar atualizar se existe
+      const { data: existingData, error: selectError } = await supabase
+        .from('oracle_config')
+        .select('*')
+        .eq('id', 1)
+        .single();
+
+      if (selectError && selectError.code === 'PGRST116') {
+        // Não existe, criar novo
+        console.log('Configuração não existe, criando nova...');
+        const { data, error } = await supabase
+          .from('oracle_config')
+          .insert([{
+            id: 1,
+            ...updates,
+            updated_at: new Date().toISOString()
+          }])
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Erro ao criar configuração:', error);
+          return null;
+        }
+
+        console.log('Configuração criada:', data);
+        return data;
+      } else if (existingData) {
+        // Existe, atualizar
+        console.log('Configuração existe, atualizando...');
+        const { data, error } = await supabase
+          .from('oracle_config')
+          .update({
+            ...updates,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', 1)
+          .select()
+          .single();
+
+        if (error) {
+          console.error('Erro ao atualizar configuração:', error);
+          return null;
+        }
+
+        console.log('Configuração atualizada:', data);
+        return data;
+      }
+
+      return null;
     } catch (error) {
       console.error('Erro ao atualizar configuração dos oráculos:', error);
       return null;

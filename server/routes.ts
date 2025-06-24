@@ -1608,15 +1608,26 @@ Que os mistérios se revelem em sua jornada espiritual.`;
   // Atualizar configuração dos oráculos (admin)
   app.put('/api/admin/oracles/config', authenticateToken, async (req: any, res: Response) => {
     try {
+      console.log('=== ATUALIZAR CONFIG ORACLE ===');
+      console.log('User role:', req.user.role);
+      console.log('Body recebido:', req.body);
+      
       if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        console.log('Acesso negado - role insuficiente');
         return res.status(403).json({ error: 'Acesso negado' });
       }
 
-      const config = await SupabaseDirect.updateOracleConfig(req.body);
+      const updates = req.body;
+      console.log('Enviando updates para SupabaseDirect:', updates);
+      
+      const config = await SupabaseDirect.updateOracleConfig(updates);
+      
       if (!config) {
+        console.log('Erro ao atualizar configuração');
         return res.status(500).json({ error: 'Erro ao atualizar configuração' });
       }
 
+      console.log('Configuração atualizada com sucesso:', config);
       res.json(config);
     } catch (error) {
       console.error('Erro ao atualizar configuração:', error);
