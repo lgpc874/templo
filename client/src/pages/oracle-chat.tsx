@@ -102,7 +102,7 @@ export default function OracleChat() {
       if (!response.ok) throw new Error('Sessão não encontrada');
       return response.json();
     },
-    enabled: !!sessionToken && isAuthenticated
+    enabled: !!sessionToken
   });
 
   // Buscar mensagens da sessão
@@ -117,7 +117,7 @@ export default function OracleChat() {
       if (!response.ok) return [];
       return response.json();
     },
-    enabled: !!session?.id && isAuthenticated
+    enabled: !!session?.id
   });
 
   // Apresentação automática do oráculo
