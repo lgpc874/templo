@@ -29,12 +29,21 @@ export default function OracleEspelhoNegro() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ userName, birthDate })
+        body: JSON.stringify({ 
+          user_name: userName, 
+          birth_date: birthDate 
+        })
       });
 
       if (response.ok) {
-        const { sessionToken } = await response.json();
-        window.location.href = `/chat/${sessionToken}`;
+        const data = await response.json();
+        console.log('Resposta completa:', data);
+        const sessionToken = data.session_token || data.sessionToken;
+        if (sessionToken) {
+          window.location.href = `/chat/${sessionToken}`;
+        } else {
+          alert('Token de sessão não encontrado na resposta');
+        }
       } else {
         const errorData = await response.json();
         console.error('Erro na resposta:', errorData);

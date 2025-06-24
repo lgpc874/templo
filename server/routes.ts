@@ -1299,29 +1299,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Criar sessão de oráculo
   app.post('/api/oracles/:id/session', authenticateToken, async (req: any, res: Response) => {
     try {
-      const { userName, birthDate } = req.body;
+      console.log('=== CRIAR SESSÃO ORÁCULO ===');
+      console.log('Body recebido:', req.body);
       
-      if (!userName || !birthDate) {
+      const { user_name, birth_date } = req.body;
+      
+      if (!user_name || !birth_date) {
+        console.log('Dados faltando - user_name:', user_name, 'birth_date:', birth_date);
         return res.status(400).json({ error: 'Nome e data de nascimento são obrigatórios' });
       }
 
-      const oracle = await SupabaseDirect.getOracleById(parseInt(req.params.id));
+      const oracleId = parseInt(req.params.id);
+      console.log('Buscando oráculo ID:', oracleId);
+      
+      const oracle = await SupabaseDirect.getOracleById(oracleId);
       if (!oracle) {
+        console.log('Oráculo não encontrado:', oracleId);
         return res.status(404).json({ error: 'Oráculo não encontrado' });
       }
 
-      const session = await SupabaseDirect.createOracleSession({
+      // Gerar token único para a sessão
+      const sessionToken = `oracle_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      console.log('Token gerado:', sessionToken);
+
+      const sessionData = {
         oracle_id: oracle.id,
         user_id: req.user.id,
-        user_name: userName,
-        birth_date: birthDate
-      });
+        user_name: user_name,
+        birth_date: birth_date,
+        session_token: sessionToken,
+        started_at: new Date().toISOString(),
+        last_activity: new Date().toISOString(),
+        is_active: true
+      };
+
+      console.log('Criando sessão com dados:', sessionData);
+      const session = await SupabaseDirect.createOracleSession(sessionData);
 
       if (!session) {
+        console.log('Falha ao criar sessão no banco');
         return res.status(500).json({ error: 'Erro ao criar sessão' });
       }
 
-      res.json(session);
+      console.log('Sessão criada com sucesso:', session);
+      
+      // Retornar dados com session_token explícito
+      const response = {
+        ...session,
+        session_token: sessionToken
+      };
+      
+      console.log('Retornando resposta:', response);
+      res.json(response);
     } catch (error) {
       console.error('Erro ao criar sessão:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
