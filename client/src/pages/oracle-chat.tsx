@@ -75,12 +75,12 @@ const getOracleIcon = (oracleName: string) => {
 };
 
 export default function OracleChat() {
-  const [, params] = useRoute('/oraculum/:id');
+  const [, params] = useRoute('/chat/:sessionToken');
   const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   
   const [sessionToken, setSessionToken] = useState<string | null>(
-    localStorage.getItem(`oracle_session_${params?.id}`)
+    params?.sessionToken || null
   );
   const [showUserForm, setShowUserForm] = useState(!sessionToken);
   const [userName, setUserName] = useState('');
@@ -90,14 +90,8 @@ export default function OracleChat() {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Buscar dados do oráculo
-  const { data: oracle, isLoading: oracleLoading } = useQuery<Oracle>({
-    queryKey: [`/api/oracles/${params?.id}`],
-    enabled: !!params?.id && isAuthenticated
-  });
-
-  // Buscar sessão atual
-  const { data: session } = useQuery<OracleSession>({
+  // Buscar sessão atual e dados do oráculo
+  const { data: session, isLoading: sessionLoading } = useQuery<OracleSession & { oracle: Oracle }>({
     queryKey: [`/api/oracles/session/${sessionToken}`],
     enabled: !!sessionToken && isAuthenticated
   });
@@ -107,6 +101,23 @@ export default function OracleChat() {
     queryKey: [`/api/oracles/messages/${session?.id}`],
     enabled: !!session?.id && isAuthenticated
   });
+
+  // Criar mensagem de apresentação se não houver mensagens
+  useEffect(() => {
+    if (session?.oracle && messages.length === 0 && !sessionLoading) {
+      const welcomeMessage: OracleMessage = {
+        id: 0,
+        session_id: session.id,
+        is_user: false,
+        message: `Eu sou ${session.oracle.name}. ${session.oracle.custom_presentation || 'Bem-vindo à consulta. Como posso ajudá-lo hoje?'}`,
+        tokens_used: 0,
+        cost: 0,
+        created_at: new Date().toISOString()
+      };
+      // Temporariamente adicionar mensagem de boas-vindas
+      setTimeout(() => refetchMessages(), 100);
+    }
+  }, [session, messages.length, sessionLoading, refetchMessages]);
 
   // Criar nova sessão
   const createSessionMutation = useMutation({

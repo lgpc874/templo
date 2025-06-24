@@ -105,7 +105,7 @@ function App() {
                 <Route path="/flammae-infernales" component={OracleChamasInfernais} />
                 <Route path="/aquae-tenebrosae" component={OracleAguasSombrias} />
                 <Route path="/custos-abyssi" component={OracleGuardiaoAbismo} />
-                <Route path="/oracle-chat" component={OracleChat} />
+                <Route path="/chat/:sessionToken" component={OracleChat} />
                 <Route path="/vox-pluma" component={VoxPluma} />
                 <Route path="/de-templo" component={DeTemplo} />
                 <Route>
