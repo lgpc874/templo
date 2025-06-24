@@ -1431,7 +1431,12 @@ Responda de forma mística, profunda e ritualística, sempre contextualizando co
       // Integração com OpenAI
       let aiResponse = '';
       try {
-        const openaiKey = process.env.OPENAI_API_KEY;
+        // Buscar chave OpenAI da configuração do banco
+        const oracleConfig = await SupabaseDirect.getOracleConfig();
+        const openaiKey = oracleConfig?.openai_api_key || process.env.OPENAI_API_KEY;
+        
+        console.log('Chave OpenAI encontrada:', openaiKey ? 'Sim (config)' : 'Não encontrada');
+        
         if (openaiKey) {
           const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -1440,21 +1445,25 @@ Responda de forma mística, profunda e ritualística, sempre contextualizando co
               'Authorization': `Bearer ${openaiKey}`
             },
             body: JSON.stringify({
-              model: 'gpt-4',
+              model: oracleConfig?.default_model || 'gpt-4',
               messages: [
                 { role: 'system', content: aiPrompt },
                 { role: 'user', content: message }
               ],
-              max_tokens: 500,
-              temperature: 0.8
+              max_tokens: oracleConfig?.max_tokens || 500,
+              temperature: oracleConfig?.temperature || 0.8
             })
           });
 
+          console.log('Enviando request para OpenAI...');
           if (response.ok) {
-            const data = await response.json();
-            aiResponse = data.choices[0]?.message?.content || 'Erro na resposta da IA';
+            const openaiData = await response.json();
+            aiResponse = openaiData.choices[0]?.message?.content || 'Resposta indisponível.';
+            console.log('Resposta da OpenAI recebida com sucesso');
           } else {
-            throw new Error('Erro na API OpenAI');
+            const errorData = await response.text();
+            console.error('Erro da OpenAI API:', response.status, errorData);
+            throw new Error(`OpenAI API error: ${response.status} - ${errorData}`);
           }
         } else {
           throw new Error('Chave OpenAI não configurada');
@@ -1593,11 +1602,18 @@ Que os mistérios se revelem em sua jornada espiritual.`;
   // Buscar configuração dos oráculos (admin)
   app.get('/api/admin/oracles/config', authenticateToken, async (req: any, res: Response) => {
     try {
+      console.log('=== BUSCAR CONFIG ORACLE ===');
+      console.log('User role:', req.user.role);
+      
       if (!checkRoleAccess(req.user.role, 'magus_supremo')) {
+        console.log('Acesso negado - role insuficiente');
         return res.status(403).json({ error: 'Acesso negado' });
       }
 
+      console.log('Buscando configuração dos oráculos...');
       const config = await SupabaseDirect.getOracleConfig();
+      console.log('Configuração encontrada:', config);
+      
       res.json(config);
     } catch (error) {
       console.error('Erro ao buscar configuração:', error);
