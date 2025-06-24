@@ -73,12 +73,11 @@ const getOracleIcon = (oracleName: string) => {
       return <Sparkles className="w-6 h-6" />;
   }
 };
-
 export default function OracleChat() {
   const [, params] = useRoute('/chat/:sessionToken');
   const { user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
-  
+
   const [sessionToken, setSessionToken] = useState<string | null>(
     params?.sessionToken || null
   );
@@ -87,10 +86,9 @@ export default function OracleChat() {
   const [birthDate, setBirthDate] = useState('');
   const [currentMessage, setCurrentMessage] = useState('');
   const [isPaymentRequired, setIsPaymentRequired] = useState(false);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Buscar sessão atual e dados do oráculo
   const { data: session, isLoading: sessionLoading } = useQuery<OracleSession & { oracle: Oracle }>({
     queryKey: [`/api/oracles/session/${sessionToken}`],
     queryFn: async () => {
@@ -105,7 +103,6 @@ export default function OracleChat() {
     enabled: !!sessionToken && isAuthenticated
   });
 
-  // Buscar mensagens da sessão
   const { data: messages = [], refetch: refetchMessages } = useQuery<OracleMessage[]>({
     queryKey: [`/api/oracles/messages/${session?.id}`],
     queryFn: async () => {
@@ -120,71 +117,34 @@ export default function OracleChat() {
     enabled: !!session?.id && isAuthenticated
   });
 
-  // Apresentação automática do oráculo
-  useEffect(() => {
-    if (session && session.oracle && messages.length === 0 && !sessionLoading) {
-      // Se não há mensagens e o oráculo tem apresentação automática, enviar apresentação
-      if (session.oracle.auto_presentation) {
-        const presentationMessage = "APRESENTACAO_AUTOMATICA";
-        
-        chatMutation.mutate({
-          message: presentationMessage,
-          sessionToken: session.session_token
-        });
-      }
-    }
-  }, [session, messages, sessionLoading]);
+  const hasSentAutoPresentation = useRef(false);
 
-  // Criar nova sessão
-  const createSessionMutation = useMutation({
-    mutationFn: async (data: { userName: string; birthDate: string }) => {
-      const response = await fetch(`/api/oracles/${params?.id}/session`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(data)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Erro ao criar sessão');
-      }
-      
-      return response.json();
-    },
-    onSuccess: (session: OracleSession) => {
-      setSessionToken(session.session_token);
-      localStorage.setItem(`oracle_session_${params?.id}`, session.session_token);
-      setShowUserForm(false);
-      queryClient.invalidateQueries({ queryKey: [`/api/oracles/session/${session.session_token}`] });
-    }
-  });
-
-  // Enviar mensagem
   const sendMessageMutation = useMutation({
-    mutationFn: async (message: string) => {
+    mutationFn: async ({
+      message,
+      sessionToken
+    }: {
+      message: string;
+      sessionToken: string;
+    }) => {
       const response = await fetch(`/api/oracles/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify({
-          sessionToken,
-          message
-        })
+        body: JSON.stringify({ sessionToken, message })
       });
-      
+
       if (!response.ok) {
-        const error = await response.json();
         if (response.status === 402) {
           setIsPaymentRequired(true);
           throw new Error('Pagamento necessário');
         }
+        const error = await response.json();
         throw new Error(error.message || 'Erro ao enviar mensagem');
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
@@ -193,15 +153,58 @@ export default function OracleChat() {
       refetchMessages();
     }
   });
+  useEffect(() => {
+    if (
+      session &&
+      session.oracle &&
+      session.oracle.auto_presentation &&
+      messages.length === 0 &&
+      !sessionLoading &&
+      !hasSentAutoPresentation.current
+    ) {
+      hasSentAutoPresentation.current = true;
 
-  // Auto scroll para o final das mensagens
+      const presentationMessage = "APRESENTACAO_AUTOMATICA";
+
+      sendMessageMutation.mutate({
+        message: presentationMessage,
+        sessionToken: session.session_token
+      });
+    }
+  }, [session, messages, sessionLoading]);
+
+  const createSessionMutation = useMutation({
+    mutationFn: async (data: { userName: string; birthDate: string }) => {
+      const response = await fetch(`/api/oracles/:id}/session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao criar sessão');
+      }
+
+      return response.json();
+    },
+    onSuccess: (session: OracleSession) => {
+      setSessionToken(session.session_token);
+      localStorage.setItem(`oracle_session_:id}`, session.session_token);
+      setShowUserForm(false);
+      queryClient.invalidateQueries({ queryKey: [`/api/oracles/session/${session.session_token}`] });
+    }
+  });
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const handleStartSession = () => {
     if (!userName.trim() || !birthDate) return;
-    
+
     createSessionMutation.mutate({
       userName: userName.trim(),
       birthDate
@@ -210,13 +213,16 @@ export default function OracleChat() {
 
   const handleSendMessage = () => {
     if (!currentMessage.trim() || sendMessageMutation.isPending) return;
-    
-    sendMessageMutation.mutate(currentMessage.trim());
+
+    sendMessageMutation.mutate({
+      message: currentMessage.trim(),
+      sessionToken: session?.session_token || ''
+    });
   };
 
   const getUserPrice = (oracle: Oracle) => {
     if (!user || !oracle) return oracle?.price || 0;
-    
+
     if (oracle.free_roles.includes(user.role || '')) {
       return 0;
     }
@@ -224,7 +230,6 @@ export default function OracleChat() {
     const discount = oracle.role_discounts[user.role || ''] || 0;
     return oracle.price * (1 - discount / 100);
   };
-
   if (!isAuthenticated) {
     return (
       <PageTransition>
@@ -318,7 +323,7 @@ export default function OracleChat() {
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Voltar
                 </Button>
-                
+
                 <div className="flex-1 flex items-center space-x-4">
                   <div 
                     className="w-12 h-12 rounded-full flex items-center justify-center"
@@ -339,7 +344,7 @@ export default function OracleChat() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div>
                     <h1 className="text-2xl font-bold text-white">{oracle.name}</h1>
                     <p className="text-sm text-gray-400 italic">{oracle.latin_name}</p>
@@ -357,217 +362,8 @@ export default function OracleChat() {
               </div>
             </div>
           </div>
-
-          <div className="max-w-4xl mx-auto p-4">
-            {showUserForm ? (
-              /* Formulário de Dados Pessoais */
-              <Card className="bg-gray-900/80 border-purple-500/30 mt-8">
-                <CardHeader className="text-center">
-                  <CardTitle className="text-2xl text-purple-300 mb-2">
-                    Preparação Ritual
-                  </CardTitle>
-                  <p className="text-gray-400 text-sm">
-                    Para que as energias sejam canalizadas corretamente, 
-                    informe seus dados pessoais verdadeiros
-                  </p>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="text-gray-300 flex items-center space-x-2">
-                        <User className="w-4 h-4" />
-                        <span>Nome Completo Real</span>
-                      </Label>
-                      <Input
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        placeholder="Seu nome completo verdadeiro"
-                        className="bg-gray-800 border-gray-600 text-white mt-2"
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label className="text-gray-300 flex items-center space-x-2">
-                        <Calendar className="w-4 h-4" />
-                        <span>Data de Nascimento</span>
-                      </Label>
-                      <Input
-                        type="date"
-                        value={birthDate}
-                        onChange={(e) => setBirthDate(e.target.value)}
-                        className="bg-gray-800 border-gray-600 text-white mt-2"
-                      />
-                    </div>
-                  </div>
-
-                  <Separator className="bg-gray-700" />
-
-                  <div className="text-center space-y-4">
-                    <p className="text-sm text-gray-400">
-                      As informações são utilizadas apenas para a canalização energética 
-                      e não são compartilhadas com terceiros.
-                    </p>
-                    
-                    <Button
-                      onClick={handleStartSession}
-                      disabled={!userName.trim() || !birthDate || createSessionMutation.isPending}
-                      className="w-full bg-gradient-to-r text-white shadow-lg"
-                      style={{
-                        background: `linear-gradient(135deg, ${oracle.theme_color}, ${oracle.theme_color}CC)`
-                      }}
-                    >
-                      {createSessionMutation.isPending ? (
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                      ) : (
-                        getOracleIcon(oracle.name)
-                      )}
-                      Iniciar Consulta
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              /* Interface de Chat */
-              <div className="space-y-4">
-                {/* Informações da Sessão */}
-                {session && (
-                  <Card className="bg-gray-900/60 border-purple-500/30">
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center space-x-4 text-gray-300">
-                          <div className="flex items-center space-x-2">
-                            <User className="w-4 h-4" />
-                            <span>{session.user_name}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Calendar className="w-4 h-4" />
-                            <span>{format(new Date(session.birth_date), 'dd/MM/yyyy')}</span>
-                          </div>
-                        </div>
-                        <div className="text-purple-300">
-                          Sessão iniciada em {format(new Date(session.started_at), 'dd/MM HH:mm', { locale: ptBR })}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Área de Mensagens */}
-                <Card className="bg-gray-900/60 border-purple-500/30">
-                  <CardContent className="p-0">
-                    <div className="h-96 overflow-y-auto p-4 space-y-4">
-                      {messages.length === 0 ? (
-                        <div className="text-center text-gray-400 py-8">
-                          <div className="mb-4">
-                            {oracle.icon_url ? (
-                              <img 
-                                src={oracle.icon_url} 
-                                alt={oracle.name}
-                                className="w-16 h-16 object-contain mx-auto opacity-50"
-                              />
-                            ) : (
-                              <div className="w-16 h-16 mx-auto flex items-center justify-center text-gray-500">
-                                {getOracleIcon(oracle.name)}
-                              </div>
-                            )}
-                          </div>
-                          <p>Faça sua primeira pergunta para o {oracle.name}</p>
-                        </div>
-                      ) : (
-                        messages.map((message) => (
-                          <div
-                            key={message.id}
-                            className={`flex ${message.is_user ? 'justify-end' : 'justify-start'}`}
-                          >
-                            <div
-                              className={`max-w-[80%] p-4 rounded-lg ${
-                                message.is_user
-                                  ? 'bg-purple-600 text-white'
-                                  : 'bg-gray-800 text-gray-100 border border-gray-700'
-                              }`}
-                              style={
-                                !message.is_user
-                                  ? {
-                                      background: `linear-gradient(135deg, ${oracle.theme_color}10, rgba(31, 41, 55, 0.8))`,
-                                      borderColor: oracle.theme_color + '30'
-                                    }
-                                  : {}
-                              }
-                            >
-                              <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                {message.message}
-                              </div>
-                              <div className="text-xs opacity-60 mt-2 flex justify-between items-center">
-                                <span>
-                                  {format(new Date(message.created_at), 'HH:mm', { locale: ptBR })}
-                                </span>
-                                {message.cost > 0 && (
-                                  <span>R$ {message.cost.toFixed(2)}</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                      <div ref={messagesEndRef} />
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Área de Input */}
-                <Card className="bg-gray-900/60 border-purple-500/30">
-                  <CardContent className="p-4">
-                    {isPaymentRequired ? (
-                      <div className="text-center space-y-4">
-                        <div className="flex items-center justify-center space-x-2 text-yellow-400">
-                          <CreditCard className="w-5 h-5" />
-                          <span>Pagamento necessário para continuar</span>
-                        </div>
-                        <Button
-                          className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                          onClick={() => setIsPaymentRequired(false)}
-                        >
-                          Processar Pagamento (R$ {userPrice.toFixed(2)})
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="flex space-x-2">
-                        <Textarea
-                          value={currentMessage}
-                          onChange={(e) => setCurrentMessage(e.target.value)}
-                          placeholder="Digite sua pergunta para o oráculo..."
-                          className="bg-gray-800 border-gray-600 text-white resize-none"
-                          rows={3}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                              e.preventDefault();
-                              handleSendMessage();
-                            }
-                          }}
-                        />
-                        <Button
-                          onClick={handleSendMessage}
-                          disabled={!currentMessage.trim() || sendMessageMutation.isPending}
-                          className="bg-gradient-to-r text-white px-6"
-                          style={{
-                            background: `linear-gradient(135deg, ${oracle.theme_color}, ${oracle.theme_color}CC)`
-                          }}
-                        >
-                          {sendMessageMutation.isPending ? (
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                          ) : (
-                            <Send className="w-4 h-4" />
-                          )}
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            )}
           </div>
-        </div>
-      </ContentProtection>
-    </PageTransition>
-  );
-}
+          </ContentProtection>
+          </PageTransition>
+          );
+          }
