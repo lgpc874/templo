@@ -1446,10 +1446,12 @@ Responda de forma mística, profunda e ritualística, sempre contextualizando co
             },
             body: JSON.stringify({
               model: oracleConfig?.default_model || 'gpt-4',
-              messages: [
-                { role: 'system', content: aiPrompt },
-                { role: 'user', content: message }
-              ],
+              messages: isAutoPresentation ? 
+                [{ role: 'system', content: aiPrompt }] :
+                [
+                  { role: 'system', content: aiPrompt },
+                  { role: 'user', content: message }
+                ],
               max_tokens: oracleConfig?.max_tokens || 500,
               temperature: oracleConfig?.temperature || 0.8
             })
@@ -1470,7 +1472,19 @@ Responda de forma mística, profunda e ritualística, sempre contextualizando co
         }
       } catch (error) {
         console.log('Usando resposta simulada:', error);
-        aiResponse = `Salve, ${session.user_name}, nascido(a) sob as influências de ${session.birth_date}...
+        
+        if (isAutoPresentation) {
+          aiResponse = `Salve, ${session.user_name}, nascido(a) sob as influências cósmicas de ${session.birth_date}...
+
+Eu sou o ${oracle.name}, conhecido nos círculos místicos como ${oracle.latin_name}. Através dos reflexos sombrios do espelho negro, posso vislumbrar os segredos que o destino reserva para sua jornada.
+
+Sinto a energia de sua alma pulsando através do véu dimensional... Há perguntas que ecoam em seu ser, verdades que anseiam por revelação.
+
+Qual questão traz à minha presença, criança das estrelas? Que mistério deseja desvendar através da antiga sabedoria do espelho negro?
+
+*Configure a chave OpenAI no painel admin para ativar respostas completas da IA.*`;
+        } else {
+          aiResponse = `Salve, ${session.user_name}, nascido(a) sob as influências de ${session.birth_date}...
 
 As energias que emanam de sua essência revelam através do ${oracle.name} que sua pergunta ecoa pelos corredores do tempo...
 
@@ -1486,6 +1500,7 @@ ${message.toLowerCase().includes('amor') || message.toLowerCase().includes('rela
 Configure a chave OpenAI no painel admin para ativar respostas completas da IA.
 
 Que os mistérios se revelem em sua jornada espiritual.`;
+        }
       }
 
       // Salvar resposta da IA
