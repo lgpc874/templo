@@ -1505,6 +1505,93 @@ ${isAutoPresentation ? 'Situação: Apresentação inicial do oráculo' : `Pergu
   });
 
   // ===========================================
+  // ADMIN PAGES ROUTES
+  // ===========================================
+
+  // Buscar todas as páginas (admin)
+  app.get('/api/admin/pages', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (req.user.role !== 'magus_supremo') {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const pages = await SupabaseDirect.getAllPages();
+      res.json(pages);
+    } catch (error: any) {
+      console.error('Erro ao buscar páginas:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Criar nova página
+  app.post('/api/admin/pages', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (req.user.role !== 'magus_supremo') {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const page = await SupabaseDirect.createPage(req.body);
+      res.json(page);
+    } catch (error: any) {
+      console.error('Erro ao criar página:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Atualizar página
+  app.put('/api/admin/pages/:id', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (req.user.role !== 'magus_supremo') {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const pageId = parseInt(req.params.id);
+      const page = await SupabaseDirect.updatePage(pageId, req.body);
+      res.json(page);
+    } catch (error: any) {
+      console.error('Erro ao atualizar página:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Excluir página
+  app.delete('/api/admin/pages/:id', authenticateToken, async (req: any, res: Response) => {
+    try {
+      if (req.user.role !== 'magus_supremo') {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const pageId = parseInt(req.params.id);
+      const success = await SupabaseDirect.deletePage(pageId);
+      if (success) {
+        res.json({ message: 'Página excluída com sucesso' });
+      } else {
+        res.status(404).json({ error: 'Página não encontrada' });
+      }
+    } catch (error: any) {
+      console.error('Erro ao excluir página:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Buscar página pública por slug
+  app.get('/api/pages/:slug', async (req: Request, res: Response) => {
+    try {
+      const { slug } = req.params;
+      const page = await SupabaseDirect.getPageBySlug(slug);
+      
+      if (!page || !page.is_active) {
+        return res.status(404).json({ error: 'Página não encontrada' });
+      }
+
+      res.json(page);
+    } catch (error: any) {
+      console.error('Erro ao buscar página:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // ===========================================
   // ADMIN ORACLE ROUTES
   // ===========================================
 

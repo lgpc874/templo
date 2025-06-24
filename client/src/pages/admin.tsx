@@ -89,6 +89,17 @@ export default function Admin() {
       route: '/sanctum-magistri/usuarios'
     },
     {
+      id: 'pages',
+      title: 'Paginae Magistri',
+      subtitle: 'Configurar Páginas Customizadas',
+      description: 'Crie e edite páginas personalizadas com controle total de código e acesso',
+      icon: FileText,
+      color: 'from-cyan-600 to-blue-600',
+      borderColor: 'border-cyan-500/30',
+      shadowColor: 'shadow-cyan-900/30',
+      route: '/sanctum-magistri/paginas'
+    },
+    {
       id: 'oracles',
       title: 'Oraculum Supremum',
       subtitle: 'Comandar as Vozes Proféticas',

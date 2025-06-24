@@ -12,7 +12,6 @@ import LibriTenebris from "@/pages/libri-tenebris";
 import LectorGrimorio from "@/pages/lector-grimorio";
 import Bibliotheca from "@/pages/bibliotheca";
 import OracleChat from "@/pages/oracle-chat";
-import AdminOraculum from "@/pages/admin-oraculum";
 import OracleEspelhoNegro from "@/pages/oracle-espelho-negro";
 import OracleTarotInfernal from "@/pages/oracle-tarot-infernal";
 import OracleChamasInfernais from "@/pages/oracle-chamas-infernais";
@@ -31,6 +30,8 @@ import Admin from "@/pages/admin";
 import AdminCourses from "@/pages/admin-courses";
 import AdminModules from "@/pages/admin-modules";
 import AdminLibri from "@/pages/admin-libri";
+import AdminOraculum from "@/pages/admin-oraculum";
+import AdminPages from "@/pages/admin-pages";
 import Oraculum from "@/pages/oraculum";
 import VoxPluma from "@/pages/vox-pluma";
 import DeTemplo from "@/pages/de-templo";
@@ -99,6 +100,7 @@ function App() {
                 <Route path="/sanctum-magistri/modulus" component={AdminModules} />
                 <Route path="/sanctum-magistri/libri" component={AdminLibri} />
                 <Route path="/sanctum-magistri/oraculum" component={AdminOraculum} />
+                <Route path="/sanctum-magistri/paginas" component={AdminPages} />
                 <Route path="/oraculum" component={Oraculum} />
                 <Route path="/speculum-nigrum" component={OracleEspelhoNegro} />
                 <Route path="/tarotum-infernalis" component={OracleTarotInfernal} />

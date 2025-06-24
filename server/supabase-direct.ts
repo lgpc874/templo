@@ -180,6 +180,26 @@ export interface OracleConfig {
   updated_at: string;
 }
 
+export interface CustomPage {
+  id: number;
+  name: string;
+  slug: string;
+  title: string;
+  description?: string;
+  html_content: string;
+  css_content?: string;
+  js_content?: string;
+  meta_description?: string;
+  meta_keywords?: string;
+  required_role: string;
+  is_active: boolean;
+  is_public: boolean;
+  custom_layout: boolean;
+  route_path: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 // Funções diretas do Supabase
 export class SupabaseDirect {
   
