@@ -72,24 +72,6 @@ const ROLE_OPTIONS = [
 export default function AdminLibri() {
   const { user } = useAuth();
   const { toast } = useToast();
-
-  if (user?.role !== 'magus_supremo') {
-    return (
-      <PageTransition>
-        <div className="min-h-screen bg-black flex items-center justify-center">
-          <Card className="w-full max-w-md bg-black/90 border-red-500/40">
-            <CardContent className="p-8 text-center">
-              <Shield className="w-16 h-16 mx-auto text-red-500 mb-4" />
-              <CardTitle className="text-xl text-red-400 mb-4">Acesso Negado</CardTitle>
-              <CardDescription className="text-ritualistic-beige">
-                Apenas o Magus Supremo pode administrar os grimórios.
-              </CardDescription>
-            </CardContent>
-          </Card>
-        </div>
-      </PageTransition>
-    );
-  }
   
   const [grimoires, setGrimoires] = useState<Grimoire[]>([]);
   const [sections, setSections] = useState<LibrarySection[]>([]);
@@ -127,7 +109,7 @@ export default function AdminLibri() {
   });
 
   useEffect(() => {
-    if (user?.role === 'magus_supremo') {
+    if (user?.email === 'admin@templodoabismo.com.br') {
       loadData();
     }
   }, [user]);

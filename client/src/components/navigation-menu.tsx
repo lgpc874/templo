@@ -22,7 +22,7 @@ export default function NavigationMenu() {
     { href: "/bibliotheca", label: "Bibliotheca", icon: BookOpen, subtitle: "Textos Sagrados" },
     { href: "/de-templo", label: "De Templo", icon: Crown, subtitle: "Sobre Nós" },
     ...(user?.role === 'magus_supremo' ? [
-      { href: "/sanctum-magistri", label: "Sanctum Magistri", icon: Crown, subtitle: "Painel Admin" }
+      { href: "/admin", label: "Sanctum Magistri", icon: Crown, subtitle: "Painel Admin" }
     ] : [])
   ];
 

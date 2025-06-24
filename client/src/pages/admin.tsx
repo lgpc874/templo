@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { 
   BookOpen, 
@@ -13,33 +13,43 @@ import {
   Flame,
   Eye,
   Scroll,
-  Zap,
-  Shield
+  Zap
 } from "lucide-react";
 
 export default function Admin() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
 
-  if (user?.role !== 'magus_supremo') {
+  // Verificar se é admin
+  if (user?.email !== 'admin@templodoabismo.com.br') {
     return (
       <PageTransition>
-        <div className="min-h-screen bg-black flex items-center justify-center">
-          <Card className="w-full max-w-md bg-black/90 border-red-500/40">
-            <CardContent className="p-8 text-center">
-              <Shield className="w-16 h-16 mx-auto text-red-500 mb-4" />
-              <CardTitle className="text-xl text-red-400 mb-4">Acesso Negado</CardTitle>
-              <CardDescription className="text-ritualistic-beige">
-                Apenas o Magus Supremo pode acessar o painel administrativo.
-              </CardDescription>
-            </CardContent>
-          </Card>
+        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
+          <div className="relative">
+            {/* Efeito místico de fundo */}
+            <div className="absolute inset-0 bg-red-900/10 blur-3xl rounded-full animate-pulse"></div>
+            
+            <Card className="relative bg-black/80 border-red-600/50 backdrop-blur-sm shadow-2xl shadow-red-900/50">
+              <CardContent className="p-8 text-center">
+                <div className="mb-6">
+                  <Crown className="w-16 h-16 mx-auto text-red-500 animate-pulse" />
+                </div>
+                <h1 className="text-3xl font-bold text-red-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+                  Sanctum Clausum
+                </h1>
+                <p className="text-gray-300 text-lg" style={{ fontFamily: 'EB Garamond' }}>
+                  Apenas o Magus Supremo pode adentrar nestes domínios sagrados
+                </p>
+                <div className="mt-8 flex justify-center">
+                  <div className="w-16 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </PageTransition>
     );
   }
-
-
 
   const adminSections = [
     {
@@ -51,7 +61,7 @@ export default function Admin() {
       color: 'from-amber-600 to-orange-600',
       borderColor: 'border-amber-500/30',
       shadowColor: 'shadow-amber-900/30',
-      route: '/sanctum-magistri/cursus',
+      route: '/admin-courses',
       isPrimary: true
     },
     {
@@ -63,7 +73,7 @@ export default function Admin() {
       color: 'from-blue-600 to-purple-600',
       borderColor: 'border-blue-500/30',
       shadowColor: 'shadow-blue-900/30',
-      route: '/sanctum-magistri/modulus',
+      route: '/admin-modules',
       isPrimary: true
     },
     {
@@ -75,7 +85,7 @@ export default function Admin() {
       color: 'from-purple-600 to-indigo-600',
       borderColor: 'border-purple-500/30',
       shadowColor: 'shadow-purple-900/30',
-      route: '/sanctum-magistri/libri'
+      route: '/admin/libri'
     },
     {
       id: 'initiates',
@@ -86,18 +96,7 @@ export default function Admin() {
       color: 'from-green-600 to-teal-600',
       borderColor: 'border-green-500/30',
       shadowColor: 'shadow-green-900/30',
-      route: '/sanctum-magistri/usuarios'
-    },
-    {
-      id: 'pages',
-      title: 'Paginae Magistri',
-      subtitle: 'Configurar Páginas Customizadas',
-      description: 'Crie e edite páginas personalizadas com controle total de código e acesso',
-      icon: FileText,
-      color: 'from-cyan-600 to-blue-600',
-      borderColor: 'border-cyan-500/30',
-      shadowColor: 'shadow-cyan-900/30',
-      route: '/sanctum-magistri/paginas'
+      route: '/admin-users'
     },
     {
       id: 'oracles',
@@ -108,7 +107,7 @@ export default function Admin() {
       color: 'from-indigo-600 to-purple-600',
       borderColor: 'border-indigo-500/30',
       shadowColor: 'shadow-indigo-900/30',
-      route: '/sanctum-magistri/oraculum'
+      route: '/admin/oraculum'
     },
     {
       id: 'system',

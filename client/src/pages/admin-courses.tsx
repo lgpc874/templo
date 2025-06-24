@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,8 +19,7 @@ import {
   FileText,
   ArrowLeft,
   Settings,
-  RefreshCw,
-  Shield
+  RefreshCw
 } from "lucide-react";
 
 interface Course {
@@ -78,7 +77,26 @@ export default function AdminCoursesFinal() {
     reward_role_id: ''
   });
 
-
+  // Verificar se é admin
+  if (user?.email !== 'admin@templodoabismo.com.br') {
+    return (
+      <PageTransition>
+        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
+          <Card className="bg-black/80 border-red-600/50 backdrop-blur-sm shadow-2xl shadow-red-900/50">
+            <CardContent className="p-8 text-center">
+              <Settings className="w-16 h-16 mx-auto text-red-500 animate-pulse mb-6" />
+              <h1 className="text-3xl font-bold text-red-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
+                Sanctum Clausum
+              </h1>
+              <p className="text-gray-300 text-lg" style={{ fontFamily: 'EB Garamond' }}>
+                Apenas o Magus Supremo pode adentrar nestes domínios sagrados
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </PageTransition>
+    );
+  }
 
   // Carregar dados
   const loadData = async () => {
