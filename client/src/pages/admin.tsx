@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { PageTransition } from "@/components/page-transition";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { 
   BookOpen, 
@@ -13,12 +13,31 @@ import {
   Flame,
   Eye,
   Scroll,
-  Zap
+  Zap,
+  Shield
 } from "lucide-react";
 
 export default function Admin() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
+
+  if (user?.role !== 'magus_supremo') {
+    return (
+      <PageTransition>
+        <div className="min-h-screen bg-black flex items-center justify-center">
+          <Card className="w-full max-w-md bg-black/90 border-red-500/40">
+            <CardContent className="p-8 text-center">
+              <Shield className="w-16 h-16 mx-auto text-red-500 mb-4" />
+              <CardTitle className="text-xl text-red-400 mb-4">Acesso Negado</CardTitle>
+              <CardDescription className="text-ritualistic-beige">
+                Apenas o Magus Supremo pode acessar o painel administrativo.
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </div>
+      </PageTransition>
+    );
+  }
 
   // Verificar se é admin
   if (user?.email !== 'admin@templodoabismo.com.br') {
