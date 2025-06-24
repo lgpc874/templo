@@ -39,7 +39,7 @@ function authenticateToken(req: any, res: Response, next: NextFunction) {
     req.user = decoded;
     
     // Adicionar flags de admin para emails específicos
-    if (decoded.email === 'admin@templodoabismo.com.br') {
+    if (decoded.email === 'magus_supremo') {
       console.log('Admin detectado, flags adicionadas');
       req.user.isAdmin = true;
       req.user.role = 'magus_supremo';
@@ -160,7 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           email: user.email,
           role: user.role,
           spiritual_name: user.spiritual_name,
-          isAdmin: user.email === 'admin@templodoabismo.com.br'
+          isAdmin: user.email === 'magus_supremo'
         }
       });
     } catch (error: any) {
@@ -257,7 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Admin tem acesso a tudo
-      if (user.email === 'admin@templodoabismo.com.br') {
+      if (user.email === 'magus_supremo') {
         return res.json(course);
       }
       
@@ -308,7 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Admin tem acesso a tudo
-      if (user.email !== 'admin@templodoabismo.com.br') {
+      if (user.email !== 'magus_supremo') {
         const hasAccess = checkRoleAccess(user.role, course.required_role);
         
         if (!hasAccess) {
@@ -599,7 +599,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('User:', req.user?.email);
       console.log('User ID:', req.user?.id);
       
-      if (req.user?.email !== 'admin@templodoabismo.com.br') {
+      if (req.user?.email !== 'magus_supremo') {
         console.log('Access denied - not admin user');
         return res.status(403).json({ error: "Acesso negado" });
       }
@@ -622,10 +622,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/courses", authenticateToken, async (req: any, res) => {
     try {
       console.log('=== CRIANDO CURSO ===');
-      console.log('User:', req.user.email);
+      console.log('User:', req.user.role);
       console.log('Request body:', req.body);
       
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -667,7 +667,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/admin/courses/:id", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -687,7 +687,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/admin/courses/:id", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -707,7 +707,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/modules", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -731,7 +731,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Atualizar módulo
   app.put("/api/admin/modules/:id", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -758,7 +758,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Deletar módulo
   app.delete("/api/admin/modules/:id", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -1111,7 +1111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para criar grimório
   app.post("/api/admin/grimoires", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -1136,7 +1136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para atualizar grimório
   app.put("/api/admin/grimoires/:id", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -1162,7 +1162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para excluir grimório
   app.delete("/api/admin/grimoires/:id", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -1190,7 +1190,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para criar seção
   app.post("/api/admin/library-sections", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -1215,7 +1215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para atualizar seção
   app.put("/api/admin/library-sections/:id", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 
@@ -1241,7 +1241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para excluir seção
   app.delete("/api/admin/library-sections/:id", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.email !== 'admin@templodoabismo.com.br') {
+      if (req.user.role !== 'magus_supremo') {
         return res.status(403).json({ error: "Acesso negado" });
       }
 

@@ -127,7 +127,7 @@ export default function AdminLibri() {
   });
 
   useEffect(() => {
-    if (user?.email === 'admin@templodoabismo.com.br') {
+    if (user?.role === 'magus_supremo') {
       loadData();
     }
   }, [user]);

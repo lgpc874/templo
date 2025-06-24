@@ -39,36 +39,7 @@ export default function Admin() {
     );
   }
 
-  // Verificar se é admin
-  if (user?.email !== 'admin@templodoabismo.com.br') {
-    return (
-      <PageTransition>
-        <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black flex items-center justify-center">
-          <div className="relative">
-            {/* Efeito místico de fundo */}
-            <div className="absolute inset-0 bg-red-900/10 blur-3xl rounded-full animate-pulse"></div>
-            
-            <Card className="relative bg-black/80 border-red-600/50 backdrop-blur-sm shadow-2xl shadow-red-900/50">
-              <CardContent className="p-8 text-center">
-                <div className="mb-6">
-                  <Crown className="w-16 h-16 mx-auto text-red-500 animate-pulse" />
-                </div>
-                <h1 className="text-3xl font-bold text-red-400 mb-4" style={{ fontFamily: 'Cinzel Decorative' }}>
-                  Sanctum Clausum
-                </h1>
-                <p className="text-gray-300 text-lg" style={{ fontFamily: 'EB Garamond' }}>
-                  Apenas o Magus Supremo pode adentrar nestes domínios sagrados
-                </p>
-                <div className="mt-8 flex justify-center">
-                  <div className="w-16 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent"></div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </PageTransition>
-    );
-  }
+
 
   const adminSections = [
     {
